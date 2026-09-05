@@ -1,4 +1,6 @@
-/* SAINO HEALTH - Custom CSS & Animations */
+/* ==========================================
+   SAINO HEALTH - Custom CSS & Animations
+   ========================================== */
 
 :root {
   --primary: #0284c7;
@@ -114,6 +116,7 @@
 .provider-card {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 /* Big Screen & Digital Billboard Frame Styles */
 .big-screen-frame {
   background: linear-gradient(145deg, #1e293b, #0f172a);
@@ -158,6 +161,7 @@ html, body {
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
 #discSlideImg {
   transition: opacity 0.4s ease-in-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
@@ -170,42 +174,131 @@ html, body {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
 }
-  .saino-provider-left-col {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  @media (min-width: 1024px) {
-    .saino-provider-left-col {
-      max-width: 440px;
-    }
-  }
-  .saino-card {
-    background-color: #0b1329;
-    border: 1px solid #1e293b;
-    border-radius: 12px;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .saino-rating-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(245, 158, 11, 0.12);
-    border: 1px solid rgba(245, 158, 11, 0.35);
-    padding: 2px 6px;
-    border-radius: 6px;
-  }
 
-  
-  .saino-chip {
-    font-size: 11px;
-    color: #94a3b8;
-    background-color: #1e293b;
-    padding: 2px 7px;
-    border-radius: 4px;
-    white-space: nowrap;
+.saino-provider-left-col {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@media (min-width: 1024px) {
+  .saino-provider-left-col {
+    max-width: 440px;
   }
+}
+.saino-card {
+  background-color: #0b1329;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.saino-rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.saino-chip {
+  font-size: 11px;
+  color: #94a3b8;
+  background-color: #1e293b;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+body:not([data-view="marketplace"]) #homeHeroSection {
+  display: none !important;
+}
+
+/* ==========================================
+   BUTTON CLICK, FILTER & CARD INTERACTIVE STYLES
+   ========================================== */
+
+nav a:active, 
+.category-card:active,
+.filter-pill-btn:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+ nav-link-active,
+.category-item-active {
+  color: #B91C1C !important; /* Red Color */
+  font-weight: 700 !important; /* Bold */
+  transform: scale(0.95);
+  transition: all 0.15s ease-in-out;
+}
+/* Transparent pill buttons styling (Most Recent / High / Low) */
+.filter-pill-btn {
+  background: transparent !important;
+  border: 1px solid transparent;
+  border-radius: 9999px !important;
+  padding: 6px 14px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  transition: all 0.2s ease !important;
+}
+
+.filter-pill-btn.active,
+.filter-pill-btn:active {
+  background-color: #931919 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(147, 25, 25, 0.3) !important;
+  transform: scale(0.96) !important;
+}
+
+/* Location cards & Section cards click interactive effect */
+.interactive-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  cursor: pointer;
+}
+
+.interactive-card:active,
+.interactive-card.card-clicked {
+  transform: scale(0.97) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-color: #931919 !important;
+}
+
+.nav-link-active,
+.category-item-active,
+.blood-bank-item-active {
+  color: #B91C1C !important;
+  font-weight: 700 !important;
+  transform: scale(0.95);
+  transition: all 0.15s ease-in-out;
+}
+
+.category-card:active,
+.category-option:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+button.bg-white,
+.btn-white,
+input[type="button"].bg-white,
+input[type="submit"].bg-white {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+button.bg-white:hover,
+.btn-white:hover {
+  background-color: #cbd5e1 !important; 
+  border-color: #94a3b8 !important;
+}
+
+
+button.bg-white:active,
+.btn-white:active,
+button.bg-white.btn-clicked-active {
+  color: #ffffff !important;
+  transform: scale(0.94) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}

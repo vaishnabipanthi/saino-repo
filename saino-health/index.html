@@ -73,19 +73,20 @@
   </div>
 
   <!-- Section 2: Header / Search & Action Bar -->
-  <header class="w-full flex justify-center" style="background: #E2E6EA;">
-    <div class="w-full max-w-7xl px-3 sm:px-8 md:px-16 py-3 flex flex-col justify-center gap-3 overflow-x-hidden">
+    <!-- Section 2: Header / Search & Action Bar -->
+  <header class="w-full flex flex-col justify-center" style="background: #E2E6EA;">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
       
       <!-- Top Row: Logo + Search Box + Sign In / Get Started -->
-      <div class="flex items-center justify-between w-full gap-4 bg-[#E2E6EA] pt-3">
+      <div class="flex items-center justify-between w-full gap-4 bg-[#E2E6EA] pt-2">
         
         <!-- Logo -->
         <a href="#" data-nav="marketplace" class="flex items-center flex-shrink-0">
-         <img src="assets/logo.png" alt="SAINO HEALTH" class="h-12 sm:h-16 w-auto object-contain" style="mix-blend-mode: multiply;">
+          <img src="assets/logo.png" alt="SAINO HEALTH" class="h-16 sm:h-24 md:h-28 w-auto object-contain" style="mix-blend-mode: multiply;">
         </a>
 
         <!-- Search Box (Integrated) -->
-        <div class="relative flex flex-1 max-w-2xl items-center border-2 border-slate-400 rounded-[10px] bg-[#E2E6EA] px-2 md:pl-3 md:pr-1 py-1 shadow-xs">
+        <div class="relative flex flex-1 min-w-0 max-w-4xl items-center border-2 border-slate-400 rounded-[10px] bg-[#E2E6EA] px-2 md:pl-3 md:pr-1 py-1 shadow-xs">
           <i data-lucide="search" class="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400 mr-1 md:mr-2 shrink-0"></i>
           <input 
             type="text" 
@@ -105,7 +106,7 @@
             </select>
           </div>
 
-          <button onclick="globalSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-2.5 md:px-7 py-1.5 md:py-2 rounded-[8px] md:rounded-[10px] text-[11px] md:text-xs font-bold transition shrink-0">
+          <button id="globalSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-2.5 md:px-7 py-1.5 md:py-2 rounded-[8px] md:rounded-[10px] text-[11px] md:text-xs font-bold transition shrink-0">
             Search
           </button>
           <div id="globalResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-80 overflow-y-auto text-left"></div>
@@ -131,26 +132,28 @@
       </div>
 
       <!-- Desktop Navigation: Left & Right Split with Auto Space after 'Saved' -->
-      <nav class="hidden lg:flex items-center justify-between w-full text-[13px] font-medium text-slate-700 pt-3">
-  
-  <!-- Left Side Links (Home to Saved) -->
-  <div class="flex items-center gap-6">
-    <a href="#" data-nav="marketplace" class="text-[#B91C1C] font-bold">Home</a>
-    <a href="#" data-nav="discovery" class="hover:text-[#B91C1C] transition">Discover</a>
-    <a href="#" onclick="filterCategory('all')" class="hover:text-[#B91C1C] transition">Find Healthcare</a>
-    <a href="#" onclick="navigateTo('appointments')" class="hover:text-[#B91C1C] transition">My Appointments</a>
-    <a href="#" onclick="navigateTo('saved')" class="hover:text-[#B91C1C] transition">Saved</a>
-  </div>
+      <nav class="hidden lg:flex items-center justify-between w-full text-[13px] font-medium text-slate-700 pt-4  mt-3">
+        
+        <!-- Left Side Links (Home to Saved) -->
+        <div class="flex items-center gap-6">
+          <a href="#" data-nav="marketplace" class="text-[#B91C1C] font-bold">Home</a>
+          <a href="#" data-nav="discovery" class="hover:text-[#B91C1C] transition">Discover</a>
+          <a href="#" onclick="filterCategory('all')" class="hover:text-[#B91C1C] transition">Find Healthcare</a>
+          <a href="#" onclick="navigateTo('appointments')" class="hover:text-[#B91C1C] transition">My Appointments</a>
+          <a href="#" onclick="navigateTo('saved')" class="hover:text-[#B91C1C] transition">Saved</a>
+        </div>
 
-  <!-- Right Side Links (List Your Care to FAQs) -->
-  <div class="flex items-center gap-6">
-    <a href="#" onclick="navigateTo('list-your-care')" class="hover:text-[#B91C1C] transition">List Your Care</a>
-    <a href="#" data-nav="about" class="hover:text-[#B91C1C] transition">About Us</a>
-    <a href="#" data-nav="contact" class="hover:text-[#B91C1C] transition">Contact Us</a>
-    <a href="#" onclick="navigateTo('faqs')" class="hover:text-[#B91C1C] transition">FAQs</a>
-  </div>
+        <!-- Right Side Links (List Your Care to FAQs) -->
+        <div class="flex items-center gap-6">
+          <a href="#" onclick="navigateTo('list-your-care')" class="hover:text-[#B91C1C] transition">List Your Care</a>
+          <a href="#" data-nav="about" class="hover:text-[#B91C1C] transition">About Us</a>
+          <a href="#" data-nav="contact" class="hover:text-[#B91C1C] transition">Contact Us</a>
+          <a href="#" onclick="navigateTo('faqs')" class="hover:text-[#B91C1C] transition">FAQs</a>
+        </div>
 
-</nav>
+      </nav>
+
+    </div>
   </header>
 
         <!-- Right Side Header Actions: Single Unified Account Button + List my Care
@@ -259,81 +262,6 @@
   <!-- Comprehensive Footer (Styled with SAINO Health Logo Red Theme) -->
   <footer class="w-full bg-[#E5E9EE] text-slate-700 pt-16 pb-10 border-t border-slate-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <!-- Top Footer Row with Big Brand Logo & Mission (Page 3: Big Logo of SAINO Health) -->
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-10 mb-10 border-b border-rose-700/60 gap-6">
-        <div class="flex items-center space-x-5">
-          <div class="bg-white p-3.5 sm:p-4 rounded-3xl shadow-2xl flex items-center justify-center border-2 border-rose-200">
-            <img src="assets/logo.png" alt="SAINO HEALTH" class="h-20 sm:h-24 md:h-28 w-auto max-w-[320px] object-contain">
-          </div>
-          <div>
-            <div class="text-xs sm:text-sm font-black text-amber-300 tracking-widest uppercase">CONNECTED. SIMPLIFIED. BETTER HEALTH.</div>
-            <p class="text-xs text-rose-200 mt-1">Nepal's Connected Healthcare Marketplace & Verification Network</p>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-          <button onclick="openUpgradeBadgeModal('prime')" class="px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 text-rose-900 text-xs font-black transition shadow-lg hover:scale-105">
-            Upgrade Your Provider Badge
-          </button>
-          <button onclick="navigateTo('contact')" class="px-4 py-2.5 rounded-xl bg-black/30 hover:bg-black/50 text-white text-xs font-bold transition border border-rose-400/40">
-            Contact Sales & Support
-          </button>
-        </div>
-      </div>
-
-      <!-- Dedicated Footer Hub: Healthcare Providers & SAINO Boost (Moved to Footer per Requirement) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12 mb-12 border-b border-rose-700/60">
-        
-        <!-- Healthcare Providers Portal Card -->
-        <div class="bg-black/30 backdrop-blur-md border border-white/20 rounded-3xl p-6 flex flex-col justify-between hover:border-white/40 transition shadow-lg">
-          <div>
-            <div class="flex items-center space-x-2 mb-2">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-white/20 text-white border border-white/30">
-                HEALTHCARE PROVIDERS HUB
-              </span>
-              <span class="text-xs text-rose-200 font-semibold">30 Participating Vendors</span>
-            </div>
-            <h3 class="text-base sm:text-lg font-bold text-white mb-2">Join 250+ Doctors, Clinics & Hospitals in Nepal</h3>
-            <p class="text-xs text-slate-600/90 leading-relaxed mb-4">
-              Showcase your medical facility on the 30-logo directory grid. Get verified with <strong>Saino Prime</strong> or <strong>Saino Pro</strong> for priority ranking, analytics, and direct WhatsApp patient leads.
-            </p>
-          </div>
-          <div class="flex flex-wrap items-center gap-2.5 pt-2">
-            <button onclick="navigateTo('providers-showcase')" class="px-4 py-2 bg-white hover:bg-rose-50 text-rose-900 font-black text-xs rounded-xl transition shadow">
-              Explore 30 Vendor Logos Directory →
-            </button>
-            <button onclick="openUpgradeBadgeModal('prime')" class="px-3.5 py-2 bg-black/40 hover:bg-black/60 text-white font-bold text-xs rounded-xl transition border border-white/20">
-              List Facility / Upgrade Badge
-            </button>
-          </div>
-        </div>
-
-        <!-- SAINO Boost & Advertising Suite Card -->
-        <div class="bg-black/30 backdrop-blur-md border border-white/20 rounded-3xl p-6 flex flex-col justify-between hover:border-white/40 transition shadow-lg">
-          <div>
-            <div class="flex items-center space-x-2 mb-2">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-400 text-slate-950">
-                SAINO BOOST & ADVERTISING
-              </span>
-              <span class="text-xs text-rose-200 font-semibold">Healthcare Campaigns</span>
-            </div>
-            <h3 class="text-base sm:text-lg font-bold text-white mb-2">Marketplace Advertising & Big Screen Billboard Features</h3>
-            <p class="text-xs text-slate-600/90 leading-relaxed mb-4">
-              Boost your healthcare packages with #1 category search pinning, top promotional carousels, and 16:9 big screen digital billboard placements.
-            </p>
-          </div>
-          <div class="flex flex-wrap items-center gap-2.5 pt-2">
-            <button onclick="navigateTo('boost')" class="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs rounded-xl transition shadow">
-              Explore SAINO Boost Portal →
-            </button>
-            <button onclick="navigateTo('campaigns')" class="px-3.5 py-2 bg-white/20 hover:bg-white/30 text-white font-bold text-xs rounded-xl transition border border-white/30">
-              View Big Screen Campaigns
-            </button>
-          </div>
-        </div>
-
-      </div>
 
       <!-- Footer Columns (Exact Specification from Pages 2 & 3) -->
       <div class="flex flex-col md:flex-row justify-between items-start gap-8 md:gap-4 mb-12 text-xs w-full">
@@ -449,16 +377,16 @@
 
       </div>
 
-      <!-- Bottom Bar with 2026 Copyright & Office Address -->
-      <div class="w-full border-t-2 border-slate-400 my-6">
-
-      <div class="flex items-center justify-start text-[10px] sm:text-xs text-slate-800 font-medium space-x-2">
-       <span class="text-sm leading-none font-bold">&copy;</span>
-        <span> 
-          Saino Health 2026 Saino Tech Ventures</span>
+      <!-- Bottom Bar with Darker, Visible Line & Proper Alignment -->
+      <div class="w-full border-t-2 border-slate-500 mt-10 pt-6 mb-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-700 font-medium">
+          <div class="flex items-center space-x-1.5 mb-2 sm:mb-0">
+            <span class="text-sm font-bold leading-none">&copy;</span>
+            <span class="font-bold text-slate-900">Saino Health 2026</span>
+            <span>· Saino Tech Ventures</span>
+          </div>
         </div>
-
-    </div>
+      </div>
   </footer>
 
   <!-- Global Modal Container -->

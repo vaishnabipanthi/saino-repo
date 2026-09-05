@@ -1,6 +1,8 @@
 const API_BASE_URL = 'http://localhost:4000/api';
 
-// Core Fetch Function (Reused by both search inputs)
+// ==========================================
+// 1. CORE FETCH & SEARCH ENGINE
+// ==========================================
 async function fetchProviders(query, city) {
   try {
     let url = `${API_BASE_URL}/search?q=${encodeURIComponent(query)}`;
@@ -16,14 +18,13 @@ async function fetchProviders(query, city) {
   }
 }
 
-// HTML Card Generator
 function renderDropdownList(providers, container) {
   if (!container) return;
 
   if (providers === null) {
     container.innerHTML = `
       <div class="p-3 text-xs text-rose-600 font-semibold">
-        Backend connect nahi ho raha (Check port 4000).
+        Backend is not responding (Check port 4000).
       </div>
     `;
     container.classList.remove('hidden');
@@ -65,7 +66,6 @@ function closeDropdown(container) {
   }
 }
 
-// Search bar setup helper
 function setupLiveSearch({ inputId, selectId, dropdownId, btnId }) {
   const input = document.getElementById(inputId);
   const select = document.getElementById(selectId);
@@ -94,7 +94,6 @@ function setupLiveSearch({ inputId, selectId, dropdownId, btnId }) {
   if (select) select.addEventListener('change', triggerSearch);
   if (btn) btn.addEventListener('click', triggerSearch);
 
-  // Outside click par dropdown band karna
   document.addEventListener('click', (e) => {
     if (input && dropdown && !input.contains(e.target) && !dropdown.contains(e.target)) {
       closeDropdown(dropdown);
@@ -102,7 +101,7 @@ function setupLiveSearch({ inputId, selectId, dropdownId, btnId }) {
   });
 }
 
-// 1. Setup Header Search Bar
+// Setup Search Bars
 setupLiveSearch({
   inputId: 'globalSearchInput',
   selectId: 'globalLocationSelect',
@@ -110,10 +109,135 @@ setupLiveSearch({
   btnId: 'globalSearchBtn'
 });
 
-// 2. Setup Hero Section Search Bar
 setupLiveSearch({
   inputId: 'heroSearchInput',
   selectId: 'heroLocationSelect',
   dropdownId: 'searchResultsDropdown',
   btnId: 'heroSearchBtn'
+});
+
+
+// ==========================================
+// 2. DISCOVERY SLIDER ENGINE
+// ==========================================
+window.nextDiscoverySlide = function() {
+  if (!window._discoverySlides) return;
+  AppState.discoverySlideIndex = (AppState.discoverySlideIndex + 1) % window._discoverySlides.length;
+  animateDiscoverySlideTransition();
+};
+
+window.prevDiscoverySlide = function() {
+  if (!window._discoverySlides) return;
+  AppState.discoverySlideIndex = (AppState.discoverySlideIndex - 1 + window._discoverySlides.length) % window._discoverySlides.length;
+  animateDiscoverySlideTransition();
+};
+
+window.goToDiscoverySlide = function(idx) {
+  if (!window._discoverySlides || !window._discoverySlides[idx]) return;
+  AppState.discoverySlideIndex = idx;
+  animateDiscoverySlideTransition();
+};
+
+function animateDiscoverySlideTransition() {
+  const slide = window._discoverySlides[AppState.discoverySlideIndex];
+  const img = document.getElementById('discSlideImg');
+  const title = document.getElementById('discSlideTitle');
+  const hosp = document.getElementById('discSlideHospital');
+  const note = document.getElementById('discSlideNote');
+
+  if (img && title && hosp && note) {
+    img.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    img.style.opacity = '0';
+    img.style.transform = 'scale(0.96)';
+
+    setTimeout(() => {
+      img.src = slide.image;
+      title.innerHTML = slide.titleHtml || slide.title;
+      hosp.innerText = slide.hospital;
+      note.innerHTML = slide.note;
+      
+      img.style.opacity = '1';
+      img.style.transform = 'scale(1)';
+    }, 300);
+  } else {
+    if (typeof renderApp === 'function') renderApp();
+  }
+}
+
+
+// ==========================================
+// 3. NAVIGATION & VIEW CONTROLLER
+// ==========================================
+function navigateTo(viewName) {
+  AppState.activeView = viewName;
+  
+  const navLinks = document.querySelectorAll('nav a[data-nav]');
+  navLinks.forEach(link => {
+    const targetNav = link.getAttribute('data-nav');
+    if (targetNav === viewName) {
+      link.classList.add('text-[#B91C1C]', 'font-bold');
+      link.classList.remove('text-slate-700', 'font-medium');
+    } else {
+      link.classList.remove('text-[#B91C1C]', 'font-bold');
+      link.classList.add('text-slate-700', 'font-medium');
+    }
+  });
+
+  if (typeof renderApp === 'function') {
+    renderApp();
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+// ==========================================
+// 4. UI INTERACTIVITY & TEXT-ONLY ACTIVE STATES
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Persistent red fill for Action / Filter / Load More buttons
+  const persistentRedButtons = document.querySelectorAll('#applyFiltersBtn, button[onclick*="Load More"], button[onclick*="navigateTo"]');
+  persistentRedButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.classList.add('active-red-fill');
+    });
+  });
+
+  // General buttons scale effect
+  const allActionButtons = document.querySelectorAll('button, .category-card');
+  allActionButtons.forEach(el => {
+    el.addEventListener('click', function() {
+      this.classList.add('btn-clicked-active');
+      setTimeout(() => {
+        this.classList.remove('btn-clicked-active');
+      }, 250);
+    });
+  });
+
+  // Cards click effect (shrink + shadow)
+  const allCards = document.querySelectorAll('.provider-card, [data-location], .bg-white.rounded-2xl, .bg-white.rounded-xl');
+  allCards.forEach(card => {
+    card.classList.add('interactive-card');
+    card.addEventListener('click', function() {
+      this.classList.add('card-clicked');
+      setTimeout(() => {
+        this.classList.remove('card-clicked');
+      }, 200);
+    });
+  });
+
+});
+
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('nav a, .category-option, [data-category], .category-card');
+  if (!target) return;
+
+  //
+  const container = target.parentElement;
+  if (container) {
+    const siblings = container.querySelectorAll('nav a, .category-option, [data-category], .category-card');
+    siblings.forEach(el => el.classList.remove('nav-link-active', 'category-item-active'));
+  }
+
+  target.classList.add('category-item-active');
 });

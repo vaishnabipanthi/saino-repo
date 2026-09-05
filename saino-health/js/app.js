@@ -72,16 +72,15 @@ function initNavigation() {
 }
 
 // Render Master Controller
+ // Render Master Controller
 function renderApp() {
   const heroSection = document.getElementById('homeHeroSection');
-  if (heroSection) {
-    if (AppState.activeView === 'discovery' || AppState.activeView === 'providers-showcase') {
-      heroSection.style.setProperty('display', 'none', 'important');
-    } else {
-      heroSection.style.removeProperty('display');
-    }
-  }
+  const isSubPage = ['discovery', 'providers-showcase', 'discussions', 'all-reviews'].includes(AppState.activeView);
 
+  // Sirf hero section hide/show ka logic rahega
+  if (heroSection) {
+    heroSection.style.setProperty('display', isSubPage ? 'none' : 'block', 'important');
+  }
 
   const mainContainer = document.getElementById('mainContent');
   if (!mainContainer) return;
@@ -91,30 +90,23 @@ function renderApp() {
       mainContainer.innerHTML = renderMarketplaceView();
       bindMarketplaceEvents();
       break;
-      case 'discovery':
+
+    case 'discovery':
     case 'providers-showcase':
       mainContainer.innerHTML = renderDiscoveryView();
       bindProvidersShowcaseEvents();
       break;
-    case 'list-your-care':
-      mainContainer.innerHTML = renderListYourCareView();
-      bindListYourCareEvents();
+      
+    case 'all-reviews':
+      mainContainer.innerHTML = typeof window.renderAllReviewsView === 'function' 
+        ? window.renderAllReviewsView() 
+        : '<p class="p-8 text-center text-slate-500">Review view function not found.</p>';
       break;
-    case 'campaigns':
-      mainContainer.innerHTML = renderCampaignsView();
-      bindCampaignsEvents();
-      break;
-    case 'boost':
-      mainContainer.innerHTML = renderBoostView();
-      bindBoostEvents();
-      break;
-    case 'about':
-      mainContainer.innerHTML = renderAboutView();
-      bindAboutEvents();
-      break;
-    case 'contact':
-      mainContainer.innerHTML = renderContactView();
-      bindContactEvents();
+
+    case 'discussions':
+      mainContainer.innerHTML = typeof window.renderAllDiscussionsView === 'function' 
+        ? window.renderAllDiscussionsView() 
+        : renderDiscoveryView();
       break;
     default:
       mainContainer.innerHTML = renderMarketplaceView();
@@ -125,9 +117,6 @@ function renderApp() {
     window.lucide.createIcons();
   }
 }
-
-
-
 // ==========================================
 // 1. MARKETPLACE VIEW RENDERING
 // ==========================================
@@ -418,43 +407,6 @@ function renderMarketplaceView() {
       </div>
     </section>
 
-    <!-- Community Engagement: "Talk of the Town" & Reviews (Page 11 Requirement) -->
-    <section class="mb-14">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-sky-600">Patient Community & Live Updates</span>
-          <h2 class="text-xl font-bold text-slate-900">Review & Talk of the Town</h2>
-          <p class="text-xs text-slate-500">Live conversations between Patients, Doctors, and Healthcare Providers</p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        ${window.SAINO_DATA.talkOfTheTown.map(talk => `
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-bold bg-sky-50 text-sky-700">
-                  <i data-lucide="${talk.icon}" class="w-3 h-3"></i>
-                  <span>${talk.category}</span>
-                </span>
-                <span class="text-[11px] font-medium text-slate-400">${talk.tag}</span>
-              </div>
-              <h4 class="text-sm font-bold text-slate-900 mb-2 leading-snug">${talk.title}</h4>
-              <p class="text-xs text-slate-600 mb-4 leading-relaxed">"${talk.body}"</p>
-            </div>
-            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-              <div>
-                <span class="font-bold text-slate-800 block">${talk.author}</span>
-                <span class="text-[11px] text-slate-400">${talk.role} · <strong class="text-slate-600">${talk.provider}</strong></span>
-              </div>
-              <button onclick="openCustomWhatsApp('Talk of Town Discussion', 'Hi, I saw ${talk.author} comment regarding ${talk.provider} on SAINO HEALTH and wanted to inquire.')" class="text-sky-600 hover:text-sky-700 font-semibold text-xs">
-                Inquire →
-              </button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </section>
   `;
 }
 
@@ -1337,104 +1289,254 @@ function bindCampaignsEvents() {}
           </div>
 
           <!-- 2x2 Grid (Hospitals, Clinics, Diagnostic Centers, Wellness Centers) -->
-          <div class="grid grid-cols-2 gap-3 w-full min-w-0">
+          <div class="grid grid-cols-2 gap-4 w-full min-w-0">
 
             <!-- 1. Hospitals -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-25 shadow-sm min-w-0">
-              <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Hospitals</h4>
-              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">01</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">B&B</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">B&B Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 56 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">02</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NO</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Norvic Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.7</span><span class="text-[9px] text-slate-400">· 41 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">03</span><span class="w-4 h-4 rounded bg-purple-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">GR</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Grande Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.8</span><span class="text-[9px] text-slate-400">· 28 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">04</span><span class="w-4 h-4 rounded bg-emerald-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">KMC Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 23 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">05</span><span class="w-4 h-4 rounded bg-amber-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NE</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Nepal Mediciti</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 21 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">06</span><span class="w-4 h-4 rounded bg-blue-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">OM</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Om Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">07</span><span class="w-4 h-4 rounded bg-teal-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">HA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">HAMS Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.6</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">08</span><span class="w-4 h-4 rounded bg-indigo-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">PA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Patan Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 17 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">09</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">DH</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Dhulikhel Hosp.</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 14 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">10</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Model Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 13 disc.</span></div></div>
-              </div>
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+              <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Hospitals</h4>
+              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">04</span><span class="w-5 h-5 rounded bg-emerald-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Medical College</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">23 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">05</span><span class="w-5 h-5 rounded bg-amber-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NE</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Nepal Mediciti Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">21 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">06</span><span class="w-5 h-5 rounded bg-blue-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">OM</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Om Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">07</span><span class="w-5 h-5 rounded bg-teal-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">HA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">HAMS Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.6</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">08</span><span class="w-5 h-5 rounded bg-indigo-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">PA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Patan Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">17 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">09</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">DH</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Dhulikhel Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">14 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">10</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Model Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">13 disc.</span></div>
+
+                </div>
+
             </div>
 
             <!-- 2. Clinics -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-25 shadow-sm min-w-0">
-              <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Clinics</h4>
-              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">01</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">B&B</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">B&B Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 56 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">02</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NO</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Norvic Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.7</span><span class="text-[9px] text-slate-400">· 41 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">03</span><span class="w-4 h-4 rounded bg-purple-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">GR</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Grande Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.8</span><span class="text-[9px] text-slate-400">· 28 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">04</span><span class="w-4 h-4 rounded bg-emerald-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">KMC Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 23 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">05</span><span class="w-4 h-4 rounded bg-amber-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NE</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Nepal Mediciti</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 21 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">06</span><span class="w-4 h-4 rounded bg-blue-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">OM</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Om Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">07</span><span class="w-4 h-4 rounded bg-teal-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">HA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">HAMS Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.6</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">08</span><span class="w-4 h-4 rounded bg-indigo-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">PA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Patan Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 17 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">09</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">DH</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Dhulikhel Hosp.</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 14 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">10</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Model Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 13 disc.</span></div></div>
-              </div>
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+              <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Clinics</h4>
+                <div class="flex flex-col gap-1 text-[11px] min-w-0">
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">04</span><span class="w-5 h-5 rounded bg-emerald-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Medical College</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">23 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">05</span><span class="w-5 h-5 rounded bg-amber-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NE</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Nepal Mediciti Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">21 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">06</span><span class="w-5 h-5 rounded bg-blue-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">OM</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Om Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">07</span><span class="w-5 h-5 rounded bg-teal-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">HA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">HAMS Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.6</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">08</span><span class="w-5 h-5 rounded bg-indigo-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">PA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Patan Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">17 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">09</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">DH</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Dhulikhel Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">14 disc.</span></div>
+              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">10</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Model Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">13 disc.</span></div>
+            </div>
             </div>
 
             <!-- 3. Diagnostic Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-20 shadow-sm min-w-0">
-              <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Diagnostic Centers</h4>
-              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">01</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">B&B</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">B&B Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 56 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">02</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NO</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Norvic Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.7</span><span class="text-[9px] text-slate-400">· 41 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">03</span><span class="w-4 h-4 rounded bg-purple-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">GR</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Grande Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.8</span><span class="text-[9px] text-slate-400">· 28 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">04</span><span class="w-4 h-4 rounded bg-emerald-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">KMC Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 23 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">05</span><span class="w-4 h-4 rounded bg-amber-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NE</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Nepal Mediciti</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 21 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">06</span><span class="w-4 h-4 rounded bg-blue-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">OM</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Om Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">07</span><span class="w-4 h-4 rounded bg-teal-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">HA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">HAMS Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.6</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">08</span><span class="w-4 h-4 rounded bg-indigo-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">PA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Patan Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 17 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">09</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">DH</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Dhulikhel Hosp.</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 14 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">10</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Model Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 13 disc.</span></div></div>
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+              <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Diagnostic Centers</h4>
+              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">04</span><span class="w-5 h-5 rounded bg-emerald-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Medical College</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">23 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">05</span><span class="w-5 h-5 rounded bg-amber-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NE</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Nepal Mediciti Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">21 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">06</span><span class="w-5 h-5 rounded bg-blue-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">OM</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Om Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">07</span><span class="w-5 h-5 rounded bg-teal-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">HA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">HAMS Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.6</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">08</span><span class="w-5 h-5 rounded bg-indigo-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">PA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Patan Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">17 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">09</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">DH</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Dhulikhel Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">14 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">10</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Model Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">13 disc.</span></div>
               </div>
             </div>
 
             <!-- 4. Wellness Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-20 shadow-sm min-w-0">
-              <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Wellness Centers</h4>
-              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">01</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">B&B</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">B&B Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 56 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">02</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NO</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Norvic Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.7</span><span class="text-[9px] text-slate-400">· 41 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">03</span><span class="w-4 h-4 rounded bg-purple-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">GR</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Grande Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.8</span><span class="text-[9px] text-slate-400">· 28 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">04</span><span class="w-4 h-4 rounded bg-emerald-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">KMC Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 23 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">05</span><span class="w-4 h-4 rounded bg-amber-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NE</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Nepal Mediciti</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 21 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">06</span><span class="w-4 h-4 rounded bg-blue-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">OM</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Om Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.4</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">07</span><span class="w-4 h-4 rounded bg-teal-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">HA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">HAMS Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.6</span><span class="text-[9px] text-slate-400">· 19 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">08</span><span class="w-4 h-4 rounded bg-indigo-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">PA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Patan Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 17 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">09</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">DH</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Dhulikhel Hosp.</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 14 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">10</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Model Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.3</span><span class="text-[9px] text-slate-400">· 13 disc.</span></div></div>
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+              <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Wellness Centers</h4>
+               <div class="flex flex-col gap-1 text-[11px] min-w-0"> 
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">04</span><span class="w-5 h-5 rounded bg-emerald-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Medical College</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">23 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">05</span><span class="w-5 h-5 rounded bg-amber-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NE</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Nepal Mediciti Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">21 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">06</span><span class="w-5 h-5 rounded bg-blue-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">OM</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Om Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">07</span><span class="w-5 h-5 rounded bg-teal-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">HA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">HAMS Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.6</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">19 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">08</span><span class="w-5 h-5 rounded bg-indigo-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">PA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Patan Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">17 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">09</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">DH</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Dhulikhel Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">14 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">10</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Model Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">13 disc.</span></div>
+                </div>
               </div>
-            </div>
              <!-- 5. Ambulance -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-11 shadow-sm min-w-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
               <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Ambulance</h4>
-              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">01</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">B&B</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0]">B&B Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 56 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">02</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NO</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Norvic international Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.7</span><span class="text-[9px] text-slate-400">· 41 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">03</span><span class="w-4 h-4 rounded bg-purple-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">GR</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Grande International Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.8</span><span class="text-[9px] text-slate-400">· 28 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">04</span><span class="w-4 h-4 rounded bg-emerald-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Kathamandu Medical College</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 23 disc.</span></div></div>
-            
-              </div>
+              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+                     <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
+                    <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
+                    <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
+                    <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">04</span><span class="w-5 h-5 rounded bg-emerald-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Medical College</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">23 disc.</span></div>
+                    <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">05</span><span class="w-5 h-5 rounded bg-amber-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NE</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Nepal Mediciti Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">21 disc.</span></div>
+                  </div>
                 </div>
-             <!-- 6. Blood bank -->
-                <div class="bg-white border border-slate-200/90 rounded-xl p-11 shadow-sm min-w-0">
-              <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Ambulance</h4>
-              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">01</span><span class="w-4 h-4 rounded bg-slate-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">B&B</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">B&B Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 56 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">02</span><span class="w-4 h-4 rounded bg-emerald-900 text-white text-[7px] font-bold flex items-center justify-center shrink-0">NO</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Norvic international Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.7</span><span class="text-[9px] text-slate-400">· 41 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-extrabold text-[#B91C1C] w-3.5 shrink-0">03</span><span class="w-4 h-4 rounded bg-purple-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">GR</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Grande International Hospital</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.8</span><span class="text-[9px] text-slate-400">· 28 disc.</span></div></div>
-                <div class="flex items-center justify-between py-0.5"><div class="flex items-center space-x-1.5 min-w-0"><span class="font-medium text-slate-400 w-3.5 shrink-0">04</span><span class="w-4 h-4 rounded bg-emerald-950 text-white text-[7px] font-bold flex items-center justify-center shrink-0">KA</span><span class="font-semibold text-slate-800 truncate flex-1 min-w-0">Kathamandu Medical College</span></div><div class="flex items-center space-x-0.5 shrink-0"><span class="text-amber-500 font-bold text-[9px]">★ 4.5</span><span class="text-[9px] text-slate-400">· 23 disc.</span></div></div>
-            
-              </div>
+
+                 <!-- 6. Blood bank -->
+                <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+              <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Blood Bank</h4>
+              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">04</span><span class="w-5 h-5 rounded bg-emerald-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Medical College</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">23 disc.</span></div>
+                  <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">05</span><span class="w-5 h-5 rounded bg-amber-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NE</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Nepal Mediciti Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.4</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">21 disc.</span></div>
                 </div>
-      
+              </div>
           </div>
           </div>
 
         </div>
 
       </div>
+      <!-- 1. People Are Talking About -->
+      <section class="mt-14 px-4 sm:px-6">
+        <div class="flex items-center justify-between mb-6">
+        <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-600">COMMUNITY</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">People Are Talking About</h2>
+          </div>
+           <a href="#discussions" onclick="navigateTo('discussions')" class="text-xs sm:text-sm font-bold text-rose-600 hover:text-rose-700 cursor-pointer">View All Discussions →</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
+          <!-- Grande -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs">GI</div>
+                <div><h4 class="font-bold text-slate-900 text-xs">Grande International Hospital</h4><span class="text-[11px] text-slate-400">2 hours ago</span></div>
+              </div>
+              <p class="text-xs text-slate-700 font-medium mb-4">"Has anyone recently visited their emergency department?"</p>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-3">14 replies • 9 helpful</div>
+              <button onclick="openDiscussionModal('disc-grande')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+              
+            </div>
+          </div>
+          <!-- Norvic -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-900 text-white flex items-center justify-center font-bold text-xs">NI</div>
+                <div><h4 class="font-bold text-slate-900 text-xs">Norvic International Hospital</h4><span class="text-[11px] text-slate-400">5 hours ago</span></div>
+              </div>
+              <p class="text-xs text-slate-700 font-medium mb-4">"How was your experience with the cardiology department?"</p>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-3">22 replies • 17 helpful</div>
+             <button onclick="openDiscussionModal('disc-norvic')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+            </div>
+          </div>
+          <!-- HAMS -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-950 text-white flex items-center justify-center font-bold text-xs">HA</div>
+                <div><h4 class="font-bold text-slate-900 text-xs">HAMS Hospital</h4><span class="text-[11px] text-slate-400">Yesterday</span></div>
+              </div>
+              <p class="text-xs text-slate-700 font-medium mb-4">"Anyone know about their dermatology OPD timing and wait time?"</p>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-3">8 replies • 5 helpful</div>
+              <button onclick="openDiscussionModal('disc-hams')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+            </div>
+          </div>
+          <!-- B&B -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs">BB</div>
+                <div><h4 class="font-bold text-slate-900 text-xs">B&B Hospital</h4><span class="text-[11px] text-slate-400">2 days ago</span></div>
+              </div>
+              <p class="text-xs text-slate-700 font-medium mb-4">"Is the diabetes specialist available on weekends at B&B?"</p>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-3">11 replies • 8 helpful</div>
+              <button onclick="openDiscussionModal('disc-bb')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="border-slate-200 my-10 mx-4 sm:px-6" />
+
+      <!-- 2. What Patients Are Saying -->
+      <section class="mb-14 px-4 sm:px-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-600">PATIENT VOICES</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">What Patients Are Saying</h2>
+          </div>
+          <div class="inline-flex items-center bg-slate-100 p-1 rounded-xl text-xs font-semibold text-slate-600">
+            <button class="px-3 py-1.5 bg-white shadow-xs rounded-lg text-slate-900 font-bold">Most Recent</button>
+            <button class="px-3 py-1.5 hover:text-slate-900">Highest Rated</button>
+            <button class="px-3 py-1.5 hover:text-slate-900">Lowest Rated</button>
+          </div>
+        </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+          <!-- Priya -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">PM</div>
+                  <div><span class="font-bold text-slate-900 text-xs block">Priya Maharjan</span><span class="text-[10px] text-slate-400">3 days ago</span></div>
+                </div>
+                <div class="text-amber-400 text-xs">★★★★★</div>
+              </div>
+              <p class="text-xs text-slate-600 mb-4">"The emergency department at Grande was incredibly efficient. My father was admitted within minutes and the staff was professional throughout."</p>
+              <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl mb-4 text-[11px]">
+                <span class="font-bold text-slate-900 block mb-0.5">Provider Response</span>
+                <p class="text-slate-600">Thank you for your kind words. We're glad your father received prompt care.</p>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+              <div class="mb-2 text-slate-600 font-medium">Grande International Hospital</div>
+              <div class="flex justify-between"><span>👍 Helpful (24)</span><span>💬 3</span></div>
+            </div>
+          </div>
+          <!-- Rajesh -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">RT</div>
+                  <div><span class="font-bold text-slate-900 text-xs block">Rajesh Thapa</span><span class="text-[10px] text-slate-400">1 week ago</span></div>
+                </div>
+                <div class="text-amber-400 text-xs">★★★★☆</div>
+              </div>
+              <p class="text-xs text-slate-600 mb-4">"Good cardiologist but the waiting time is long. Arrived at 10am, waited nearly 2 hours before seeing Dr. Shrestha. The consultation was thorough."</p>
+            </div>
+            <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+              <div class="mb-2 text-slate-600 font-medium">Norvic International Hospital</div>
+              <div class="flex justify-between"><span>👍 Helpful (18)</span><span>💬 5</span></div>
+            </div>
+          </div>
+          <!-- Sunita -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">SG</div>
+                  <div><span class="font-bold text-slate-900 text-xs block">Sunita Gurung</span><span class="text-[10px] text-slate-400">2 weeks ago</span></div>
+                </div>
+                <div class="text-amber-400 text-xs">★★★★★</div>
+              </div>
+              <p class="text-xs text-slate-600 mb-4">"Excellent physiotherapy unit at HAMS. Three weeks of treatment for my knee injury and I'm back to normal. The therapists genuinely care."</p>
+            </div>
+            <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+              <div class="mb-2 text-slate-600 font-medium">HAMS Hospital</div>
+              <div class="flex justify-between"><span>👍 Helpful (31)</span><span>💬 7</span></div>
+            </div>
+          </div>
+        </div>
+
+       <div class="mt-8 text-center">
+        <button type="button" onclick="window.navigateTo('all-reviews')" class="px-6 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold shadow-xs cursor-pointer">See More Reviews</button>
+      </div>
+      </section>
     </div>
   `;
 }
@@ -3227,14 +3329,21 @@ async function loadNearbyProviders() {
         <!-- Specialty Type -->
         <p class="text-xs font-semibold text-slate-700 mt-2">${prov.type}</p>
 
-        <!-- Department Chips + Clickable More Button -->
+        <!-- Department Chips + Clickable More Button with Unique Index -->
         <div class="flex flex-wrap items-center gap-1.5 mt-2.5">
           ${initialThree.map(d => `<span class="text-[11px] font-medium bg-slate-100 text-slate-800 px-2.5 py-1 rounded-md border border-slate-200/80">${d}</span>`).join('')}
           
+          <span id="card-${index}-more" class="hidden flex-wrap gap-1.5 transition-all duration-300">
+            ${(prov.departments || []).slice(3).map(dept => `
+              <span class="text-[11px] font-medium bg-slate-100 text-slate-800 px-2.5 py-1 rounded-md border border-slate-200/80">${dept}</span>
+            `).join('')}
+          </span>
+
           <button 
             type="button" 
-            onclick="navigateToHospitalPage('${encodeURIComponent(prov.name)}', ${index})" 
-            class="text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-md border border-slate-200/80 transition-colors cursor-pointer">
+            id="card-${index}-btn"
+            onclick="toggleSpecialties('card-${index}')" 
+            class="text-[11px] font-medium bg-transparent text-slate-400 hover:text-slate-600 px-2.5 py-1 rounded-md border border-dashed border-slate-200 hover:border-slate-300 transition-all duration-200 cursor-pointer">
             + ${extraCount} more specialties
           </button>
         </div>
@@ -3262,18 +3371,660 @@ async function loadNearbyProviders() {
     </div>
   `;
   }
-      window.navigateToHospitalPage = function(encodedName, index) {
-      const hospitalName = decodeURIComponent(encodedName);
-      if (window.AppState) {
-        window.AppState.currentView = 'providers-showcase';
-        window.AppState.selectedHospital = hospitalName;
-        if (typeof renderApp === 'function') {
-          renderApp();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          return;
-        }
-      }
-      window.location.hash = `#providers?hospital=${encodeURIComponent(hospitalName)}`;
-    };
-      
+  window.navigateToHospitalPage = function(encodedName, index) {
+  const hospitalName = decodeURIComponent(encodedName);
+  if (window.AppState) {
+    window.AppState.currentView = 'providers-showcase';
+    window.AppState.selectedHospital = hospitalName;
+    if (typeof renderApp === 'function') {
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+  }
+  window.location.hash = `#providers?hospital=${encodeURIComponent(hospitalName)}`;
+};
 
+// Global toggle function (Ye bilkul bahar hona chahiye)
+window.toggleSpecialties = function(cardId) {
+  const moreSpan = document.getElementById(cardId + '-more');
+  const btn = document.getElementById(cardId + '-btn');
+  
+  if (moreSpan && btn) {
+    if (moreSpan.classList.contains('hidden')) {
+      moreSpan.classList.remove('hidden');
+      moreSpan.classList.add('flex');
+      btn.textContent = '- Show less specialties';
+    } else {
+      moreSpan.classList.add('hidden');
+      moreSpan.classList.remove('flex');
+      btn.textContent = '+ 10 more specialties';
+    }
+  }
+};
+// =========================================================
+// DISCUSSION & FACEBOOK COMMENT ENGINE (End of File)
+// =========================================================
+
+// Fallback data (Agar backend se 404 aaye tab bhi chalega)
+ window.DISCUSSIONS_STORE = {
+  'disc-grande': {
+    id: 'disc-grande',
+    hospital: 'Grande International Hospital',
+    logo: 'GI',
+    time: '2 hours ago',
+    question: 'Has anyone recently visited their emergency department?',
+    likes: 9,
+    comments: [
+      {
+        id: 'c1', author: 'Rohan Shrestha', time: '1 hour ago', text: 'Visited last night around 11 PM with severe chest discomfort. Triage was exceptionally quick and the duty doctor was right there within minutes.', likes: 9, isLiked: false,
+        replies: [
+          { id: 'r1', author: 'Pooja Karki', text: 'Did they ask for an upfront cash deposit before starting treatment?' },
+          { id: 'r2', author: 'Rohan Shrestha', text: 'No upfront cash deposit asked. They prioritized stabilization first.' },
+          { id: 'r3', author: 'Manoj Bajracharya', text: 'That is reassuring to know, thank you for sharing.' },
+          { id: 'r4', author: 'Sunita Maharjan', text: 'Their emergency team is quite professional during late hours.' },
+          { id: 'r5', author: 'Karan KC', text: 'Was the billing counter crowded when you checked out?' },
+          { id: 'r6', author: 'Anil Pandey', text: 'Billing takes a bit of time if insurance verification is pending.' },
+          { id: 'r7', author: 'Deepa Adhikari', text: 'Always keep your insurance card handy for faster clearance.' },
+          { id: 'r8', author: 'Bibek Thapa', text: 'Glad to hear you recovered well, Rohan.' },
+          { id: 'r9', author: 'Rajesh Thapa', text: 'Grande ER is definitely one of the better-managed ones in Kathmandu.' },
+          { id: 'r10', author: 'Sita Sharma', text: 'Do they have dedicated pediatric emergency bays as well?' },
+          { id: 'r11', author: 'Dr. A. Sharma', text: 'Yes Sita, we run separate pediatric resuscitation units 24/7.' },
+          { id: 'r12', author: 'Gita Shrestha', text: 'Very helpful thread, saving this for future reference.' },
+          { id: 'r13', author: 'Ram Prasad', text: 'Appreciate the detailed breakdown from everyone here.' }
+        ]
+      }
+    ]
+  },
+  'disc-norvic': { 
+    id: 'disc-norvic', 
+    hospital: 'Norvic International Hospital', 
+    logo: 'NI', 
+    time: '5 hours ago', 
+    question: 'How was your experience with the cardiology department?', 
+    likes: 17, 
+    comments: [
+      {
+        id: 'nc1', author: 'Rajesh Thapa', time: '4 hours ago', text: 'Consultation with Dr. Shrestha was extremely thorough, though the wait time at the OPD lobby crossed nearly two hours.', likes: 17, isLiked: false,
+        replies: [
+          { id: 'nr1', author: 'Sunita Gurung', text: 'The morning slots are always packed, better book past noon.' },
+          { id: 'nr2', author: 'Karan KC', text: 'Did you book your token online or through their app?' },
+          { id: 'nr3', author: 'Rajesh Thapa', text: 'Walk-in token, which is why it took longer.' },
+          { id: 'nr4', author: 'Deepa Adhikari', text: 'Online booking saves at least an hour of waiting.' },
+          { id: 'nr5', author: 'Bibek Thapa', text: 'Their cath lab facilities are top-notch though.' },
+          { id: 'nr6', author: 'Pooja Karki', text: 'Is valet parking easily available during peak hours?' },
+          { id: 'nr7', author: 'Manoj Bajracharya', text: 'Valet gets crowded by 11 AM, better park in the basement.' },
+          { id: 'nr8', author: 'Hari Prasad', text: 'How are the consultation fees for senior cardiologists?' },
+          { id: 'nr9', author: 'Rajesh Thapa', text: 'It was around NPR 1500 for the senior consultant slot.' },
+          { id: 'nr10', author: 'Gita Shrestha', text: 'Thank you for sharing your experience, Rajesh.' },
+          { id: 'nr11', author: 'Ram Prasad', text: 'Norvic staff is very courteous once you get inside.' },
+          { id: 'nr12', author: 'Binod Shrestha', text: 'Cardiology wing is well-maintained.' },
+          { id: 'nr13', author: 'Prakash Adhikari', text: 'Did they recommend any follow-up blood tests?' },
+          { id: 'nr14', author: 'Nisha Karki', text: 'Their in-house lab reports are generated quite fast.' },
+          { id: 'nr15', author: 'Dipesh Lama', text: 'Good to know, planning a visit this Thursday.' },
+          { id: 'nr16', author: 'Suman Shrestha', text: 'Take care of your health, Rajesh.' },
+          { id: 'nr17', author: 'Bikash Shrestha', text: 'Very informative discussion thread.' },
+          { id: 'nr18', author: 'Rohan Shrestha', text: 'Agree with the online booking tip.' },
+          { id: 'nr19', author: 'Aayush Koirala', text: 'Norvic has always maintained high clinical standards.' },
+          { id: 'nr20', author: 'Pradeep Joshi', text: 'Appreciate the honest feedback.' },
+          { id: 'nr21', author: 'Puja Lama', text: 'Thanks for the parking tip too!' }
+        ]
+      }
+    ] 
+  },
+  'disc-hams': { 
+    id: 'disc-hams', 
+    hospital: 'HAMS Hospital', 
+    logo: 'HA', 
+    time: 'Yesterday', 
+    question: 'Anyone know about their dermatology OPD timing and wait time?', 
+    likes: 5, 
+    comments: [
+      {
+        id: 'hc1', author: 'Sunita Gurung', time: 'Yesterday', text: 'Dermatology OPD starts right around 10 AM. Reaching by 9:30 AM helps secure a lower token number.', likes: 5, isLiked: false,
+        replies: [
+          { id: 'hr1', author: 'Bikash Shrestha', text: 'Can we collect tokens over a phone call a day prior?' },
+          { id: 'hr2', author: 'Karan KC', text: 'Phone booking works if you call before 9 AM.' },
+          { id: 'hr3', author: 'Anil Pandey', text: 'Is weekend OPD available for skin consultation?' },
+          { id: 'hr4', author: 'Sunita Gurung', text: 'Only Saturday morning slots are open for limited hours.' },
+          { id: 'hr5', author: 'Bibek Thapa', text: 'Thanks for the precise timing details.' },
+          { id: 'hr6', author: 'Pooja Karki', text: 'This will save me a wasted trip tomorrow.' },
+          { id: 'hr7', author: 'Manoj Bajracharya', text: 'Great community insight!' }
+        ]
+      }
+    ] 
+  },
+  'disc-bnb': { 
+    id: 'disc-bnb', 
+    hospital: 'B&B Hospital', 
+    logo: 'BB', 
+    time: '2 days ago', 
+    question: 'Is the diabetes specialist available on weekends at B&B?', 
+    likes: 8, 
+    comments: [
+      {
+        id: 'bc1', author: 'Binod Shrestha', time: '2 days ago', text: 'Endocrinology consultation is available only on Saturday mornings. Sundays are closed for specialized OPDs.', likes: 8, isLiked: false,
+        replies: [
+          { id: 'br1', author: 'Sita Sharma', text: 'Is prior appointment mandatory for Saturday slots?' },
+          { id: 'br2', author: 'Hari Prasad', text: 'Yes, because the queue fills up by Friday evening.' },
+          { id: 'br3', author: 'Gita Shrestha', text: 'Good to know before heading out.' },
+          { id: 'br4', author: 'Ram Prasad', text: 'B&B orthopedics is famous, but endocrinology is good too.' },
+          { id: 'br5', author: 'Karan KC', text: 'Thanks for saving my weekend plan.' },
+          { id: 'br6', author: 'Anil Pandey', text: 'Are lab tests done on the same floor?' },
+          { id: 'br7', author: 'Deepa Adhikari', text: 'Lab collection center is right down the hall.' },
+          { id: 'br8', author: 'Bibek Thapa', text: 'Very helpful community response.' },
+          { id: 'br9', author: 'Pooja Karki', text: 'Will book in advance for this Saturday.' },
+          { id: 'br10', author: 'Manoj Bajracharya', text: 'Appreciate the clear update.' }
+        ]
+      }
+    ] 
+  },
+  'disc-mediciti': {
+    id: 'disc-mediciti',
+    hospital: 'Nepal Mediciti Hospital',
+    logo: 'NE',
+    time: '3 days ago',
+    question: 'How are the room charges and insurance claim process at Mediciti?',
+    likes: 12,
+    comments: [
+      {
+        id: 'mc1', author: 'Prakash Adhikari', time: '3 days ago', text: 'The cashless insurance desk is well-structured, though insurance discharge approval took about an hour during final billing.', likes: 12, isLiked: false,
+        replies: [
+          { id: 'mr1', author: 'Nisha Karki', text: 'Did they accept your corporate health card without hassle?' },
+          { id: 'mr2', author: 'Dipesh Lama', text: 'Pre-authorization letter from the insurance provider speeds it up.' },
+          { id: 'mr3', author: 'Suman Shrestha', text: 'Room rates are on the higher side compared to government setups.' },
+          { id: 'mr4', author: 'Bikash Shrestha', text: 'Nursing care and hygiene standards justify the cost though.' },
+          { id: 'mr5', author: 'Rohan Shrestha', text: 'Were deluxe rooms covered under your policy tier?' },
+          { id: 'mr6', author: 'Prakash Adhikari', text: 'Only semi-private was covered under my base corporate plan.' },
+          { id: 'mr7', author: 'Pradeep Joshi', text: 'Good information regarding room tiers.' },
+          { id: 'mr8', author: 'Puja Lama', text: 'Mediciti infrastructure is world-class.' },
+          { id: 'mr9', author: 'Karan KC', text: 'Thanks for sharing the discharge timeline details.' },
+          { id: 'mr10', author: 'Anil Pandey', text: 'Helps a lot in financial planning.' },
+          { id: 'mr11', author: 'Deepa Adhikari', text: 'The billing staff is cooperative if documents are complete.' },
+          { id: 'mr12', author: 'Bibek Thapa', text: 'Glad your discharge went smoothly eventually.' },
+          { id: 'mr13', author: 'Pooja Karki', text: 'Noting this down for future insurance claims.' },
+          { id: 'mr14', author: 'Manoj Bajracharya', text: 'Very detailed patient perspective.' },
+          { id: 'mr15', author: 'Hari Prasad', text: 'Thanks Prakash.' },
+          { id: 'mr16', author: 'Gita Shrestha', text: 'Very useful thread.' },
+          { id: 'mr17', author: 'Ram Prasad', text: 'Clear and honest feedback.' },
+          { id: 'mr18', author: 'Sita Sharma', text: 'Appreciate it!' }
+        ]
+      }
+    ]
+  },
+  'disc-patan': {
+    id: 'disc-patan',
+    hospital: 'Patan Hospital',
+    logo: 'PA',
+    time: '4 days ago',
+    question: 'Is prior appointment mandatory for general surgery OPD?',
+    likes: 10,
+    comments: [
+      {
+        id: 'pc1', author: 'Hari Prasad', time: '4 days ago', text: 'General OPD operates entirely on a token system. Reaching early around 7:30 AM ensures you get an early slot.', likes: 10, isLiked: false,
+        replies: [
+          { id: 'pr1', author: 'Gita Shrestha', text: 'Can we obtain tokens via their ticketing counter?' },
+          { id: 'pr2', author: 'Ram Prasad', text: 'Yes, counter opens sharply at 8 AM.' },
+          { id: 'pr3', author: 'Karan KC', text: 'Is the crowd manageable on weekdays?' },
+          { id: 'pr4', author: 'Hari Prasad', text: 'Mondays and Thursdays are unusually crowded.' },
+          { id: 'pr5', author: 'Deepa Adhikari', text: 'Good tip about avoiding Mondays.' },
+          { id: 'pr6', author: 'Bibek Thapa', text: 'Patan Hospital doctors are extremely dedicated.' },
+          { id: 'pr7', author: 'Pooja Karki', text: 'Affordable and reliable healthcare option.' },
+          { id: 'pr8', author: 'Manoj Bajracharya', text: 'Thanks for the early morning advice.' },
+          { id: 'pr9', author: 'Sunita Gurung', text: 'Very helpful community guidance.' },
+          { id: 'pr10', author: 'Binod Shrestha', text: 'Will keep this in mind.' },
+          { id: 'pr11', author: 'Prakash Adhikari', text: 'Appreciate the breakdown.' },
+          { id: 'pr12', author: 'Nisha Karki', text: 'Thanks Hari.' },
+          { id: 'pr13', author: 'Dipesh Lama', text: 'Very clear guidance.' },
+          { id: 'pr14', author: 'Suman Shrestha', text: 'Helpful notes.' }
+        ]
+      }
+    ]
+  },
+  'disc-kmc': {
+    id: 'disc-kmc',
+    hospital: 'Kathmandu Medical College (KMC)',
+    logo: 'KA',
+    time: '5 days ago',
+    question: 'Best pediatrician for newborn vaccination schedule here?',
+    likes: 6,
+    comments: [
+      {
+        id: 'kc1', author: 'Suman Shrestha', time: '5 days ago', text: 'The pediatric vaccination clinic runs Sunday through Friday. The nursing staff handles infants with great care.', likes: 6, isLiked: false,
+        replies: [
+          { id: 'kr1', author: 'Bikash Shrestha', text: 'Are government immunization vaccines available too?' },
+          { id: 'kr2', author: 'Rohan Shrestha', text: 'Both private and regular national schedule vaccines are stocked.' },
+          { id: 'kr3', author: 'Aayush Koirala', text: 'Do we need prior pediatrician consultation before each shot?' },
+          { id: 'kr4', author: 'Suman Shrestha', text: 'A quick pediatrician checkup is done right before administration.' },
+          { id: 'kr5', author: 'Puja Lama', text: 'That makes it very convenient for parents.' },
+          { id: 'kr6', author: 'Karan KC', text: 'Thanks for sharing the schedule details.' }
+        ]
+      }
+    ]
+  },
+  'disc-om': {
+    id: 'disc-om',
+    hospital: 'Om Hospital & Research Centre',
+    logo: 'OM',
+    time: '1 week ago',
+    question: 'ENT department consultation fees and doctor availability?',
+    likes: 9,
+    comments: [
+      {
+        id: 'oc1', author: 'Dipesh Lama', time: '1 week ago', text: 'Consultation fees range between NPR 800 and 1200 depending on the seniority of the ENT consultant. Evening shifts are available.', likes: 9, isLiked: false,
+        replies: [
+          { id: 'or1', author: 'Anil Pandey', text: 'Are evening slots available on Saturdays?' },
+          { id: 'or2', author: 'Deepa Adhikari', text: 'Saturday evening OPD is usually closed.' },
+          { id: 'or3', author: 'Bibek Thapa', text: 'Good to know about the fee structure.' },
+          { id: 'or4', author: 'Pooja Karki', text: 'Dr. Rana in ENT is exceptionally good.' },
+          { id: 'or5', author: 'Manoj Bajracharya', text: 'Thanks for confirming the consultant fees.' },
+          { id: 'or6', author: 'Hari Prasad', text: 'Very helpful community post.' },
+          { id: 'or7', author: 'Gita Shrestha', text: 'Will check their evening timings.' },
+          { id: 'or8', author: 'Ram Prasad', text: 'Om Hospital parking is quite spacious now.' },
+          { id: 'or9', author: 'Sita Sharma', text: 'Appreciate the exact price range.' },
+          { id: 'or10', author: 'Binod Shrestha', text: 'Thanks for the recommendation.' },
+          { id: 'or11', author: 'Prakash Adhikari', text: 'Helpful details.' },
+          { id: 'or12', author: 'Nisha Karki', text: 'Thanks Dipesh.' },
+          { id: 'or13', author: 'Suman Shrestha', text: 'Great thread.' }
+        ]
+      }
+    ]
+  }
+};
+window.activeDiscussionId = null;
+
+function getOrCreateModalContainer() {
+  let container = document.getElementById('modalContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'modalContainer';
+    document.body.appendChild(container);
+  }
+  return container;
+}
+
+// Open Modal (DB se try karega, 404 aane par bhi fallback se show karega)
+window.openDiscussionModal = async function(discussionId) {
+  window.activeDiscussionId = discussionId;
+  window.renderFBCommentModal();
+
+  try {
+    const res = await fetch(`/api/discussions/${discussionId}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.comments && data.comments.length > 0) {
+        window.DISCUSSIONS_STORE[discussionId] = data;
+        window.renderFBCommentModal();
+      }
+    }
+  } catch (err) {}
+};
+
+window.renderFBCommentModal = function() {
+  const container = getOrCreateModalContainer();
+  const d = window.DISCUSSIONS_STORE[window.activeDiscussionId] || { hospital: 'Community', question: 'Q&A', likes: 0, comments: [] };
+  const comments = d.comments || [];
+  const totalCount = comments.reduce((acc, c) => acc + 1 + (c.replies ? c.replies.length : 0), 0);
+
+  container.innerHTML = `
+    <div class="fixed inset-0 z-[9999] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+      <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200">
+        
+        <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+              ${d.logo || 'H'}
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm leading-tight">${d.hospital}</h3>
+              <span class="text-[11px] text-slate-400">Community Discussion • ${d.time || 'Recent'}</span>
+            </div>
+          </div>
+          <button onclick="window.closeDiscussionModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold">✕</button>
+        </div>
+
+        <div class="p-5 border-b border-slate-100 bg-slate-50 flex-shrink-0">
+          <p class="text-sm sm:text-base font-bold text-slate-900 leading-snug">"${d.question}"</p>
+          <div class="flex items-center space-x-4 mt-3 text-xs text-slate-500">
+            <span>❤️ ${d.likes || 0} Helpful</span>
+            <span>💬 ${totalCount} Comments</span>
+          </div>
+        </div>
+
+        <div id="commentsStream" class="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
+          ${comments.map(c => `
+            <div class="flex items-start space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-[11px] flex-shrink-0 mt-0.5">
+                ${(c.author || 'User').slice(0, 2).toUpperCase()}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="bg-slate-100 rounded-2xl px-4 py-2.5 inline-block max-w-full">
+                  <span class="font-bold text-slate-900 block leading-tight">${c.author}</span>
+                  <p class="text-slate-700 mt-1 text-xs leading-relaxed whitespace-pre-wrap">${c.text}</p>
+                </div>
+                <div class="flex items-center space-x-3 mt-1 ml-2 text-[11px] text-slate-500">
+                  <span>${c.time || 'Just now'}</span>
+                  <button onclick="window.toggleCommentLike('${c.id}')" class="flex items-center space-x-1 font-bold transition ${c.isLiked ? 'text-rose-600' : 'text-slate-500 hover:text-slate-800'}">
+                    <svg class="w-3.5 h-3.5 ${c.isLiked ? 'fill-rose-600 text-rose-600' : 'text-slate-400'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>Like ${c.likes > 0 ? `(${c.likes})` : ''}</span>
+                  </button>
+                                    <button onclick="window.toggleReplyBox('${c.id}')" class="font-bold hover:text-slate-800">Reply</button>
+                </div>
+
+                ${c.replies && c.replies.length > 0 ? `
+                  <div class="ml-3 pl-3 border-l-2 border-slate-200 mt-2.5 space-y-2">
+                    ${c.replies.map(r => `
+                      <div class="flex items-start space-x-2">
+                        <div class="w-6 h-6 rounded-full bg-slate-700 text-white flex items-center justify-center font-bold text-[9px] flex-shrink-0 mt-0.5">
+                          ${(r.author || 'U').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div class="bg-slate-100 rounded-xl px-3 py-1.5 inline-block max-w-full">
+                          <span class="font-bold text-slate-900 block text-[11px]">${r.author}</span>
+                          <p class="text-slate-700 text-[11px] mt-0.5">${r.text}</p>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : ''}
+
+                <div id="replyBox-${c.id}" class="hidden mt-2.5 ml-3 pl-3 border-l-2 border-slate-200">
+                  <div class="flex items-center space-x-2">
+                    <input type="text" id="replyInput-${c.id}" placeholder="Write a reply..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800">
+                    <button onclick="window.submitReply('${c.id}')" class="px-3.5 py-1.5 bg-blue-600 text-white rounded-xl text-[11px] font-bold">Reply</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="p-3 sm:p-4 bg-white border-t border-slate-200 flex-shrink-0">
+          <form onsubmit="window.submitDiscussionComment(event)" class="flex items-center space-x-2">
+            <input type="text" id="fbCommentInput" required placeholder="Write a public comment..." class="flex-1 bg-slate-100 rounded-2xl px-4 py-2.5 text-xs">
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-2xl text-xs">Post</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  `;
+};
+
+window.submitDiscussionComment = function(e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById('fbCommentInput');
+  const text = input ? input.value.trim() : '';
+  if (!text) return;
+
+  const currentDisc = window.DISCUSSIONS_STORE[window.activeDiscussionId];
+  if (!currentDisc) return;
+
+  if (!currentDisc.comments) currentDisc.comments = [];
+  currentDisc.comments.push({
+    id: 'c_' + Date.now(),
+    author: 'You (Patient)',
+    time: 'Just now',
+    text: text,
+    likes: 0,
+    isLiked: false,
+    replies: []
+  });
+
+  window.renderFBCommentModal();
+  setTimeout(() => {
+    const stream = document.getElementById('commentsStream');
+    if (stream) stream.scrollTop = stream.scrollHeight;
+  }, 50);
+};
+
+window.toggleReplyBox = function(commentId) {
+  const box = document.getElementById(`replyBox-${commentId}`);
+  if (box) box.classList.toggle('hidden');
+};
+
+window.submitReply = function(commentId) {
+  const input = document.getElementById(`replyInput-${commentId}`);
+  const text = input ? input.value.trim() : '';
+  if (!text) return;
+
+  const currentDisc = window.DISCUSSIONS_STORE[window.activeDiscussionId];
+  const comment = currentDisc?.comments?.find(c => c.id === commentId);
+  if (!comment) return;
+
+  if (!comment.replies) comment.replies = [];
+  comment.replies.push({ id: 'r_' + Date.now(), author: 'You', time: 'Just now', text: text });
+  window.renderFBCommentModal();
+};
+
+window.toggleCommentLike = function(commentId) {
+  const currentDisc = window.DISCUSSIONS_STORE[window.activeDiscussionId];
+  const c = currentDisc?.comments?.find(x => x.id === commentId);
+  if (!c) return;
+  c.isLiked = !c.isLiked;
+  c.likes = (c.likes || 0) + (c.isLiked ? 1 : -1);
+  window.renderFBCommentModal();
+};
+
+window.closeDiscussionModal = function() {
+  const container = getOrCreateModalContainer();
+  if (container) container.innerHTML = '';
+};
+
+// View All Discussions Page
+window.renderAllDiscussionsView = function() {
+  const list = [
+    { id: 'disc-grande', hospital: 'Grande International Hospital', logo: 'GI', time: '2 hours ago', question: 'Has anyone recently visited their emergency department?', replies: 14, helpful: 9 },
+    { id: 'disc-norvic', hospital: 'Norvic International Hospital', logo: 'NI', time: '5 hours ago', question: 'How was your experience with the cardiology department?', replies: 22, helpful: 17 },
+    { id: 'disc-hams', hospital: 'HAMS Hospital', logo: 'HA', time: 'Yesterday', question: 'Anyone know about their dermatology OPD timing and wait time?', replies: 8, helpful: 5 },
+    { id: 'disc-bnb', hospital: 'B&B Hospital', logo: 'BB', time: '2 days ago', question: 'Is the diabetes specialist available on weekends at B&B?', replies: 11, helpful: 8 },
+    { id: 'disc-mediciti', hospital: 'Nepal Mediciti Hospital', logo: 'NE', time: '3 days ago', question: 'How are the room charges and insurance claim process at Mediciti?', replies: 19, helpful: 12 },
+    { id: 'disc-patan', hospital: 'Patan Hospital', logo: 'PA', time: '4 days ago', question: 'Is prior appointment mandatory for general surgery OPD?', replies: 15, helpful: 10 },
+    { id: 'disc-kmc', hospital: 'Kathmandu Medical College (KMC)', logo: 'KA', time: '5 days ago', question: 'Best pediatrician for newborn vaccination schedule here?', replies: 7, helpful: 6 },
+    { id: 'disc-om', hospital: 'Om Hospital & Research Centre', logo: 'OM', time: '1 week ago', question: 'ENT department consultation fees and doctor availability?', replies: 13, helpful: 9 }
+  ];
+
+  return `
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 mb-16">
+      <div class="mb-8">
+        <button onclick="navigateTo('discovery')" class="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center space-x-1 mb-3 cursor-pointer">
+          <span>← Back to Discovery</span>
+        </button>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Healthcare Community Discussions</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Ask questions, read patient experiences, and discuss care across hospitals in Nepal.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
+        ${list.map(item => `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  ${item.logo}
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-900 text-xs leading-tight">${item.hospital}</h4>
+                  <span class="text-[11px] text-slate-400">${item.time}</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-700 font-medium mb-4 leading-relaxed">
+                "${item.question}"
+              </p>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-3">
+                ${item.replies} replies • ${item.helpful} helpful
+              </div>
+              <button onclick="window.openDiscussionModal('${item.id}')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer">
+                View Discussion
+              </button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+};
+// 1. LocalStorage Store & Filter States
+window.REVIEWS_STORE = JSON.parse(localStorage.getItem('NEPAL_HEALTH_REVIEWS')) || {
+  'disc-grande': [
+    { id: 'rev-1', author: 'Priya Maharjan', rating: 5, timestamp: Date.now() - 259200000, date: '3 days ago', text: 'The emergency department at Grande was incredibly efficient. My father was admitted within minutes and the staff was professional throughout.', hospitalName: 'Grande International Hospital', providerResponse: "Thank you for your kind words. We're glad your father received prompt care.", helpful: 24, commentsCount: 3 }
+  ],
+  'disc-norvic': [
+    { id: 'rev-1', author: 'Rajesh Thapa', rating: 4, timestamp: Date.now() - 604800000, date: '1 week ago', text: 'Good cardiologist but the waiting time is long. Arrived at 10am, waited nearly 2 hours before seeing Dr. Shrestha. The consultation was thorough.', hospitalName: 'Norvic International Hospital', helpful: 18, commentsCount: 5 }
+  ],
+  'disc-hams': [
+    { id: 'rev-1', author: 'Sunita Gurung', rating: 5, timestamp: Date.now() - 1209600000, date: '2 weeks ago', text: "Excellent physiotherapy unit at HAMS. Three weeks of treatment for my knee injury and I'm back to normal. The therapists genuinely care.", hospitalName: 'HAMS Hospital', helpful: 31, commentsCount: 7 }
+  ]
+};
+
+window.currentReviewFilter = window.currentReviewFilter || 'recent';
+
+window.setPatientVoiceFilter = function(filterType) {
+  window.currentReviewFilter = filterType;
+  if (typeof renderApp === 'function') renderApp();
+};
+
+window.setReviewFilter = function(filterType) {
+  window.currentReviewFilter = filterType;
+  if (typeof AppState !== 'undefined') AppState.activeView = 'all-reviews';
+  if (typeof renderApp === 'function') renderApp();
+};
+
+// 2. Global Review Submit Handler
+window.handleGlobalReviewSubmit = function(e) {
+  if (e) e.preventDefault();
+  const hospitalSelect = document.getElementById('globalReviewHospital');
+  if (!hospitalSelect) return;
+  
+  const hospitalId = hospitalSelect.value;
+  const hospitalName = hospitalSelect.options[hospitalSelect.selectedIndex].text;
+  const ratingVal = parseInt(document.getElementById('globalReviewRating').value);
+  const textVal = document.getElementById('globalReviewText').value.trim();
+  if (!textVal) return;
+
+  if (!window.REVIEWS_STORE[hospitalId]) window.REVIEWS_STORE[hospitalId] = [];
+
+  window.REVIEWS_STORE[hospitalId].unshift({
+    id: 'rev_' + Date.now(),
+    author: 'You (Verified Patient)',
+    rating: ratingVal,
+    timestamp: Date.now(),
+    date: 'Just now',
+    text: textVal,
+    hospitalName: hospitalName,
+    helpful: 0,
+    commentsCount: 0
+  });
+
+  localStorage.setItem('NEPAL_HEALTH_REVIEWS', JSON.stringify(window.REVIEWS_STORE));
+  if (typeof renderApp === 'function') renderApp();
+};
+
+// 3. Full Reviews Page View Renderer
+window.renderAllReviewsView = function() {
+  let allReviews = [];
+  const store = window.REVIEWS_STORE || {};
+  Object.keys(store).forEach(hId => {
+    const list = store[hId] || [];
+    list.forEach(r => allReviews.push({ ...r, hospitalId: hId }));
+  });
+
+  const filter = window.currentReviewFilter || 'recent';
+  const searchQuery = window.currentReviewSearch || '';
+
+  if (searchQuery.trim() !== '') {
+    const q = searchQuery.toLowerCase();
+    allReviews = allReviews.filter(r => 
+      (r.hospitalName && r.hospitalName.toLowerCase().includes(q)) || 
+      (r.text && r.text.toLowerCase().includes(q)) ||
+      (r.author && r.author.toLowerCase().includes(q))
+    );
+  }
+
+  if (filter === 'recent') {
+    allReviews.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  } else if (filter === 'highest') {
+    allReviews.sort((a, b) => b.rating - a.rating);
+  } else if (filter === 'lowest') {
+    allReviews.sort((a, b) => a.rating - b.rating);
+  }
+
+  return `
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 mb-16 text-left">
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <button onclick="navigateTo('discovery')" class="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center space-x-1 mb-3 cursor-pointer">
+            <span>← Back to Discovery</span>
+          </button>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">All Patient Reviews & Experiences</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Browse verified patient feedback across healthcare providers or share your own experience.</p>
+        </div>
+
+        <div class="inline-flex items-center bg-slate-100 p-1 rounded-xl text-xs font-semibold text-slate-600 self-start sm:self-auto">
+          <button onclick="window.setReviewFilter('recent')" class="px-3 py-1.5 rounded-lg transition cursor-pointer ${filter === 'recent' ? 'bg-white shadow-xs text-slate-900 font-bold' : 'hover:text-slate-900'}">Most Recent</button>
+          <button onclick="window.setReviewFilter('highest')" class="px-3 py-1.5 rounded-lg transition cursor-pointer ${filter === 'highest' ? 'bg-white shadow-xs text-slate-900 font-bold' : 'hover:text-slate-900'}">Highest Rated</button>
+          <button onclick="window.setReviewFilter('lowest')" class="px-3 py-1.5 rounded-lg transition cursor-pointer ${filter === 'lowest' ? 'bg-white shadow-xs text-slate-900 font-bold' : 'hover:text-slate-900'}">Lowest Rated</button>
+        </div>
+      </div>
+
+      <!-- Reviews List Feed -->
+      <div class="space-y-4">
+        ${allReviews.length === 0 ? '<p class="text-slate-400 text-center py-8 text-xs">No matching reviews found.</p>' : ''}
+        ${allReviews.map(r => {
+          const stars = Array.from({length: 5}, (_, i) => `<span class="${i < r.rating ? 'text-amber-400' : 'text-slate-300'}">★</span>`).join('');
+          const initials = r.author ? r.author.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'VP';
+          return `
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">${initials}</div>
+                    <div>
+                      <span class="font-bold text-slate-900 text-xs block">${r.author}</span>
+                      <span class="text-[10px] text-slate-400">${r.date || 'Just now'} / Verified Patient</span>
+                    </div>
+                  </div>
+                  <div class="text-xs">${stars}</div>
+                </div>
+                <p class="text-xs text-slate-600 mb-3">"${r.text}"</p>
+              </div>
+              <div class="pt-3 border-t border-slate-100 text-[11px] font-medium text-slate-700">
+                ${r.hospitalName || 'Healthcare Provider'}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+};
+window.setStarRating = function(rating) {
+  const input = document.getElementById('selectedStarRating');
+  if (input) input.value = rating;
+  const ratingText = document.getElementById('ratingText');
+  if (ratingText) ratingText.innerText = `(${rating}/5 ${labels[rating]})`;
+
+  const stars = document.querySelectorAll('#starContainer .star-btn');
+  stars.forEach((s, idx) => {
+    if (idx < rating) {
+      s.classList.remove('text-slate-300');
+      s.classList.add('text-amber-400');
+    } else {
+      s.classList.remove('text-amber-400');
+      s.classList.add('text-slate-300');
+    }
+  });
+};
+
+window.previewStarRating = function(rating) {
+  const stars = document.querySelectorAll('#starContainer .star-btn');
+  stars.forEach((s, idx) => {
+    if (idx < rating) {
+      s.classList.add('text-amber-200');
+    } else {
+      s.classList.remove('text-amber-200');
+    }
+  });
+};
