@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAINO HEALTH - Search, Discover, Review & Book Healthcare in Nepal</title>
+  <meta name="description" content="Nepal's premier connected healthcare marketplace. Search, discover, review and book doctor consultations, hospital OPD, diagnostic scans, homecare nurses and emergency blood bank across Kathmandu, Lalitpur, Pokhara and nationwide.">
+
+  <!-- Google Fonts (Plus Jakarta Sans & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            saino: {
+              red: '#ad0b0e',
+              'red-dark': '#B3121A',
+              'red-light': '#FDE8E9',
+              navy: '#1A2B4C',
+              'navy-light': '#2A4070',
+              gray: {
+                50: '#F8F9FA',
+                100: '#F1F3F5',
+                200: '#E9ECEF',
+                300: '#DEE2E6',
+                400: '#CED4DA',
+                500: '#ADB5BD',
+                600: '#6C757D',
+                700: '#495057',
+                800: '#343A40',
+                900: '#212529',
+              }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-saino-gray-50 text-saino-gray-800 font-sans antialiased min-h-screen flex flex-col selection:bg-saino-red selection:text-white">
+
+
+   <!-- Top Header -->
+<header class="sticky top-0 z-40 bg-[#d6d6d6] backdrop-blur-md border-b border-saino-gray-200 shadow-sm">    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between min-h-[72px] py-2 gap-4">
+        
+        <!-- Brand Logo -->
+        <a href="#" data-nav="marketplace" class="flex items-center space-x-3 group py-1 flex-shrink-0 ml-0 md:-ml-8">
+  <img src="assets/logo.png" alt="SAINO HEALTH" class="h-12 sm:h-14 md:h-16 w-auto max-w-[200px] object-contain transition group-hover:scale-105 drop-shadow-xs">
+</a>
+
+            <!-- Header Search Bar - Desktop Only -->
+    <div class="hidden md:flex flex-1 max-w-xl items-center bg-saino-gray-50 rounded-lg border border-saino-gray-200 p-1 pl-4 shadow-sm focus-within:border-saino-red focus-within:ring-2 focus-within:ring-saino-red/20 transition">
+      <i data-lucide="search" class="w-4 h-4 text-saino-gray-400 mr-2 flex-shrink-0"></i>
+
+      <input 
+        type="text" 
+        id="headerSearchInput" 
+        placeholder="Search hospitals, clinics, services..." 
+        class="bg-transparent flex-1 text-xs text-saino-gray-800 font-medium focus:outline-none placeholder-saino-gray-400"
+      >
+
+      <div class="h-4 w-px bg-saino-gray-300 mx-2"></div>
+
+      <select 
+        id="headerLocationSelect" 
+        class="bg-transparent text-xs text-saino-gray-600 font-semibold focus:outline-none cursor-pointer pr-2"
+      >
+        <option value="all">All Locations</option>
+        <option value="Kathmandu">Kathmandu</option>
+        <option value="Lalitpur">Lalitpur</option>
+        <option value="Bhaktapur">Bhaktapur</option>
+        <option value="Pokhara">Pokhara</option>
+        <option value="Chitwan">Chitwan</option>
+      </select>
+
+      <button 
+        onclick="triggerHeaderSearch()" 
+        class="px-4 py-1.5 bg-[#ad0b0e] hover:bg-saino-red-dark text-white font-bold rounded-lg text-xs transition shadow-sm"
+      >
+        Search
+      </button>
+    </div>
+
+      
+<!-- Right Actions - Desktop -->
+<div class="hidden md:flex items-center gap-2 flex-shrink-0">
+
+  <button
+    onclick="openProviderSignInModal('patient')"
+    class="header-action-btn bg-saino-red hover:bg-saino-red-dark text-white"
+  >
+    Sign In
+  </button>
+
+  <a
+    href="#"
+    class="header-action-btn bg-saino-red hover:bg-saino-red-dark text-white"
+  >
+    <span>Get Started</span>
+  </a>
+
+</div>
+
+        <!-- Mobile + Tablet Actions (Sign In + Menu) - visible below 768px -->
+        <div class="md:hidden flex items-center space-x-2 ml-auto">
+            <button
+        onclick="openProviderSignInModal('patient')"
+        class="w-24 h-9 px-3 rounded-lg bg-saino-red hover:bg-saino-red-dark border border-saino-red text-white font-bold text-xs flex items-center justify-center transition shadow-xs"
+      >
+        Sign In
+      </button>
+          <button id="mobileMenuBtn" class="p-2 rounded-xl text-saino-gray-600 hover:bg-saino-gray-100 transition">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+  </div>
+
+    <!-- Sub-Navigation -->
+<div class="bg-[#d6d6d6] px-4 sm:px-6 lg:px-8 py-2">      
+  <div class="max-w-7xl mx-auto flex items-center justify-between text-xs font-bold text-saino-gray-600">
+        <nav class="flex items-center space-x-6">
+          <a href="#" data-nav="marketplace" class="text-saino-red font-black uppercase tracking-wider hover:text-saino-red-dark transition">HOME</a>
+          <a href="#" data-nav="about" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Discover</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Find Health care</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">My Appoinments</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Saved</a>
+
+        </nav>
+        <div class="hidden md:flex items-center space-x-5 text-saino-gray-700 font-semibold text-[11px]">
+    
+          <a href="#" data-nav="about" class="text-saino-gray-700 hover:text-saino-red transition">List Your Care</a>
+          <a href="#" data-nav="contact" class="text-saino-gray-700 hover:text-saino-red transition">About Us</a>
+          <a href="#" data-nav="about" class="text-saino-gray-700 hover:text-saino-red transition">Contact Us</a>
+          <a href="#" data-nav="contact" class="text-saino-gray-700 hover:text-saino-red transition">FAQs</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-saino-gray-200 bg-white px-4 py-4 space-y-2 shadow-lg">
+      <a href="#" data-nav="marketplace" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Home</a>
+      <a href="#" data-nav="discovery" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition flex items-center justify-between">
+        <span>Discovery</span>
+        <span class="px-1.5 py-0.5 rounded text-[10px] bg-saino-red/10 text-saino-red font-bold">Explore</span>
+      </a>
+      <a href="#" data-nav="about" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">About us</a>
+      <a href="#" data-nav="contact" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Contact us</a>
+      <a href="#" data-nav="list-your-care" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-red hover:bg-saino-red/5 transition">List your care</a>
+      <div class="pt-3 border-t border-saino-gray-100 mb-2">
+        <button onclick="openProviderSignInModal('patient')" class="w-full py-2.5 text-xs font-bold text-saino-gray-800 border border-saino-gray-200 rounded-xl hover:border-saino-red hover:text-saino-red hover:bg-saino-red/5 transition flex items-center justify-center space-x-2">
+          <i data-lucide="user" class="w-4 h-4 text-saino-red"></i>
+          <span>Sign In / Register</span>
+        </button>
+      </div>
+      <a href="tel:+9779761427155" class="w-full py-2.5 text-xs font-bold bg-saino-red hover:bg-saino-red-dark text-white rounded-xl shadow flex items-center justify-center space-x-2 transition">
+        <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+        <span>Call Hotline: +977 9761427155</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-saino-gray-50 via-white to-saino-gray-50 border-b border-saino-gray-200 pt-8 pb-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto text-center">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-saino-gray-900 tracking-tight leading-tight mb-4">
+        Welcome back! Start your Journey with <span class="text-saino-red">#SAINO HEALTH</span>
+      </h1>
+
+      <!-- Quick Category Pills -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-6">
+        <button onclick="filterCategory('hospital')" class="px-4 py-1.5 rounded-full border border-saino-gray-200 bg-white text-xs font-bold text-saino-gray-700 hover:border-saino-red hover:text-saino-red shadow-xs transition">HOSPITALS</button>
+        <button onclick="filterCategory('clinic')" class="px-4 py-1.5 rounded-full border border-saino-gray-200 bg-white text-xs font-bold text-saino-gray-700 hover:border-saino-red hover:text-saino-red shadow-xs transition">CLINICS</button>
+        <button onclick="filterCategory('diagnostic')" class="px-4 py-1.5 rounded-full border border-saino-gray-200 bg-white text-xs font-bold text-saino-gray-700 hover:border-saino-red hover:text-saino-red shadow-xs transition">DIAGNOSTIC CENTRES</button>
+        <button onclick="filterCategory('pharmacy')" class="px-4 py-1.5 rounded-full border border-saino-gray-200 bg-white text-xs font-bold text-saino-gray-700 hover:border-saino-red hover:text-saino-red shadow-xs transition">PHARMACY & LABS</button>
+        <button onclick="filterCategory('ambulance')" class="px-4 py-1.5 rounded-full border border-saino-gray-200 bg-white text-xs font-bold text-saino-gray-700 hover:border-saino-red hover:text-saino-red shadow-xs transition">AMBULANCE</button>
+        <button onclick="filterCategory('bloodbank')" class="px-4 py-1.5 rounded-full border border-saino-gray-200 bg-white text-xs font-bold text-saino-gray-700 hover:border-saino-red hover:text-saino-red shadow-xs transition">BLOOD BANKS</button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="bg-white p-2 rounded-2xl shadow-lg border border-saino-gray-200 max-w-3xl mx-auto flex flex-col sm:flex-row items-center gap-2 mb-5">
+        <div class="w-full sm:flex-1 flex items-center px-3 py-2 text-xs">
+          <i data-lucide="search" class="w-4 h-4 text-saino-gray-400 mr-2 flex-shrink-0"></i>
+          <input type="text" id="globalSearchInput" placeholder="Search hospitals, clinics, services..." class="bg-transparent w-full text-saino-gray-800 font-medium focus:outline-none">
+        </div>
+        <div class="w-full sm:w-auto flex items-center px-3 py-2 bg-saino-gray-50 rounded-xl text-xs border border-saino-gray-200">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-saino-red mr-1.5"></i>
+          <select id="globalLocationSelect" class="bg-transparent text-saino-gray-800 font-semibold focus:outline-none cursor-pointer">
+            <option value="all">Kathmandu ▾</option>
+            <option value="Kathmandu">Kathmandu</option>
+            <option value="Lalitpur">Lalitpur</option>
+            <option value="Bhaktapur">Bhaktapur</option>
+            <option value="Pokhara">Pokhara</option>
+            <option value="Chitwan">Chitwan</option>
+          </select>
+        </div>
+        <button onclick="renderApp()" class="w-full sm:w-auto px-6 py-2.5 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-xl text-xs shadow-md transition">
+          Search
+        </button>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="flex flex-wrap items-center justify-center gap-6 text-xs font-bold text-saino-gray-600">
+        <span class="flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i><span>VERIFIED DOCTORS</span></span>
+        <span class="flex items-center space-x-1.5"><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i><span>INSTANT OPD TOKENS</span></span>
+        <span class="flex items-center space-x-1.5"><i data-lucide="truck" class="w-4 h-4 text-saino-red"></i><span>24/7 ALS AMBULANCE</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dynamic Main Content -->
+  <main id="mainContent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    <!-- Populated dynamically via app.js -->
+  </main>
+
+  
+
+<!-- Footer -->
+<footer class="bg-[#c0c5cc] text-saino-gray-700 pt-12 pb-6 border-t-4 border-[#c0c5cc] shadow-2xl relative overflow-hidden">
+  <!-- Decorative Elements -->
+  <div class="absolute top-0 right-0 w-96 h-96 bg-saino-red/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+  <div class="absolute bottom-0 left-0 w-64 h-64 bg-saino-red/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+    <!-- Main Footer Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 pb-8 md:pb-12 border-b border-saino-gray-300">
+
+      <!-- Brand Column -->
+      <div class="lg:col-span-2 space-y-4 text-center md:text-left">
+
+        <!-- Logo + Brand -->
+        <div class="flex flex-col md:flex-row items-center md:items-start space-y-3 md:space-y-0 md:space-x-3">
+          <!-- Logo Frame -->
+          <div class="bg-[#d6d6d6] p-2.5 rounded-2xl   border-[#d6d6d6] inline-block">
+            <img src="assets/logo.png" alt="SAINO HEALTH" class="footer-logo-img w-auto object-contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%23c0c5cc%22 rx=%2212%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 font-family=%22Arial%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23E31B23%22%3ESAINO%3C/text%3E%3C/svg%3E'">
+          </div>
+          <div>
+            <span class="text-base font-black text-saino-gray-900 tracking-tight block">SAINO HEALTH</span>
+            <span class="text-[10px] font-extrabold text-saino-red tracking-widest uppercase">Connected. Simplified. Better Health.</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm text-saino-gray-700 leading-relaxed max-w-sm mx-auto md:mx-0">
+          Nepal's premier unified healthcare discovery and booking marketplace, bridging patients directly with verified doctors, clinics, diagnostics, and 24/7 emergency response.
+        </p>
+
+        <!-- Contact -->
+        <div class="text-sm text-saino-gray-700 space-y-2 pt-1 flex flex-col items-center md:items-start">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="phone" class="w-4 h-4 text-saino-red flex-shrink-0"></i>
+            <span>Appointment Booking: <a href="tel:+9779761427155" class="text-saino-gray-900 font-semibold hover:text-saino-red transition">+977 9761427155</a></span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <i data-lucide="mail" class="w-4 h-4 text-saino-red flex-shrink-0"></i>
+            <span><a href="mailto:support@sainohealth.com" class="text-saino-gray-900 font-semibold hover:text-saino-red transition">support@sainohealth.com</a></span>
+          </div>
+        </div>
+
+        <!-- Social Icons -->
+        <div class="flex items-center justify-center md:justify-start space-x-3 pt-3">
+          <a href="https://facebook.com" target="_blank" class="w-10 h-10 rounded-full bg-[#1877F2] hover:bg-[#1877F2]/80 text-white flex items-center justify-center transition-all duration-300 shadow-md hover:scale-110" title="Facebook">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://instagram.com" target="_blank" class="w-10 h-10 rounded-full bg-gradient-to-r from-[#feda75] via-[#d62976] to-[#4f5bd5] hover:brightness-110 text-white flex items-center justify-center transition-all duration-300 shadow-md hover:scale-110" title="Instagram">
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://linkedin.com" target="_blank" class="w-10 h-10 rounded-full bg-[#0A66C2] hover:bg-[#0A66C2]/80 text-white flex items-center justify-center transition-all duration-300 shadow-md hover:scale-110" title="LinkedIn">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </a>
+          <a href="https://youtube.com" target="_blank" class="w-10 h-10 rounded-full bg-[#FF0000] hover:bg-[#FF0000]/80 text-white flex items-center justify-center transition-all duration-300 shadow-md hover:scale-110" title="YouTube">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Company -->
+      <div>
+        <h4 class="text-sm font-black text-saino-gray-900 uppercase tracking-wider mb-4 pb-2 border-b border-saino-gray-300">Company</h4>
+        <ul class="space-y-2.5 text-sm">
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Home Marketplace</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">About Us</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Healthcare Discovery</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Press & Media</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Contact Support</a></li>
+        </ul>
+      </div>
+
+      <!-- Care Services -->
+      <div>
+        <h4 class="text-sm font-black text-saino-gray-900 uppercase tracking-wider mb-4 pb-2 border-b border-saino-gray-300">Care Services</h4>
+        <ul class="space-y-2.5 text-sm">
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Hospitals</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Specialist Clinics</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Diagnostic Labs</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">24/7 Ambulance Dispatch</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Blood Banks & Donors</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Health Insurance Plans</a></li>
+        </ul>
+      </div>
+
+      <!-- Providers & Legal -->
+      <div>
+        <h4 class="text-sm font-black text-saino-gray-900 uppercase tracking-wider mb-4 pb-2 border-b border-saino-gray-300">Providers & Legal</h4>
+        <ul class="space-y-2.5 text-sm">
+          <li>
+            <a href="#" class="text-saino-red font-bold hover:text-saino-red-dark transition">★ List Your Care Facility</a>
+          </li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Provider Login</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Verification Badges</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Privacy Policy</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Terms of Service</a></li>
+          <li><a href="#" class="text-saino-gray-700 hover:text-saino-red transition">Medical Disclaimer</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-sm text-saino-gray-600 gap-4">
+      <div>
+        © 2026 Saino Health. All rights reserved. Saino Tech Ventures.
+      </div>
+      <div class="flex items-center space-x-4 text-saino-gray-600 font-medium text-center flex-wrap justify-center">
+        <span>Kathmandu</span>
+        <span class="w-1 h-1 rounded-full bg-saino-gray-400"></span>
+        <span>Pokhara</span>
+        <span class="w-1 h-1 rounded-full bg-saino-gray-400"></span>
+        <span>Chitwan</span>
+        <span class="w-1 h-1 rounded-full bg-saino-gray-400"></span>
+        <span>Biratnagar</span>
+        <span class="w-1 h-1 rounded-full bg-saino-gray-400"></span>
+        <span>Butwal</span>
+        <span class="w-1 h-1 rounded-full bg-saino-gray-400"></span>
+        <span>Nepalgunj</span>
+        <span class="w-1 h-1 rounded-full bg-saino-gray-400"></span>
+        <span>Dhangadhi</span>
+      </div>
+    </div>
+
+  </div>
+</footer>
+  <!-- Global Modal Container -->
+  <div id="modalContainer"></div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-saino-gray-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-saino-gray-700 flex items-center space-x-3 text-xs font-semibold">
+      <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i>
+      <span id="toastMessage">Action completed successfully!</span>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
