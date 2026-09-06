@@ -63,21 +63,16 @@ function initNavigation() {
   function navigateTo(viewName) {
   AppState.activeView = viewName;
   
-  const mobileMenu = document.getElementById('mobileMenu');
-  if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+   const mobileMenu = document.getElementById('mobileMenu');
+  if (mobileMenu) {
     mobileMenu.classList.add('hidden');
   }
-
   renderApp();
 }
-
-// Render Master Controller
  // Render Master Controller
 function renderApp() {
   const heroSection = document.getElementById('homeHeroSection');
   const isSubPage = ['discovery', 'providers-showcase', 'discussions', 'all-reviews'].includes(AppState.activeView);
-
-  // Sirf hero section hide/show ka logic rahega
   if (heroSection) {
     heroSection.style.setProperty('display', isSubPage ? 'none' : 'block', 'important');
   }
@@ -903,9 +898,9 @@ function bindCampaignsEvents() {}
 
   return `
     <div class="w-full mb-16 px-0">  
-       <section class="relative overflow-hidden bg-[#0a0f1d] text-white shadow-xl mb-8 border-y border-slate-800 w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[600px]">
-            <a 
-                href="#video-library" 
+        ${renderMobileDiscoveryCarousel(s)}
+        <section class="hidden md:block relative bg-[#0a0f1d] text-white shadow-xl mb-8 border-y border-slate-800 w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] min-h-[290px] sm:min-h-[400px] md:h-[600px] flex flex-col justify-between">
+               <a href="#video-library" 
                 onclick="navigateTo('marketplace')" 
                 class="absolute top-8 right-24 z-20 inline-flex items-center space-x-2 px-4 py-2.5 rounded-md bg-[#334155]/60 hover:bg-[#202d47] border border-slate-400/40 text-slate-200 hover:text-white text-xs font-medium tracking-wide shadow-sm transition-all duration-150 cursor-pointer select-none">
                 
@@ -989,12 +984,14 @@ function bindCampaignsEvents() {}
             <span>View Package</span>
             <span class="text-xs font-black leading-none text-[#881337]">→</span>
           </button>
-      </div>
-      <p id="discSlideValidity" class="text-xs sm:text-[13px] text-slate-400/60 font-normal tracking-wide mt-3 select-none">
-        ${s.validity || 'Valid until 30 September 2026'}
-      </p>
-            <button onclick="nextDiscoverySlide()" class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-xl z-30">
-              <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          </div>
+          <p id="discSlideValidity" class="text-xs sm:text-[13px] text-slate-400/60 font-normal tracking-wide mt-3 select-none">
+            ${s.validity || 'Valid until 30 September 2026'}
+          </p>
+            <button onclick="nextDiscoverySlide()" class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-xl z-30 cursor-pointer hover:bg-slate-100 transition">
+              <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
             </button>
         
             <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-3.5 z-30">
@@ -1545,8 +1542,81 @@ function renderProvidersShowcaseView() {
 }
 
 // ==========================================
-// 3. DEDICATED "LIST YOUR CARE" / "LIST YOUR BUSINESS" VIEW (PAGE 1 - 8 OFFICIAL SPEC)
+// Dicovery page rendering functions
 // ==========================================
+ // Dedicated Mobile Carousel 
+ // Dedicated Mobile Carousel (Compact Badges + Working Arrow)
+function renderMobileDiscoveryCarousel(s) {
+  return `
+    <div class="block md:hidden w-full bg-[#0a0f1d] text-white p-3 rounded-2xl mb-6 relative overflow-hidden border border-slate-800 shadow-lg">
+      
+      <!-- Side-by-Side: Left me Photo, Right me Info -->
+      <div class="flex items-center gap-3">
+        
+        <!-- 1. Left: Choti Photo -->
+        <div class="w-28 h-44 shrink-0 rounded-xl overflow-hidden border border-slate-700 shadow-md">
+          <img src="${s.image}" alt="${s.hospital}" class="w-full h-full object-cover">
+        </div>
+
+        <!-- 2. Right: Info & Buttons -->
+        <div class="flex-1 min-w-0 text-left pr-7">
+          
+          <!-- Badges (Ab VVIP jitna hi compact rahega, 2 line me nahi tootega) -->
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-[#142952] text-[#3b82f6] border border-[#1d4ed8]/40 whitespace-nowrap">
+              CAMPAIGN
+            </span>
+            <span class="px-2 py-0.5 rounded text-[9px] font-bold text-purple-300 bg-[#162032] border border-purple-500 whitespace-nowrap">
+              ${s.tier || 'VVIP'}
+            </span>
+          </div>
+
+          <h2 class="text-xs font-bold text-white leading-snug mb-1 drop-shadow-sm">
+            ${s.titleHtml}
+          </h2>
+
+          <p class="text-[10px] font-semibold text-slate-200 truncate mb-1">
+            ${s.hospital}
+          </p>
+
+          <p class="text-[9px] text-slate-400 leading-tight mb-2 line-clamp-2">
+            ${s.note}
+          </p>
+
+          <div class="mb-2">
+            <span class="text-xs font-bold text-white">NPR 2,999</span>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex items-center gap-1.5">
+            <button onclick="triggerCampaignWhatsApp()" class="px-3 py-1 rounded-full border border-slate-600 bg-[#152136] text-white text-[9px] font-medium">
+              Watch
+            </button>
+            <button onclick="navigateTo('marketplace')" class="px-3 py-1 rounded-full bg-white text-[#881337] text-[9px] font-bold shadow-xs">
+              Package →
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Arrow Button (Isme renderApp sync juda hai) -->
+      <button type="button" onclick="window.nextDiscoverySlide()" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white text-black flex items-center justify-center shadow-2xl z-30 cursor-pointer">
+        <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+      <!-- Dots -->
+      <div class="flex items-center justify-center space-x-1.5 mt-2">
+        <span class="inline-block rounded-full ${AppState.discoverySlideIndex === 0 ? 'w-2 h-2 bg-white' : 'w-1.5 h-1.5 bg-white/40'}"></span>
+        <span class="inline-block rounded-full ${AppState.discoverySlideIndex === 1 ? 'w-2 h-2 bg-white' : 'w-1.5 h-1.5 bg-white/40'}"></span>
+        <span class="inline-block rounded-full ${AppState.discoverySlideIndex === 2 ? 'w-2 h-2 bg-white' : 'w-1.5 h-1.5 bg-white/40'}"></span>
+      </div>
+
+    </div>
+  `;
+}
 function renderListYourCareView() {
   return `
     <div class="max-w-6xl mx-auto mb-16">
