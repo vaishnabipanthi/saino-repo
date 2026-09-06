@@ -1629,5 +1629,166 @@ window.SAINO_DATA = {
       validTill: 'Monthly Flexible Booking',
       whatsappMsg: 'Hello Everest Homecare, I would like to book a verified homecare nurse.'
     }
+  ],
+
+  // ==========================================
+  // SAINO RATED DIRECTORY (Discovery Screen Matrices: Hospital 10, Clinic 10, Diag 5, Ambulance 5, Labs 5, Blood 5)
+  // ==========================================
+  sainoRated: {
+    hospitals: [
+      { id: 'h-1', name: 'Norvic Heart & Vascular Institute', area: 'Thapathali, Kathmandu', rating: 4.9, reviews: 340, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '24/7 Emergency & ICU', fee: 'Rs. 950', phone: '+977-1-5970032', image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&auto=format&fit=crop&q=80', special: 'Cath Lab, Angioplasty, Cardiac ICU' },
+      { id: 'h-2', name: 'CityCare Multispeciality Hospital', area: 'Lazimpat, Kathmandu', rating: 4.8, reviews: 240, badge: 'SAINO VIP', badgeType: 'vip', opd: '08:00 AM - 08:00 PM', fee: 'Rs. 750', phone: '+977-1-4428900', image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=600&auto=format&fit=crop&q=80', special: 'Internal Medicine, Neuro, Pediatrics' },
+      { id: 'h-3', name: 'Pokhara Lakeside Hospital', area: 'Lakeside, Pokhara', rating: 4.7, reviews: 185, badge: 'SAINO PRO', badgeType: 'pro', opd: '07:00 AM - 08:00 PM', fee: 'Rs. 600', phone: '+977-61-465800', image: 'https://images.unsplash.com/photo-1512678080530-7760d81faba6?w=600&auto=format&fit=crop&q=80', special: 'Tourist Trauma Care, General Surgery' },
+      { id: 'h-4', name: 'Biratnagar MediCare Hospital', area: 'Main Road, Biratnagar', rating: 4.7, reviews: 195, badge: 'SAINO PRO', badgeType: 'pro', opd: '08:00 AM - 07:00 PM', fee: 'Rs. 600', phone: '+977-21-524100', image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&auto=format&fit=crop&q=80', special: 'Cardiology, Renal Dialysis, Trauma' },
+      { id: 'h-5', name: 'Grande Metro Speciality Hospital Partner', area: 'Dhapasi, Kathmandu', rating: 4.8, reviews: 310, badge: 'SAINO VIP', badgeType: 'vip', opd: '24/7 Trauma & OPD', fee: 'Rs. 900', phone: '+977-1-5159266', image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=600&auto=format&fit=crop&q=80', special: 'Joint Replacement, Spine Surgery, Oncology' },
+      { id: 'h-6', name: 'Patan LifeCare Medical Center', area: 'Lagankhel, Lalitpur', rating: 4.6, reviews: 220, badge: 'SAINO PRO', badgeType: 'pro', opd: '07:30 AM - 07:30 PM', fee: 'Rs. 550', phone: '+977-1-5522100', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80', special: 'Mother & Child Care, Laparoscopy' },
+      { id: 'h-7', name: 'Kathmandu Model Hospital Triage', area: 'Exhibition Road, Kathmandu', rating: 4.5, reviews: 280, badge: 'SAINO LISTED', badgeType: 'listed', opd: '08:00 AM - 05:00 PM', fee: 'Rs. 450', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&auto=format&fit=crop&q=80', special: 'Affordable Surgery, Community OPD' },
+      { id: 'h-8', name: 'Nepal MedCity Speciality Partner Hub', area: 'Bhaisepati, Lalitpur', rating: 4.9, reviews: 420, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '24/7 Emergency Care', fee: 'Rs. 1,000', phone: '+977-1-4217766', image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=600&auto=format&fit=crop&q=80', special: 'Robotic Surgery, Bone Marrow Transplant' },
+      { id: 'h-9', name: 'Civil Service Hospital Triage Station', area: 'Minbhawan, Kathmandu', rating: 4.6, reviews: 215, badge: 'SAINO LISTED', badgeType: 'listed', opd: '08:30 AM - 04:30 PM', fee: 'Rs. 350', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&auto=format&fit=crop&q=80', special: 'Hematology, Surgical Oncology' },
+      { id: 'h-10', name: 'B&B Trauma & Orthopedic Speciality', area: 'Gwarko, Lalitpur', rating: 4.8, reviews: 360, badge: 'SAINO VIP', badgeType: 'vip', opd: '24/7 Trauma Emergency', fee: 'Rs. 850', phone: '+977-1-5531930', image: 'https://images.unsplash.com/photo-1512678080530-7760d81faba6?w=600&auto=format&fit=crop&q=80', special: 'Polytrauma, Arthroscopy, Hand Surgery' }
+    ],
+
+    clinics: [
+      { id: 'c-1', name: 'Grande Metro Dental & ENT Clinic', area: 'Maharajgunj, Kathmandu', rating: 4.8, reviews: 180, badge: 'SAINO PRO', badgeType: 'pro', opd: '08:00 AM - 07:00 PM', fee: 'Rs. 600', phone: '+977-1-4720100', image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&auto=format&fit=crop&q=80', special: 'Dental Implants, Micro-Ear Surgery' },
+      { id: 'c-2', name: 'Nepal Eye Care Laser Foundation', area: 'Tripureshwor, Kathmandu', rating: 4.9, reviews: 290, badge: 'SAINO VIP', badgeType: 'vip', opd: '07:30 AM - 06:00 PM', fee: 'Rs. 500', phone: '+977-1-4261100', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80', special: 'Retina Scan, SMILE Laser Eye Correction' },
+      { id: 'c-3', name: 'Himalayan Physio & Sports Rehab', area: 'Baneshwor, Kathmandu', rating: 4.7, reviews: 145, badge: 'SAINO PRO', badgeType: 'pro', opd: '07:00 AM - 07:30 PM', fee: 'Rs. 700', phone: '+977-1-4785400', image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&auto=format&fit=crop&q=80', special: 'Dry Needling, Post-Op Joint Mobility' },
+      { id: 'c-4', name: 'Kathmandu Smile Cosmetic Dentistry', area: 'New Road, Kathmandu', rating: 4.6, reviews: 110, badge: 'SAINO LISTED', badgeType: 'listed', opd: '09:00 AM - 06:00 PM', fee: 'Rs. 400', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&auto=format&fit=crop&q=80', special: 'Teeth Whitening, Root Canal (RCT)' },
+      { id: 'c-5', name: 'Bhaktapur Diabetic & Thyroid Center', area: 'Suryabinayak, Bhaktapur', rating: 4.5, reviews: 98, badge: 'SAINO LISTED', badgeType: 'listed', opd: '08:00 AM - 05:00 PM', fee: 'Rs. 450', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600&auto=format&fit=crop&q=80', special: 'Continuous Glucose Monitoring, Dietetics' },
+      { id: 'c-6', name: 'Kathmandu Heart & ECG Clinic', area: 'Putalisadak, Kathmandu', rating: 4.6, reviews: 125, badge: 'SAINO LISTED', badgeType: 'listed', opd: '08:00 AM - 06:00 PM', fee: 'Rs. 500', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=600&auto=format&fit=crop&q=80', special: 'TMT Stress Test, 24-hr Holter Monitor' },
+      { id: 'c-7', name: 'Nagarjun Spine & Posture Studio', area: 'Sitapaila, Kathmandu', rating: 4.7, reviews: 140, badge: 'SAINO PRO', badgeType: 'pro', opd: '07:30 AM - 07:00 PM', fee: 'Rs. 750', phone: '+977-1-4281200', image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80', special: 'Chiropractic Adjustment, Ergonomics' },
+      { id: 'c-8', name: 'Chitwan Cancer Screening & Daycare', area: 'Bharatpur, Chitwan', rating: 4.8, reviews: 160, badge: 'SAINO VIP', badgeType: 'vip', opd: '08:00 AM - 06:00 PM', fee: 'Rs. 650', phone: '+977-56-521900', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80', special: 'Mammography, Pap Smear, Day Chemotherapy' },
+      { id: 'c-9', name: 'Baneshwor Mother & Pediatric Center', area: 'Old Baneshwor, Kathmandu', rating: 4.7, reviews: 130, badge: 'SAINO PRO', badgeType: 'pro', opd: '08:00 AM - 07:30 PM', fee: 'Rs. 550', phone: '+977-1-4471900', image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=600&auto=format&fit=crop&q=80', special: 'Childhood Vaccines, Growth Milestones' },
+      { id: 'c-10', name: 'Lalitpur Orthopedic & Arthritis Clinic', area: 'Kumaripati, Lalitpur', rating: 4.6, reviews: 115, badge: 'SAINO LISTED', badgeType: 'listed', opd: '08:30 AM - 06:30 PM', fee: 'Rs. 500', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80', special: 'Hyaluronic Injections, Knee Arthroscopy OPD' }
+    ],
+
+    diagnostics: [
+      { id: 'd-1', name: 'Annapurna Advanced Diagnostics & 3.0T MRI', area: 'Maitighar, Kathmandu', rating: 4.9, reviews: 310, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '06:30 AM - 08:30 PM', fee: 'Rs. 8,500 (MRI)', phone: '+977-1-4265400', image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&auto=format&fit=crop&q=80', special: '3.0 Tesla MRI, 128-Slice Cardiac CT, 4D USG' },
+      { id: 'd-2', name: 'LifeTrust Medical Diagnostics', area: 'Gongabu, Kathmandu', rating: 4.4, reviews: 85, badge: 'SAINO LISTED', badgeType: 'listed', opd: '07:00 AM - 07:00 PM', fee: 'Rs. 450 (CBC)', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600&auto=format&fit=crop&q=80', special: 'Digital X-Ray, Thyroid Profiles, Liver Function' },
+      { id: 'd-3', name: 'Quest Diagnostic PathLab Nepal', area: 'Jawalakhel, Lalitpur', rating: 4.8, reviews: 195, badge: 'SAINO VIP', badgeType: 'vip', opd: '06:30 AM - 08:00 PM', fee: 'Rs. 1,200 (Whole Body)', phone: '+977-1-5539200', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80', special: 'Cancer Biomarkers, Autoimmune Panels, Hormones' },
+      { id: 'd-4', name: 'Star High-Precision Imaging & Ultrasound', area: 'Sanepa, Lalitpur', rating: 4.7, reviews: 140, badge: 'SAINO PRO', badgeType: 'pro', opd: '07:00 AM - 07:00 PM', fee: 'Rs. 1,800 (USG)', phone: '+977-1-5551900', image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&auto=format&fit=crop&q=80', special: 'Color Doppler, Fetal Anomaly Scan, Elastography' },
+      { id: 'd-5', name: 'CityCare Molecular Scanning Center', area: 'Lazimpat, Kathmandu', rating: 4.8, reviews: 165, badge: 'SAINO VIP', badgeType: 'vip', opd: '07:00 AM - 07:30 PM', fee: 'Rs. 3,500 (CT)', phone: '+977-1-4428910', image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=600&auto=format&fit=crop&q=80', special: 'HRCT Chest, Bone Densitometry (DEXA), Biopsy' }
+    ],
+
+    ambulances: [
+      { id: 'a-1', name: 'Patan LifeCare 24/7 ALS Ventilator Ambulance Fleet', area: 'Kathmandu Valley Wide', rating: 4.9, reviews: 290, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '24/7 Instant Dispatch', fee: 'Avg. ETA: 14 Min', phone: '+977-1-5522999', image: 'https://images.unsplash.com/photo-1587745416684-47953f16f02f?w=600&auto=format&fit=crop&q=80', special: 'Hamilton Ventilator, Defibrillator, EMT Paramedic' },
+      { id: 'a-2', name: 'Nepal Red Cross Emergency Ambulance Service', area: 'All Major Districts', rating: 4.8, reviews: 380, badge: 'SAINO VIP', badgeType: 'vip', opd: '24/7 Dial 102', fee: 'Subsidized NGO', phone: '102 / +977-1-4288000', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&auto=format&fit=crop&q=80', special: 'Basic Life Support, Oxygen, Trauma Spine Board' },
+      { id: 'a-3', name: 'CityCare Critical Neonatal & Adult Transport EMS', area: 'Ring Road & Beyond', rating: 4.8, reviews: 175, badge: 'SAINO PRO', badgeType: 'pro', opd: '24/7 ICU on Wheels', fee: 'Fixed Transparent', phone: '+977-1-4428999', image: 'https://images.unsplash.com/photo-1587745416684-47953f16f02f?w=600&auto=format&fit=crop&q=80', special: 'Neonatal Transport Incubator, Multi-Para Monitor' },
+      { id: 'a-4', name: 'LifeLine Rapid Highway Trauma Responder', area: 'Kathmandu-Mugling-Pokhara', rating: 4.7, reviews: 120, badge: 'SAINO PRO', badgeType: 'pro', opd: '24/7 Highway Rescue', fee: 'Standard Rate', phone: '+977-9801223344', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&auto=format&fit=crop&q=80', special: 'Extrication Tools, Blood Cooler, ALS Monitor' },
+      { id: 'a-5', name: 'Everest Air & Ground Medical Evacuation', area: 'Nationwide Nepal', rating: 4.9, reviews: 210, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '24/7 Helipad & Ground', fee: 'Insurance Direct', phone: '+977-1-4488900', image: 'https://images.unsplash.com/photo-1587745416684-47953f16f02f?w=600&auto=format&fit=crop&q=80', special: 'Helicopter Rescue Triage, Critical Doctor Onboard' }
+    ],
+
+    labs: [
+      { id: 'l-1', name: 'National Reference Pathology Laboratory (NRL)', area: 'Kathmandu Central', rating: 4.9, reviews: 410, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '06:00 AM - 08:00 PM', fee: 'Home Pickup Free', phone: '+977-1-4433100', image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600&auto=format&fit=crop&q=80', special: 'ISO 15189, RT-PCR, Histopathology, Flow Cytometry' },
+      { id: 'l-2', name: 'Central Biomedical & Molecular Diagnostic Lab', area: 'Lagankhel, Lalitpur', rating: 4.8, reviews: 220, badge: 'SAINO VIP', badgeType: 'vip', opd: '06:30 AM - 07:30 PM', fee: 'Online Report in 2h', phone: '+977-1-5544200', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80', special: 'Hormone Assays, Vitamin D/B12, Genetic Screening' },
+      { id: 'l-3', name: 'Annapurna Diagnostic Molecular Lab', area: 'Maitighar, Kathmandu', rating: 4.8, reviews: 180, badge: 'SAINO PRO', badgeType: 'pro', opd: '07:00 AM - 07:00 PM', fee: 'Automated Analyzer', phone: '+977-1-4265410', image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600&auto=format&fit=crop&q=80', special: 'HbA1c, Renal Profile, Lipid Subfractions' },
+      { id: 'l-4', name: 'Lalitpur Central Blood & Micro-Pathology', area: 'Patan Dhoka, Lalitpur', rating: 4.6, reviews: 105, badge: 'SAINO LISTED', badgeType: 'listed', opd: '07:00 AM - 06:00 PM', fee: 'Standard Pricing', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80', special: 'Microbiology Culture & Sensitivity, Urine Routine' },
+      { id: 'l-5', name: 'KMC Diagnostic Clinical Research Lab', area: 'Sinamangal, Kathmandu', rating: 4.7, reviews: 155, badge: 'SAINO PRO', badgeType: 'pro', opd: '07:00 AM - 07:00 PM', fee: 'Academic Reference', phone: '+977-1-4469000', image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600&auto=format&fit=crop&q=80', special: 'Hematology Bone Marrow, Coagulation Studies' }
+    ],
+
+    bloodBanks: [
+      { id: 'b-1', name: 'Nepal Red Cross Central Blood Transfusion Service (CBTS)', area: 'Soalteemode, Kathmandu', rating: 4.9, reviews: 520, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '24/7 All Groups Open', fee: 'Processing Fee Rs. 650', phone: '+977-1-4272826', image: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&auto=format&fit=crop&q=80', special: 'PRBC, Fresh Frozen Plasma (FFP), Platelet Concentrate, Cryo' },
+      { id: 'b-2', name: 'Bhaktapur Red Cross Emergency Blood Bank Hub', area: 'Suryabinayak, Bhaktapur', rating: 4.8, reviews: 260, badge: 'SAINO VIP', badgeType: 'vip', opd: '24/7 Emergency Reserve', fee: 'Govt. Subsidized', phone: '+977-1-6611661', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&auto=format&fit=crop&q=80', special: 'Rare Group O-ve & B-ve Reserve, Single Donor Platelets' },
+      { id: 'b-3', name: 'Patan Hospital Emergency Blood Bank Reserve', area: 'Lagankhel, Lalitpur', rating: 4.8, reviews: 310, badge: 'SAINO PRO', badgeType: 'pro', opd: '24/7 Clinical Transfusion', fee: 'Standard Rate', phone: '+977-1-5522295', image: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&auto=format&fit=crop&q=80', special: 'Crossmatch Testing, Thalassemia Patient Support' },
+      { id: 'b-4', name: 'Nepal Donors Network Emergency Blood Hotline', area: 'Kathmandu Valley Wide', rating: 4.7, reviews: 180, badge: 'SAINO PRO', badgeType: 'pro', opd: '24/7 Live Volunteer Matching', fee: '100% Free Service', phone: '+977-9851000000', image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80', special: 'Live Donor WhatsApp Dispatch in < 30 Minutes' },
+      { id: 'b-5', name: 'Civil Hospital Specialized Blood Unit', area: 'Minbhawan, Kathmandu', rating: 4.6, reviews: 140, badge: 'SAINO LISTED', badgeType: 'listed', opd: '08:00 AM - 08:00 PM', fee: 'Standard Rate', phone: 'Triage via SAINO', image: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&auto=format&fit=crop&q=80', special: 'Apheresis Platelets, Pediatric Blood Filters' }
+    ]
+  },
+
+  // Map Locations with Coordinates & Facilities for Google Map Simulator
+  mapLocations: [
+    { id: 'loc-1', name: 'Kathmandu Central Hub', city: 'Kathmandu', lat: 27.7172, lng: 85.3240, address: 'Lazimpat, Thapathali, Maitighar & Baneshwor', hospitalCount: 14, clinicCount: 38, icon: 'map-pin', featured: 'Norvic Heart, CityCare, Annapurna MRI' },
+    { id: 'loc-2', name: 'Lalitpur Medical Corridor', city: 'Lalitpur', lat: 27.6710, lng: 85.3218, address: 'Lagankhel, Jawalakhel, Gwarko & Bhaisepati', hospitalCount: 8, clinicCount: 24, icon: 'map-pin', featured: 'Patan LifeCare, B&B Ortho, MedCity' },
+    { id: 'loc-3', name: 'Bhaktapur Health Cluster', city: 'Bhaktapur', lat: 27.6710, lng: 85.4298, address: 'Suryabinayak, Durbar Square & Sallaghari', hospitalCount: 5, clinicCount: 16, icon: 'map-pin', featured: 'Bhaktapur Blood Hub, Diabetic Center' },
+    { id: 'loc-4', name: 'Pokhara Lakeside Healthcare Zone', city: 'Pokhara', lat: 28.2096, lng: 83.9856, address: 'Lakeside, New Road & Chipledhunga', hospitalCount: 6, clinicCount: 19, icon: 'map-pin', featured: 'Pokhara Lakeside Hospital, Physio Hub' },
+    { id: 'loc-5', name: 'Chitwan Medical City Corridor', city: 'Chitwan', lat: 27.6833, lng: 84.4333, address: 'Bharatpur, Narayangarh Medical College Road', hospitalCount: 7, clinicCount: 22, icon: 'map-pin', featured: 'Chitwan Cancer Screening, MediCare' },
+    { id: 'loc-6', name: 'Biratnagar Eastern Regional Hub', city: 'Biratnagar', lat: 26.4525, lng: 87.2718, address: 'Main Road & Hospital Chowk', hospitalCount: 6, clinicCount: 18, icon: 'map-pin', featured: 'Biratnagar MediCare, Eastern Bloodline' }
+  ],
+
+  // Diagnostic Packages (Matching Figma Homepage Layout)
+  diagnosticPackages: [
+    {
+      id: 'pkg-1',
+      title: 'Comprehensive Full Body Checkup',
+      testsCount: '64 Essential Tests (CBC, Lipid, LFT, KFT, Thyroid, Sugar, ECG)',
+      originalPrice: 'Rs. 6,000',
+      discountedPrice: 'Rs. 4,500',
+      discount: '25% OFF',
+      hospital: 'Annapurna Diagnostics / CityCare Lab',
+      badge: 'POPULAR'
+    },
+    {
+      id: 'pkg-2',
+      title: 'Executive Cardiac Health Screening',
+      testsCount: 'ECHO, TMT Stress Test, Lipid Subfractions, Trop-I, Cardiac Dietetics',
+      originalPrice: 'Rs. 8,500',
+      discountedPrice: 'Rs. 6,500',
+      discount: '24% OFF',
+      hospital: 'Norvic International Hospital Lab',
+      badge: 'SPECIALIST'
+    },
+    {
+      id: 'pkg-3',
+      title: 'Senior Citizen Complete Wellness',
+      testsCount: 'Bone Mineral Density (DEXA), Vitamin D3/B12, PSA, Renal, Eye & Dental',
+      originalPrice: 'Rs. 7,000',
+      discountedPrice: 'Rs. 5,200',
+      discount: '26% OFF',
+      hospital: 'Patan LifeCare Hospital Network',
+      badge: 'RECOMMENDED'
+    }
+  ],
+
+  // Online / Immediate Doctors for Consultation Row
+  onlineDoctors: [
+    {
+      id: 'doc-1',
+      name: 'Dr. Anup Bastola',
+      role: 'Senior Infectious Disease Specialist',
+      experience: '16+ Years Experience',
+      hospital: 'Sukraraj / Kathmandu Hospital',
+      image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=300&auto=format&fit=crop&q=80',
+      fee: 'Rs. 600',
+      status: 'OPD Available'
+    },
+    {
+      id: 'doc-2',
+      name: 'Dr. Manisha Rawal',
+      role: 'Consultant Cardiologist',
+      experience: '12+ Years Experience',
+      hospital: 'Norvic Heart Institute',
+      image: 'https://images.unsplash.com/photo-1594824813628-4a2368543d07?w=300&auto=format&fit=crop&q=80',
+      fee: 'Rs. 800',
+      status: 'OPD Available'
+    },
+    {
+      id: 'doc-3',
+      name: 'Dr. Bikash Karki',
+      role: 'Senior Laparoscopic Surgeon',
+      experience: '15+ Years Experience',
+      hospital: 'Civil Service Hospital',
+      image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=300&auto=format&fit=crop&q=80',
+      fee: 'Rs. 650',
+      status: 'OPD Available'
+    },
+    {
+      id: 'doc-4',
+      name: 'Dr. Sunita Gurung',
+      role: 'Senior Pediatrician',
+      experience: '14+ Years Experience',
+      hospital: 'Kanti Children Care',
+      image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&auto=format&fit=crop&q=80',
+      fee: 'Rs. 500',
+      status: 'OPD Available'
+    },
+    {
+      id: 'doc-5',
+      name: 'Dr. Ramesh Shrestha',
+      role: 'Consultant Orthopedic Surgeon',
+      experience: '18+ Years Experience',
+      hospital: 'B&B Hospital Partner',
+      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300&auto=format&fit=crop&q=80',
+      fee: 'Rs. 750',
+      status: 'OPD Available'
+    }
   ]
 };
