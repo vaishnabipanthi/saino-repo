@@ -25,6 +25,16 @@ const AppState = {
   activeProvider: null,
   toastTimeout: null
 };
+const quickServices = [
+  { id: 'hospital', title: 'Hospital', icon: 'building-2', description: 'Hospitals & specialist care' },
+  { id: 'clinic', title: 'Clinic', icon: 'stethoscope', description: 'Doctors & OPD clinics' },
+  { id: 'diagnostic', title: 'Diagnostic / Lab', icon: 'activity', description: 'Labs, MRI, CT & scans' },
+  { id: 'packages', title: 'Diagnostic Packages', icon: 'package-check', description: 'Health screening packages' },
+  { id: 'wellness', title: 'Wellness Centre', icon: 'sparkles', description: 'Wellness & preventive care' },
+  { id: 'homecare', title: 'Homecare & Elderly', icon: 'heart-handshake', description: 'Care at your doorstep' },
+  { id: 'insurance', title: 'Health Insurance', icon: 'shield-check', description: 'Protect your health' },
+  { id: 'bloodbank', title: 'Blood Bank', icon: 'droplets', description: 'Emergency blood services' }
+];
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -72,16 +82,15 @@ function navigateTo(viewName, filterParams = null) {
     mobileMenu.classList.add('hidden');
   }
 
-  // Update active nav links
   document.querySelectorAll('[data-nav]').forEach(link => {
-    if (link.getAttribute('data-nav') === viewName) {
-      link.classList.add('text-saino-red', 'font-semibold');
-      link.classList.remove('text-saino-gray-600');
-    } else {
-      link.classList.remove('text-saino-red', 'font-semibold');
-      link.classList.add('text-saino-gray-600');
-    }
-  });
+  if (link.getAttribute('data-nav') === viewName) {
+    link.classList.add('nav-active');
+    link.classList.remove('text-slate-700');
+  } else {
+    link.classList.remove('nav-active');
+    link.classList.add('text-slate-700');
+  }
+});
 
   if (filterParams) {
     if (filterParams.category) AppState.selectedCategory = filterParams.category;
@@ -90,7 +99,7 @@ function navigateTo(viewName, filterParams = null) {
   }
 
   renderApp();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 // Render Master Controller
@@ -98,15 +107,28 @@ function renderApp() {
   const mainContainer = document.getElementById('mainContent');
   if (!mainContainer) return;
 
+  const heroSection = document.getElementById('heroHomeSection');
+  if (heroSection) {
+    heroSection.style.display = AppState.activeView === 'marketplace' ? 'block' : 'none';
+  }
+
   switch (AppState.activeView) {
     case 'marketplace':
       mainContainer.innerHTML = renderMarketplaceView();
       bindMarketplaceEvents();
       break;
     case 'discovery':
-    case 'providers-showcase':
       mainContainer.innerHTML = renderDiscoveryView();
       bindProvidersShowcaseEvents();
+      break;
+     case "find-healthcare":
+      mainContainer.innerHTML = renderFindHealthcareView();
+      break;
+    case 'appointments':
+      mainContainer.innerHTML = renderAppointmentsView();
+      break;
+    case 'saved':
+      mainContainer.innerHTML = renderSavedView();
       break;
     case 'list-your-care':
       mainContainer.innerHTML = renderListYourCareView();
@@ -128,8 +150,17 @@ function renderApp() {
       mainContainer.innerHTML = renderContactView();
       bindContactEvents();
       break;
+    case 'faqs':
+      mainContainer.innerHTML = renderFaqsView();
+      break;
+    case 'patient':
+    mainContainer.innerHTML = window.renderAllReviewsView();
+    break
+    case 'discussions':
+    mainContainer.innerHTML = window.renderAllDiscussionsView();
+    break;
     default:
-      mainContainer.innerHTML = renderMarketplaceView();
+    mainContainer.innerHTML = renderMarketplaceView();
       bindMarketplaceEvents();
   }
 
@@ -137,18 +168,66 @@ function renderApp() {
     window.lucide.createIcons();
   }
 }
+document.addEventListener("DOMContentLoaded", () => {
+  // Ads data (customize as needed)
+  const ads = [
+    { title: "Catalogue / Ads Section", desc: "Rotating healthcare promotions, sponsored placements & platform announcements" },
+    { title: "Special Offer", desc: "Get 20% off on diagnostic packages" },
+    { title: "Insurance Plans", desc: "Protect your family with cashless health insurance" },
+    { title: "Homecare Services", desc: "Book nurses and doctors at your doorstep" }
+  ];
+
+  let currentAd = 0;
+  const adTitle = document.getElementById("adTitle");
+  const adDescription = document.getElementById("adDescription");
+  const dots = document.querySelectorAll(".ad-dot");
+
+  // Show ad function
+  function showAd(index) {
+  currentAd = index;
+  if (adTitle && adDescription) {
+    adTitle.textContent = ads[index].title;
+    adDescription.textContent = ads[index].desc;
+  }
+
+  if (dots && dots.length) {
+    dots.forEach((dot, i) => {
+      dot.classList.remove("bg-white");
+      dot.classList.add("bg-white/40");
+      if (i === index) {
+        dot.classList.add("bg-white");
+        dot.classList.remove("bg-white/40");
+      }
+    });
+  }
+}
+
+
+  // Dot click event
+  dots.forEach((dot, i) => {
+    dot.setAttribute("data-index", i); // ensure index set
+    dot.addEventListener("click", () => {
+      showAd(i);
+    });
+  });
+
+  // Auto swipe every 3 seconds
+  setInterval(() => {
+    let nextAd = (currentAd + 1) % ads.length;
+    showAd(nextAd);
+  }, 3000);
+
+  // Initial load
+  showAd(0);
+});
+
 
 // ==========================================
-// 1. MARKETPLACE VIEW RENDERING (EXACT FIGMA HOMEPAGE SPEC)
+// 1. MARKETPLACE VIEW RENDERING 
 // ==========================================
 function renderMarketplaceView() {
 
-  const allProviders = AppState.providers || window.SAINO_DATA.providers || [];
-
-  // ==========================================
-  // PROVIDER GROUPS
-  // ==========================================
-
+  const allProviders = AppState.providers || window.SAINO_DATA.providers || []
   const hospitals = allProviders
     .filter(p => p.category === 'hospital')
     .slice(0, 3);
@@ -176,8 +255,7 @@ function renderMarketplaceView() {
   const diagnosticPackages =
     window.SAINO_DATA.diagnosticPackages || [];
 
-  const talkReviews =
-    window.SAINO_DATA.talkOfTheTown || [];
+  const patientReviews = window.SAINO_DATA.patientReviews || [];
 
   const onlineDoctors =
     window.SAINO_DATA.onlineDoctors || [];
@@ -245,18 +323,15 @@ function renderMarketplaceView() {
   ];
 
   return `
-
       <!-- Scrolling Ad Card -->
-      <section class="mb-8 rounded-xl bg-saino-red text-white h-[180px] flex items-center justify-center shadow-md relative overflow-hidden">
-
-      <div class="text-center relative z-10 px-4">
-
+      <section class="mb-8 bg-saino-red text-white w-full h-[180px] sm:h-[200px] md:h-[240px] lg:h-[300px] 
+      flex items-center justify-center shadow-md relative overflow-hidden -mx-0 sm:-mx-4 md:-mx-6 lg:-mx-0 lg:rounded-lg">
+        <div class="text-center relative z-10 px-4">
         <h2
           id="adTitle"
           class="text-sm sm:text-base font-bold mb-1 transition-opacity duration-500">
           Catalogue / Ads Section
         </h2>
-
         <p
           id="adDescription"
           class="text-[9px] sm:text-[10px] text-white/70 mb-2 transition-opacity duration-500">
@@ -264,36 +339,28 @@ function renderMarketplaceView() {
         </p>
 
         <div class="flex justify-center items-center gap-1.5">
-
           <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white"></span>
           <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white/40"></span>
           <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white/40"></span>
           <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white/40"></span>
 
         </div>
-
       </div>
     </section>
+
     <section class="mb-14">
-
       <div class="flex items-center justify-between mb-6">
-
         <div>
-
           <span class="text-xs font-black uppercase tracking-wider text-saino-red">
             Healthcare Services
           </span>
-
           <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
             Explore Healthcare
           </h2>
-
           <p class="text-xs text-saino-gray-500 mt-1">
             Everything you need across the healthcare journey.
           </p>
-
         </div>
-
       </div>
 
 
@@ -310,27 +377,18 @@ function renderMarketplaceView() {
             class="group bg-white rounded-2xl border border-saino-gray-200 p-4 text-center hover:border-saino-red/30 hover:shadow-md transition">
 
             <div class="w-11 h-11 mx-auto rounded-xl bg-saino-red/10 text-saino-red flex items-center justify-center group-hover:bg-saino-red group-hover:text-white transition">
-
               <i data-lucide="${service.icon}" class="w-5 h-5"></i>
-
             </div>
-
             <h3 class="mt-3 text-[11px] sm:text-xs font-black text-saino-gray-900">
               ${service.title}
             </h3>
-
             <p class="mt-1 text-[9px] text-saino-gray-500 leading-tight">
               ${service.description}
             </p>
-
           </button>
-
         `).join('')}
-
       </div>
     </section>
-
-
     <!-- ==========================================
          5. HOSPITALS
     =========================================== -->
@@ -421,18 +479,18 @@ function renderMarketplaceView() {
             </div>
 
             <button
-              onclick="navigateTo('discovery')"
+              onclick="navigateTo('patient')"
               class="text-xs font-bold text-saino-red hover:underline">
-              Read All →
+              See More Reviews →
             </button>
 
           </div>
 
           <div class="space-y-3">
 
-            ${talkReviews.slice(0, 5)
-              .map((r, i) => renderTalkReviewItem(r, i))
-              .join('')}
+          ${patientReviews.slice(0, 5)
+        .map((r, i) => renderTalkReviewItem(r, i))
+        .join('')}
 
           </div>
 
@@ -1177,7 +1235,7 @@ function renderMarketplaceView() {
 }
 
 
-// Render Horizontal Clinic Card (Matching Figma 2-Column Left Layout)
+// Render Horizontal Clinic Card
 function renderHorizontalClinicCard(c) {
   return `
     <div class="bg-white rounded-2xl border border-saino-gray-200 p-4 shadow-xs hover:shadow-md transition flex flex-col sm:flex-row gap-4">
@@ -1800,6 +1858,7 @@ function bindCampaignsEvents() {}
 // 2. DISCOVERY VIEW
 // ==========================================
   function renderDiscoveryView() {
+    const reviews = window.SAINO_DATA.patientReviews || [];
   const discoverySlides = [
     {
       badge: 'FEATURED HEALTH CAMPAIGN',
@@ -1809,11 +1868,11 @@ function bindCampaignsEvents() {}
       note: 'Get a comprehensive health screening<br>from trusted healthcare providers of Nepal.',
       middleLabel: 'Includes:',
       middleContent: `
-        <ul class="space-y-0.5 text-slate-300 font-medium text-[11px]">
-          <li class="flex items-center space-x-1.5"><span class="text-[10px] text-slate-400">✓</span> <span>40+ Health Tests</span></li>
-          <li class="flex items-center space-x-1.5"><span class="text-[10px] text-slate-400">✓</span> <span>Doctor Consultation</span></li>
-          <li class="flex items-center space-x-1.5"><span class="text-[10px] text-slate-400">✓</span> <span>ECG</span></li>
-          <li class="flex items-center space-x-1.5"><span class="text-[10px] text-slate-400">✓</span> <span>Blood & Urine Tests</span></li>
+        <ul class="space-y-0.5 sm:space-y-1 text-slate-300 font-medium text-[9px] sm:text-[11px]">
+          <li class="flex items-center space-x-1"><span class="text-[6px] sm:text-[10px] text-slate-400">✓</span> <span>40+ Health Tests</span></li>
+          <li class="flex items-center space-x-1"><span class="text-[6px] sm:text-[10px] text-slate-400">✓</span> <span>Doctor Consultation</span></li>
+          <li class="flex items-center space-x-1"><span class="text-[6px] sm:text-[10px] text-slate-400">✓</span> <span>ECG</span></li>
+          <li class="flex items-center space-x-1"><span class="text-[6px] sm:text-[10px] text-slate-400">✓</span> <span>Blood & Urine Tests</span></li>
         </ul>
       `,
       packageName: 'Full Body Health Checkup',
@@ -1828,9 +1887,10 @@ function bindCampaignsEvents() {}
       note: 'Consult experienced specialists<br>through trusted providers on Saino.',
       middleLabel: 'Specialities:',
       middleContent: `
-        <p class="text-[11px] text-slate-200 font-semibold tracking-wide">
-          CARDIOLOGY • NEUROLOGY • ORTHOPEDICS
-        </p>
+      <p class="mt-3 sm:mt-2 text-[8px] sm:text-[11px] md:text-sm text-slate-200 font-semibold tracking-wide">
+        CARDIOLOGY • NEUROLOGY • ORTHOPEDICS
+      </p>
+
       `,
       packageName: 'SPECIALIST CONSULTATION',
       price: 'Consultation from NPR 800',
@@ -1844,9 +1904,9 @@ function bindCampaignsEvents() {}
       note: 'Comprehensive women\'s health screening package.',
       middleLabel: 'Specialities:',
       middleContent: `
-        <p class="text-[11px] text-slate-200 font-semibold tracking-wide">
-          CARDIOLOGY • NEUROLOGY • ORTHOPEDICS
-        </p>
+      <p class=" mt-3 text-[8px] sm:text-[11px] md:text-sm text-slate-200 font-semibold tracking-wide">
+        CARDIOLOGY • NEUROLOGY • ORTHOPEDICS
+      </p>
       `,
       packageName: "WOMEN'S HEALTH",
       price: 'Consultation from NPR 1,999',
@@ -1863,26 +1923,29 @@ function bindCampaignsEvents() {}
 
   return `
     <div class="w-full mb-16 px-0">  
-       <section class="relative overflow-hidden bg-[#0a0f1d] text-white shadow-xl mb-8 border-y border-slate-800 w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[600px]">
+       <section class="relative overflow-hidden bg-[#0a0f1d] text-white shadow-xl mb-8 border-y border-slate-800 w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[350px] md:h-[530px]">
             <a 
                 href="#video-library" 
                 onclick="navigateTo('marketplace')" 
-                class="absolute top-8 right-24 z-20 inline-flex items-center space-x-2 px-4 py-2.5 rounded-md bg-[#334155]/60 hover:bg-[#202d47] border border-slate-400/40 text-slate-200 hover:text-white text-xs font-medium tracking-wide shadow-sm transition-all duration-150 cursor-pointer select-none">
-                
-                <svg class="w-4 h-4 text-slate-200 shrink-0 stroke-[2]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <rect x="2" y="3" width="20" height="14" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <line x1="8" y1="21" x2="16" y2="21" stroke-linecap="round"/>
-                  <line x1="12" y1="17" x2="12" y2="21" stroke-linecap="round"/>
-                  <polygon points="10 7 15 10 10 13" fill="currentColor" stroke="none"/>
-                </svg>
-                <span class="text-xs">Video Library</span>
-                <svg class="w-3 h-3 text-slate-400 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
+               class="absolute top-2 right-2 md:top-8 md:right-24 z-20 inline-flex items-center space-x-1 px-1.5 py-1 md:px-4 md:py-2.5 rounded-md bg-[#334155]/80 border border-slate-400/40 text-slate-200 text-[9px] md:text-xs">
+              <svg class="w-3 h-3 sm:w-5 sm:h-5 text-slate-200 shrink-0 stroke-[1.5]" 
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="2" y="3" width="20" height="14" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="8" y1="21" x2="16" y2="21" stroke-linecap="round"/>
+                <line x1="12" y1="17" x2="12" y2="21" stroke-linecap="round"/>
+                <polygon points="10 7 15 10 10 13" fill="currentColor" stroke="none"/>
+              </svg>
+
+              <span class="text-[8px] sm:text-xs">Video Library</span>
+
+              <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 stroke-[2]" 
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
             </a>
         <div class="absolute inset-y-0 right-0 w-[450px] md:w-[610px] bg-gradient-to-l from-slate-800 via-slate-800/60 to-transparent pointer-events-none z-0"></div>
         <div class="flex flex-row items-stretch h-full">
-          <div class="w-[280px] md:w-[470px] h-[550px] mt-[19px] mb-[16px] ml-20 relative overflow-hidden p-2 shrink-0">
+          <div class="w-[200px] md:w-[400px] md:h-[460px] md:ml-20 h-[300px] mt-[19px] mb-[16px] ml-18 relative overflow-hidden p-2 shrink-0">
             <img 
               id="discSlideImg" 
               src="${s.image}" 
@@ -1891,35 +1954,34 @@ function bindCampaignsEvents() {}
               style="image-rendering: -webkit-optimize-contrast;"
               loading="eager">
           </div>
-          <div class="flex-1 py-8 px-8 md:px-12 flex flex-col justify-center text-left h-full overflow-hidden">
+          <div class="flex-1 py-2 px-3 md:py-8 md:px-12 flex flex-col justify-center text-left h-full overflow-hidden w-full">
             <div>
-              <div class="flex items-center space-x-2.5 mb-3">
+               <div class="flex flex-row items-center gap-1 sm:gap-3 mb-1 sm:mb-3">
               <a 
                   href="#featured-campaign" 
                   onclick="navigateTo('marketplace')" 
                   id="discSlideBadge" 
-                  class="px-4 py-2 rounded-lg text-xs md:text-sm font-bold tracking-wider uppercase bg-[#142952] text-[#3b82f6] border border-[#1d4ed8]/40 hover:bg-[#1a3668] transition cursor-pointer select-none inline-flex items-center justify-center">
+                  class="px-0.5 py-0.5 sm:px-3 sm:py-2 rounded-lg text-[6px] sm:text-xs md:text-[15px] font-bold tracking-wide text-white-600 bg-[#162032] border-2 border-purple-500 hover:border-purple-400 hover:bg-purple-950/40 transition-all duration-150 inline-flex items-center justify-center cursor-pointer select-none">
                   ${s.badge || 'FEATURED HEALTH CAMPAIGN'}
                 </a>
                <a 
                   href="#vvip-info" 
                   onclick="navigateTo('marketplace')" 
                   id="discSlideTier" 
-                  class="px-5 py-2 rounded-lg text-xs md:text-sm font-bold tracking-wide text-purple-300 bg-[#162032] border-2 border-purple-500 hover:border-purple-400 hover:bg-purple-950/40 transition-all duration-150 inline-flex items-center justify-center cursor-pointer select-none">
+                  class="px-1 py-0.5 sm:px-3 sm:py-2 rounded-lg text-[8px] sm:text-xs md:text-[15px] font-bold tracking-wide text-white-600 bg-[#162032] border-2 border-purple-500 hover:border-purple-400 hover:bg-purple-950/40 transition-all duration-150 inline-flex items-center justify-center cursor-pointer select-none">
                   ${s.tier || 'VVIP'}
                 </a>
             </div>
 
-        <h2 id="discSlideTitle" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight mb-3 drop-shadow-md">
+        <h2 id="discSlideTitle" class="mt-1 text-[10px] sm:text-xs md:text-2xl font-extrabold text-white leading-tight mb-1 md:mb-3 drop-shadow-md">
           ${s.titleHtml}
         </h2>
 
-        <h3 id="discSlideHospital" class="mt-1 text-xs sm:text-[13px] font-bold text-white mb-2">
+        <h3 id="discSlideHospital" class="mt-1 text-[9px] sm:text-xs md:text-sm font-bold text-white mb-2">
           ${s.hospital || 'Grande International Hospital · Kathmandu'}
         </h3>
 
-        <p id="discSlideNote" class="text-[11px] sm:text-xs text-slate-300 max-w-sm leading-relaxed mb-3.5">
-          ${s.note || 'Get a comprehensive health screening<br>from trusted healthcare providers of Nepal.'}
+        <p id="discSlideNote" class="text-[8px] md:text-xs text-slate-300 max-w-sm leading-tight mb-1 md:mb-3.5">
         </p>
 
         <div class="mb-3.5 text-[11px] text-slate-300 min-h-[72px]">
@@ -1930,42 +1992,44 @@ function bindCampaignsEvents() {}
         </div>
         
       <div class="mb-3.5 leading-tight">
-        <span class="text-[11px] text-slate-300 font-medium block mb-0.5">Full Body Health Checkup</span>
+        <span class="text-[10px] text-slate-300 font-medium block mb-0.5">Full Body Health Checkup</span>
         <span class="text-xs font-bold text-white tracking-wide">NPR 2,999</span>
         </div>
       </div>
-
-      <div class="flex items-center space-x-3 mt-4 mb-2 z-20">
-           <button 
-            type="button"
+      <div class="flex items-center space-x-2 mt-1 mb-1 z-20">
+         <button 
+          type="button"
           onclick="triggerCampaignWhatsApp()" 
-          class="h-10 px-6 rounded-full border border-slate-600 bg-[#152136] hover:bg-[#1c2c47] text-white text-xs font-medium tracking-wide flex items-center justify-center space-x-2 transition shadow-sm cursor-pointer">
-          <span>Watch Campaign</span>
+          class="h-6 px-2 sm:h-8 sm:px-4 rounded-full border border-slate-600 bg-[#152136] hover:bg-[#1c2c47] text-white text-[10px] sm:text-xs font-medium tracking-wide flex items-center justify-center space-x-2 transition shadow-sm cursor-pointer">
+         <span class="text-[8px] sm:text-xs">Watch Campaign</span>
         </button>
 
-          <button 
-            onclick="navigateTo('marketplace')" 
-            class="h-10 px-6 rounded-full bg-white hover:bg-slate-100 text-[#881337] text-xs font-bold shadow-xs flex items-center justify-center space-x-1.5 transition cursor-pointer">
-            <span>View Package</span>
-            <span class="text-xs font-black leading-none text-[#881337]">→</span>
-          </button>
+        <button 
+          onclick="navigateTo('marketplace')" 
+          class="h-6 px-2 sm:h-8 sm:px-4 rounded-full bg-white hover:bg-slate-100 text-[#881337] text-[10px] sm:text-xs font-bold shadow-xs flex items-center justify-center space-x-1.5 transition cursor-pointer">
+          <span class="text-[8px] sm:text-xs">View Package</span>
+          <span class="text-[10px] sm:text-xs font-black leading-none text-[#881337]">→</span>
+        </button>
+
       </div>
-      <p id="discSlideValidity" class="text-xs sm:text-[13px] text-slate-400/60 font-normal tracking-wide mt-3 select-none">
-        ${s.validity || 'Valid until 30 September 2026'}
-      </p>
-            <button onclick="nextDiscoverySlide()" class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-xl z-30">
-              <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          <p id="discSlideValidity" class="text-[9px] sm:text-xs md:text-sm text-slate-400/60 font-normal tracking-wide mt-1 sm:mt-2 select-none">
+            ${s.validity || 'Valid until 30 September 2026'}
+          </p>
+            <button onclick="nextDiscoverySlide()" class="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-10 sm:h-10 rounded-full bg-white text-black 
+               flex items-center justify-center shadow-xl z-30"> <svg class="w-3 h-3 sm:w-5 sm:h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
             </button>
-        
-            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-3.5 z-30">
+                    
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-1 sm:space-x-2 z-30">
               <button onclick="goToDiscoverySlide(0)" class="p-1 cursor-pointer">
-                <span class="disc-dot block rounded-full transition-all duration-300 ${AppState.discoverySlideIndex === 0 ? 'w-2.5 h-2.5 bg-white' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}"></span>
+                <span class="disc-dot block rounded-full transition-all duration-300 ${AppState.discoverySlideIndex === 0 ? 'w-1.5 h-1.5 bg-white' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}"></span>
               </button>
             <button onclick="goToDiscoverySlide(1)" class="p-1 cursor-pointer">
-              <span class="disc-dot block rounded-full transition-all duration-300 ${AppState.discoverySlideIndex === 1 ? 'w-2.5 h-2.5 bg-white' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}"></span>
+              <span class="disc-dot block rounded-full transition-all duration-300 ${AppState.discoverySlideIndex === 1 ? 'w-1.5 h-1.5 bg-white' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}"></span>
             </button>
             <button onclick="goToDiscoverySlide(2)" class="p-1 cursor-pointer">
-            <span class="disc-dot block rounded-full transition-all duration-300 ${AppState.discoverySlideIndex === 2 ? 'w-2.5 h-2.5 bg-white' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}"></span>
+            <span class="disc-dot block rounded-full transition-all duration-300 ${AppState.discoverySlideIndex === 2 ? 'w-1.5 h-1.5 bg-white' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}"></span>
             </button>
         </div>
       </section>
@@ -2252,10 +2316,10 @@ function bindCampaignsEvents() {}
           <div class="grid grid-cols-2 gap-4 w-full min-w-0">
 
             <!-- 1. Hospitals -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Hospitals</h4>
               <div class="flex flex-col gap-1 text-[11px] min-w-0">
-              <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
+                <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">04</span><span class="w-5 h-5 rounded bg-emerald-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Medical College</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">23 disc.</span></div>
@@ -2265,13 +2329,12 @@ function bindCampaignsEvents() {}
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">08</span><span class="w-5 h-5 rounded bg-indigo-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">PA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Patan Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">17 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">09</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">DH</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Dhulikhel Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">14 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-medium text-slate-400 w-4 shrink-0 pt-0.5">10</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">KA</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Kathmandu Model Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.3</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">13 disc.</span></div>
-
                 </div>
 
             </div>
 
             <!-- 2. Clinics -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Clinics</h4>
                 <div class="flex flex-col gap-1 text-[11px] min-w-0">
               <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2288,7 +2351,7 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 3. Diagnostic Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Diagnostic Centers</h4>
               <div class="flex flex-col gap-1 text-[11px] min-w-0">
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2305,7 +2368,7 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 4. Wellness Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Wellness Centers</h4>
                <div class="flex flex-col gap-1 text-[11px] min-w-0"> 
                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2321,9 +2384,9 @@ function bindCampaignsEvents() {}
                 </div>
               </div>
              <!-- 5. Ambulance -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[290px]">
               <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Ambulance</h4>
-              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+              <div class="flex flex-col gap-2.5 text-[11px] min-w-0">
                      <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
                     <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
                     <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
@@ -2333,9 +2396,9 @@ function bindCampaignsEvents() {}
                 </div>
 
                  <!-- 6. Blood bank -->
-                <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[290px]">
               <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Blood Bank</h4>
-              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+              <div class="flex flex-col gap-2.5 text-[11px] min-w-0">
                    <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
@@ -2349,12 +2412,12 @@ function bindCampaignsEvents() {}
         </div>
 
       </div>
-      <!-- 1. People Are Talking About -->
+    <!-- 1. People Are Talking About -->
       <section class="mt-14 px-4 sm:px-6">
         <div class="flex items-center justify-between mb-6">
         <div>
             <span class="text-xs font-bold uppercase tracking-wider text-rose-600">COMMUNITY</span>
-            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">People Are Talking About</h2>
+            <h2 class="text-[11px] sm:text-2xl font-bold text-slate-800">People Are Talking About</h2>
           </div>
            <a href="#discussions" onclick="navigateTo('discussions')" class="text-xs sm:text-sm font-bold text-rose-600 hover:text-rose-700 cursor-pointer">View All Discussions →</a>
         </div>
@@ -2421,91 +2484,892 @@ function bindCampaignsEvents() {}
 
       <hr class="border-slate-200 my-10 mx-4 sm:px-6" />
 
-      <!-- 2. What Patients Are Saying -->
-      <section class="mb-14 px-4 sm:px-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-rose-600">PATIENT VOICES</span>
-            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">What Patients Are Saying</h2>
+  <!-- 2. What Patients Are Saying -->
+    <section class="mb-14 px-4 sm:px-6">
+    
+     <div class="bg-white rounded-3xl border border-saino-gray-200 p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-1 text-amber-500 text-sm">
+            <span>★★★★★</span>
           </div>
-          <div class="inline-flex items-center bg-slate-100 p-1 rounded-xl text-xs font-semibold text-slate-600">
-            <button class="px-3 py-1.5 bg-white shadow-xs rounded-lg text-slate-900 font-bold">Most Recent</button>
-            <button class="px-3 py-1.5 hover:text-slate-900">Highest Rated</button>
-            <button class="px-3 py-1.5 hover:text-slate-900">Lowest Rated</button>
-          </div>
+          <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+            Verified Patient
+          </span>
         </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
-          <!-- Priya -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2.5">
-                  <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">PM</div>
-                  <div><span class="font-bold text-slate-900 text-xs block">Priya Maharjan</span><span class="text-[10px] text-slate-400">3 days ago</span></div>
-                </div>
-                <div class="text-amber-400 text-xs">★★★★★</div>
-              </div>
-              <p class="text-xs text-slate-600 mb-4">"The emergency department at Grande was incredibly efficient. My father was admitted within minutes and the staff was professional throughout."</p>
-              <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl mb-4 text-[11px]">
-                <span class="font-bold text-slate-900 block mb-0.5">Provider Response</span>
-                <p class="text-slate-600">Thank you for your kind words. We're glad your father received prompt care.</p>
-              </div>
-            </div>
-            <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-              <div class="mb-2 text-slate-600 font-medium">Grande International Hospital</div>
-              <div class="flex justify-between"><span>👍 Helpful (24)</span><span>💬 3</span></div>
-            </div>
-          </div>
-          <!-- Rajesh -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2.5">
-                  <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">RT</div>
-                  <div><span class="font-bold text-slate-900 text-xs block">Rajesh Thapa</span><span class="text-[10px] text-slate-400">1 week ago</span></div>
-                </div>
-                <div class="text-amber-400 text-xs">★★★★☆</div>
-              </div>
-              <p class="text-xs text-slate-600 mb-4">"Good cardiologist but the waiting time is long. Arrived at 10am, waited nearly 2 hours before seeing Dr. Shrestha. The consultation was thorough."</p>
-            </div>
-            <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-              <div class="mb-2 text-slate-600 font-medium">Norvic International Hospital</div>
-              <div class="flex justify-between"><span>👍 Helpful (18)</span><span>💬 5</span></div>
-            </div>
-          </div>
-          <!-- Sunita -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2.5">
-                  <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">SG</div>
-                  <div><span class="font-bold text-slate-900 text-xs block">Sunita Gurung</span><span class="text-[10px] text-slate-400">2 weeks ago</span></div>
-                </div>
-                <div class="text-amber-400 text-xs">★★★★★</div>
-              </div>
-              <p class="text-xs text-slate-600 mb-4">"Excellent physiotherapy unit at HAMS. Three weeks of treatment for my knee injury and I'm back to normal. The therapists genuinely care."</p>
-            </div>
-            <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-              <div class="mb-2 text-slate-600 font-medium">HAMS Hospital</div>
-              <div class="flex justify-between"><span>👍 Helpful (31)</span><span>💬 7</span></div>
-            </div>
-          </div>
-        </div>
-
-       <div class="mt-8 text-center">
-        <button type="button" onclick="window.navigateTo('all-reviews')" class="px-6 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold shadow-xs cursor-pointer">See More Reviews</button>
+        <h4 class="text-sm font-bold text-saino-gray-900 mb-2 leading-snug">${s.title}</h4>
+        <p class="text-xs text-saino-gray-600 mb-4 leading-relaxed italic">"${s.body}"</p>
       </div>
-      </section>
+      <div class="pt-3 border-t border-saino-gray-100 flex items-center justify-between text-xs">
+        <div>
+          <strong class="text-saino-gray-900 block font-bold">${s.author}</strong>
+          <span class="text-[11px] text-saino-gray-500">${s.role} · <span class="text-saino-red font-semibold">${s.provider}</span></span>
+        </div>
+      </div>
     </div>
+    <div class="mt-8 text-center">
+        <button onclick="navigateTo('patient')" class="text-xs font-bold text-saino-red hover:underline">
+        See More Reviews →
+        </button>
+      </div>
+  </section>
+  
+    <div class="relative overflow-hidden bg-[#0a0f1d] text-white shadow-xl mb-8 
+            w-screen -mx-[calc((100vw-100%)/2)] 
+            py-10 sm:py-16 px-4 sm:px-12 lg:px-26 
+            rounded-none sm:rounded-2xl text-center">
+        <div class="relative z-10">
+          <!-- Icon -->
+          <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-[#B91C1C] backdrop-blur-sm 
+                      flex items-center justify-center mx-auto mb-3 sm:mb-4 relative">
+            <i data-lucide="message-circle" class="w-5 h-5 sm:w-7 sm:h-7 text-white"></i>
+          </div>
+
+          <!-- Heading -->
+          <h3 class="text-base sm:text-xl lg:text-2xl font-bold text-white">
+            Have a question about a healthcare <br class="hidden sm:block"> provider?
+          </h3>
+
+          <!-- Paragraph -->
+          <p class="text-xs sm:text-sm lg:text-base text-white/60 mt-2 sm:mt-3 max-w-3xl mx-auto leading-relaxed">
+            Ask patients who have been there and get real, experience-based answers from the 
+            <br class="hidden sm:block"> Saino Community.
+          </p>
+
+          <!-- Button -->
+          <button onclick="navigateTo('community')" 
+            class="mt-4 sm:mt-6 px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4 bg-[#B91C1C] text-white 
+                  text-xs sm:text-sm lg:text-base font-bold rounded-full hover:bg-[#991B1B] 
+                  transition shadow-lg inline-flex items-center gap-2">
+            <i data-lucide="message-circle" class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"></i>
+            <span>Ask the Community</span>
+          </button> 
+        </div>
+      </div>
+
   `;
 }
+window.renderReviewsPage = function() {
+  const reviews = window.SAINO_DATA.patientReviews || [];
+  return `
+    <section class="p-6">
+      <div class="flex items-center justify-between mb-6 pb-2 border-b border-slate-200">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">All Patient Reviews</h2>
+        <button onclick="navigateTo('discovery')" 
+                class="text-xs font-bold text-saino-red hover:underline">
+          ← Back to Directory
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 text-left">
+        ${reviews.map(r => renderPatientReviewCard(r)).join('')}
+      </div>
+    </section>
+  `;
+};
+
 function renderProvidersShowcaseView() {
   return renderDiscoveryView();
 }
+ 
+// ==========================================
+// 3.find healthcare 
+// ==========================================
+ function renderFindHealthcareView() {
+    const allProviders = AppState.providers || window.SAINO_DATA.providers || [];
+
+  const hospitals = allProviders.filter(p => p.category === 'hospital').slice(0, 3);
+  const clinics = allProviders.filter(p => p.category === 'clinic').slice(0, 3);
+  const diagnostics = allProviders.filter(p => p.category === 'diagnostic').slice(0, 3);
+  const wellness = allProviders.filter(p => p.category === 'wellness').slice(0, 3);
+  const homecare = allProviders.filter(p => p.category === 'homecare').slice(0, 3);
+  const insurance = allProviders.filter(p => p.category === 'insurance').slice(0, 3);
+
+  const diagnosticPackages = window.SAINO_DATA.diagnosticPackages || [];
+  const patientReviews = window.SAINO_DATA.patientReviews || [];
+  const onlineDoctors = window.SAINO_DATA.onlineDoctors || [];
+  const emergencyBloodBanks = window.SAINO_DATA.sainoRated?.bloodBanks?.slice(0, 3) || [];
+  const emergencyAmbulances = window.SAINO_DATA.sainoRated?.ambulances?.slice(0, 3) || [];
+
+  const quickServices = [
+    { id: 'hospital', title: 'Hospital', icon: 'building-2', description: 'Hospitals & specialist care' },
+    { id: 'clinic', title: 'Clinic', icon: 'stethoscope', description: 'Doctors & OPD clinics' },
+    { id: 'diagnostic', title: 'Diagnostic / Lab', icon: 'activity', description: 'Labs, MRI, CT & scans' },
+    { id: 'packages', title: 'Diagnostic Packages', icon: 'package-check', description: 'Health screening packages' },
+    { id: 'wellness', title: 'Wellness Centre', icon: 'sparkles', description: 'Wellness & preventive care' },
+    { id: 'homecare', title: 'Homecare & Elderly', icon: 'heart-handshake', description: 'Care at your doorstep' },
+    { id: 'insurance', title: 'Health Insurance', icon: 'shield-check', description: 'Protect your health' },
+    { id: 'bloodbank', title: 'Blood Bank', icon: 'droplets', description: 'Emergency blood services' }
+  ];
+  return `
+    <!-- Explore Healthcare Section -->
+    <section class="mb-14">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+            Healthcare Services
+          </span>
+          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
+            Explore Healthcare
+          </h2>
+          <p class="text-xs text-saino-gray-500 mt-1">
+            Everything you need across the healthcare journey.
+          </p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+        ${quickServices.map(service => `
+          <button
+            onclick="${
+              service.id === 'packages'
+                ? "document.getElementById('diagnostic-packages-section')?.scrollIntoView({behavior:'smooth'})"
+                : `filterCategory('${service.id}')`
+            }"
+            class="group bg-white rounded-2xl border border-saino-gray-200 p-4 text-center hover:border-saino-red/30 hover:shadow-md transition">
+            <div class="w-11 h-11 mx-auto rounded-xl bg-saino-red/10 text-saino-red flex items-center justify-center group-hover:bg-saino-red group-hover:text-white transition">
+              <i data-lucide="${service.icon}" class="w-5 h-5"></i>
+            </div>
+            <h3 class="mt-3 text-[11px] sm:text-xs font-black text-saino-gray-900">
+              ${service.title}
+            </h3>
+            <p class="mt-1 text-[9px] text-saino-gray-500 leading-tight">
+              ${service.description}
+            </p>
+          </button>
+        `).join('')}
+      </div>
+    </section>
+
+    <!-- Hospitals -->
+    <section class="mb-14">
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-saino-gray-200">
+        <div>
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">Trusted Healthcare Providers</span>
+          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">Hospitals</h2>
+        </div>
+        <button onclick="filterCategory('hospital')" class="text-xs font-bold text-saino-red hover:underline">View All →</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${hospitals.map(p => renderProviderCard(p)).join('')}
+      </div>
+    </section>
+
+    <!-- Clinics + Reviews -->
+    <section class="mb-14">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-7">
+          <div class="flex items-center justify-between mb-5 pb-2 border-b border-saino-gray-200">
+            <h2 class="text-base sm:text-lg font-black text-saino-gray-900 uppercase tracking-wide">Clinics</h2>
+            <button onclick="filterCategory('clinic')" class="text-xs font-bold text-saino-red hover:underline">View All →</button>
+          </div>
+          <div class="space-y-4">
+            ${clinics.map(c => renderProviderCard(c)).join('')}
+          </div>
+        </div>
+        <div class="lg:col-span-5">
+          <div class="flex items-center justify-between mb-5 pb-2 border-b border-saino-gray-200">
+            <div>
+              <span class="text-xs font-black uppercase tracking-wider text-saino-red">Community</span>
+              <h2 class="text-base sm:text-lg font-black text-saino-gray-900">Patient Reviews</h2>
+            </div>
+            <button onclick="navigateTo('discovery')" class="text-xs font-bold text-saino-red hover:underline">Read All →</button>
+          </div>
+          <div class="space-y-3">
+            ${talkReviews.slice(0, 5).map((r, i) => renderTalkReviewItem(r, i)).join('')}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Discovery / Social Engagement -->
+    <section class="mb-14 rounded-3xl bg-saino-gray-50 border border-saino-gray-200 p-6 sm:p-8">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div>
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">SAINO Discovery</span>
+          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900 mt-1">Like · Comment · Interested · Saved</h2>
+          <p class="text-xs sm:text-sm text-saino-gray-600 mt-1 max-w-2xl">
+            Discover healthcare providers, read real patient experiences, share your opinion and save providers for later.
+          </p>
+        </div>
+        <button onclick="navigateTo('discovery')" class="px-5 py-3 rounded-xl bg-white border border-saino-gray-200 text-saino-gray-800 text-xs font-black hover:border-saino-red/30 hover:text-saino-red transition shadow-xs">
+          EXPLORE DISCOVERY
+        </button>
+      </div>
+    </section>
+    <section
+      id="diagnostic-packages-section"
+      class="mb-14">
+
+      <div class="flex items-center justify-between mb-6">
+
+        <div>
+
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+            Preventive Healthcare
+          </span>
+
+          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
+            Diagnostic Packages
+          </h2>
+
+          <p class="text-xs text-saino-gray-500 mt-1">
+            Choose complete health screening packages for you and your family.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        ${diagnosticPackages
+          .slice(0, 6)
+          .map(pkg => renderDiagnosticPackageCard(pkg))
+          .join('')}
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         10. HOMECARE & ELDERLY CARE
+    =========================================== -->
+
+    <section class="mb-14">
+
+      <div class="rounded-3xl bg-white border border-saino-gray-200 shadow-sm overflow-hidden">
+
+        <div class="p-6 sm:p-8">
+
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-7">
+
+            <div>
+
+              <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+                Care at Home
+              </span>
+
+              <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900 mt-1">
+                Homecare & Elderly Care
+              </h2>
+
+              <p class="text-xs sm:text-sm text-saino-gray-600 mt-1 max-w-2xl">
+                Professional healthcare support at home — from elderly care
+                and home nursing to doctor visits and post-operative support.
+              </p>
+
+            </div>
+
+            <button
+              onclick="filterCategory('homecare')"
+              class="px-5 py-2.5 rounded-xl bg-saino-red text-white text-xs font-black hover:bg-saino-red-dark transition">
+              VIEW HOMECARE
+            </button>
+
+          </div>
+
+
+          <!-- HOMECARE SERVICES -->
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-7">
+
+            <button
+              onclick="filterBookingType('home_nurse')"
+              class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
+
+              <i data-lucide="heart-handshake"
+                 class="w-5 h-5 text-saino-red mx-auto">
+              </i>
+
+              <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
+                Home Nurse
+              </span>
+
+            </button>
+
+
+            <button
+              onclick="filterBookingType('home_doc')"
+              class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
+
+              <i data-lucide="stethoscope"
+                 class="w-5 h-5 text-saino-red mx-auto">
+              </i>
+
+              <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
+                Home Doctor
+              </span>
+
+            </button>
+
+
+            <button
+              onclick="filterCategory('homecare')"
+              class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
+
+              <i data-lucide="accessibility"
+                 class="w-5 h-5 text-saino-red mx-auto">
+              </i>
+
+              <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
+                Elderly Care
+              </span>
+
+            </button>
+
+
+            <button
+              onclick="filterCategory('homecare')"
+              class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
+
+              <i data-lucide="heart-pulse"
+                 class="w-5 h-5 text-saino-red mx-auto">
+              </i>
+
+              <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
+                Post-Op Care
+              </span>
+
+            </button>
+
+
+            <button
+              onclick="filterCategory('homecare')"
+              class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
+
+              <i data-lucide="activity"
+                 class="w-5 h-5 text-saino-red mx-auto">
+              </i>
+
+              <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
+                Home Physio
+              </span>
+
+            </button>
+
+
+            <button
+              onclick="filterCategory('homecare')"
+              class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
+
+              <i data-lucide="pill"
+                 class="w-5 h-5 text-saino-red mx-auto">
+              </i>
+
+              <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
+                Care Support
+              </span>
+
+            </button>
+
+          </div>
+
+
+          <!-- HOMECARE PROVIDERS -->
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            ${homecare.map(p => renderProviderCard(p)).join('')}
+
+          </div>
+
+
+          <div class="mt-6">
+
+            <button
+              onclick="filterBookingType('home_nurse')"
+              class="w-full sm:w-auto px-7 py-3 rounded-xl bg-saino-red hover:bg-saino-red-dark text-white text-xs font-black shadow-md transition">
+
+              BOOK HOMECARE
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         11. HEALTH INSURANCE
+    =========================================== -->
+
+    <section class="mb-14">
+
+      <div class="rounded-3xl bg-white border border-saino-gray-200 shadow-sm p-6 sm:p-8">
+
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-7">
+
+          <div>
+
+            <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+              Healthcare Protection
+            </span>
+
+            <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900 mt-1">
+              Health Insurance
+            </h2>
+
+            <p class="text-xs sm:text-sm text-saino-gray-600 mt-1">
+              Protect your health and your family with the right healthcare coverage.
+            </p>
+
+          </div>
+
+          <button
+            onclick="filterCategory('insurance')"
+            class="px-5 py-2.5 rounded-xl bg-saino-red text-white text-xs font-black hover:bg-saino-red-dark transition">
+            EXPLORE INSURANCE
+          </button>
+
+        </div>
+
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-7">
+
+          <div class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200">
+
+            <i data-lucide="user"
+               class="w-5 h-5 text-saino-red mb-2">
+            </i>
+
+            <strong class="text-xs font-black text-saino-gray-900 block">
+              Individual Plans
+            </strong>
+
+            <span class="text-[10px] text-saino-gray-500">
+              Personal healthcare protection
+            </span>
+
+          </div>
+
+
+          <div class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200">
+
+            <i data-lucide="users"
+               class="w-5 h-5 text-saino-red mb-2">
+            </i>
+
+            <strong class="text-xs font-black text-saino-gray-900 block">
+              Family Plans
+            </strong>
+
+            <span class="text-[10px] text-saino-gray-500">
+              Protect your whole family
+            </span>
+
+          </div>
+
+
+          <div class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200">
+
+            <i data-lucide="building-2"
+               class="w-5 h-5 text-saino-red mb-2">
+            </i>
+
+            <strong class="text-xs font-black text-saino-gray-900 block">
+              Corporate Plans
+            </strong>
+
+            <span class="text-[10px] text-saino-gray-500">
+              Employee healthcare coverage
+            </span>
+
+          </div>
+
+
+          <div class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200">
+
+            <i data-lucide="badge-check"
+               class="w-5 h-5 text-saino-red mb-2">
+            </i>
+
+            <strong class="text-xs font-black text-saino-gray-900 block">
+              Cashless Networks
+            </strong>
+
+            <span class="text-[10px] text-saino-gray-500">
+              Partner hospital networks
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          ${insurance.map(p => renderProviderCard(p)).join('')}
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         12. WELLNESS CENTRES
+    =========================================== -->
+
+    <section class="mb-14">
+
+      <div class="flex items-center justify-between mb-6">
+
+        <div>
+
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+            Preventive & Lifestyle Care
+          </span>
+
+          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
+            Wellness Centres
+          </h2>
+
+          <p class="text-xs text-saino-gray-500 mt-1">
+            Ayurveda · Yoga · Physiotherapy · Mental Wellness · Preventive Care
+          </p>
+
+        </div>
+
+        <button
+          onclick="filterCategory('wellness')"
+          class="text-xs font-bold text-saino-red hover:underline">
+          View All →
+        </button>
+
+      </div>
+
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        ${wellness.map(p => renderProviderCard(p)).join('')}
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         13. COMPARE BEFORE YOU BOOK
+    =========================================== -->
+
+    <section class="mb-14 bg-white rounded-3xl border border-saino-gray-200 p-6 sm:p-8 shadow-sm">
+
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+
+        <div>
+
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+            Decision Helper
+          </span>
+
+          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900 mt-1">
+            Compare Before You Book
+          </h2>
+
+          <p class="text-xs sm:text-sm text-saino-gray-600 mt-1 max-w-2xl">
+            Compare ratings, reviews, services, pricing, availability and
+            SAINO badge levels before making your healthcare decision.
+          </p>
+
+        </div>
+
+        <button
+          onclick="navigateTo('discovery')"
+          class="px-6 py-3 rounded-xl bg-saino-red hover:bg-saino-red-dark text-white text-xs font-black shadow-md transition">
+          COMPARE PROVIDERS
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         14. EMERGENCY / BLOOD BANK
+    =========================================== -->
+
+    <section class="mb-14">
+
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-saino-gray-200">
+
+        <div>
+
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+            24/7 Rapid Response
+          </span>
+
+          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
+            Emergency Care & Blood Banks
+          </h2>
+
+        </div>
+
+        <button
+          onclick="navigateTo('discovery')"
+          class="text-xs font-bold text-saino-red hover:underline">
+          Emergency Directory →
+        </button>
+
+      </div>
+
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+
+        <!-- BLOOD BANK -->
+
+        <div class="bg-white rounded-2xl border border-saino-gray-200 p-5 shadow-xs">
+
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-saino-gray-100">
+
+            <h3 class="text-xs font-black uppercase text-saino-gray-700 flex items-center gap-2">
+
+              <i data-lucide="droplet"
+                 class="w-4 h-4 text-saino-red">
+              </i>
+
+              Blood Banks
+
+            </h3>
+
+            <span class="text-[10px] text-saino-gray-400 font-semibold">
+              Emergency
+            </span>
+
+          </div>
+
+
+          <div class="space-y-3">
+
+            ${emergencyBloodBanks.map(b => `
+
+              <div class="p-3 rounded-xl bg-saino-gray-50 border border-saino-gray-100">
+
+                <strong class="text-xs text-saino-gray-900 block">
+                  ${b.name}
+                </strong>
+
+                <span class="text-[10px] text-saino-gray-500 block mt-1">
+                  ${b.area || ''}
+                </span>
+
+                <button
+                  onclick="openCustomWhatsApp('Blood Bank Enquiry: ${b.name}', 'Hello SAINO, I need blood availability information from ${b.name}.')"
+                  class="mt-2 px-3 py-1.5 bg-saino-red text-white rounded-lg text-[10px] font-bold">
+                  Enquire Now
+                </button>
+
+              </div>
+
+            `).join('')}
+
+          </div>
+
+        </div>
+
+
+        <!-- AMBULANCE -->
+
+        <div class="bg-white rounded-2xl border border-saino-gray-200 p-5 shadow-xs">
+
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-saino-gray-100">
+
+            <h3 class="text-xs font-black uppercase text-saino-gray-700 flex items-center gap-2">
+
+              <i data-lucide="truck"
+                 class="w-4 h-4 text-saino-red">
+              </i>
+
+              Ambulance
+
+            </h3>
+
+            <span class="text-[10px] text-saino-gray-400 font-semibold">
+              24/7 Dispatch
+            </span>
+
+          </div>
+
+
+          <div class="space-y-3">
+
+            ${emergencyAmbulances.map(a => `
+
+              <div class="p-3 rounded-xl bg-saino-gray-50 border border-saino-gray-100">
+
+                <strong class="text-xs text-saino-gray-900 block">
+                  ${a.name}
+                </strong>
+
+                <span class="text-[10px] text-saino-gray-500 block mt-1">
+                  ${a.area || ''}
+                </span>
+
+                <button
+                  onclick="openCustomWhatsApp('Ambulance Dispatch: ${a.name}', 'Hello SAINO, I need an ambulance dispatch enquiry for ${a.name}.')"
+                  class="mt-2 px-3 py-1.5 bg-saino-red text-white rounded-lg text-[10px] font-bold">
+                  Request Ambulance
+                </button>
+
+              </div>
+
+            `).join('')}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         15. DOCTOR OPD
+    =========================================== -->
+
+    <section class="mb-14">
+
+      <div class="mb-6">
+
+        <span class="text-xs font-black uppercase tracking-wider text-saino-red">
+          Direct Healthcare Booking
+        </span>
+
+        <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
+          Doctor Consultation & OPD
+        </h2>
+
+        <p class="text-xs text-saino-gray-500 mt-1">
+          Discover doctors and request OPD consultation bookings.
+        </p>
+
+      </div>
+
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+
+        ${onlineDoctors.slice(0, 10).map(doc => `
+
+          <div class="bg-white rounded-2xl border border-saino-gray-200 p-4 text-center shadow-xs">
+
+            <div class="relative w-16 h-16 rounded-full overflow-hidden mx-auto mb-2 border-2 border-saino-red/20">
+
+              <img
+                src="${doc.image}"
+                alt="${doc.name}"
+                class="w-full h-full object-cover">
+
+            </div>
+
+            <strong class="text-xs font-bold text-saino-gray-900 block truncate">
+              ${doc.name}
+            </strong>
+
+            <span class="text-[10px] text-saino-gray-500 block truncate mt-1">
+              ${doc.role}
+            </span>
+
+            <span class="text-[10px] text-sky-700 font-semibold block truncate mt-1">
+              ${doc.hospital}
+            </span>
+
+            <button
+              onclick="openCustomWhatsApp('Doctor OPD Consultation: ${doc.name}', 'Hi SAINO Health, I would like to book an OPD consultation with ${doc.name} at ${doc.hospital}.')"
+              class="mt-3 w-full py-2 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-xl text-[10px]">
+              BOOK OPD
+            </button>
+
+          </div>
+
+        `).join('')}
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         16. PROVIDER ONBOARDING
+    =========================================== -->
+
+    <section class="mb-14 bg-saino-gray-50 rounded-3xl border border-saino-gray-200 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+
+      <div>
+
+        <span class="text-xs font-black uppercase tracking-wider text-saino-red block mb-1">
+          SAINO Provider Network
+        </span>
+
+        <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
+          Are you a Healthcare Provider?
+        </h2>
+
+        <p class="text-xs sm:text-sm text-saino-gray-600 mt-1">
+          List your hospital, clinic, diagnostic centre, wellness centre,
+          homecare service or health insurance business on SAINO HEALTH.
+        </p>
+
+      </div>
+
+      <button
+        onclick="navigateTo('list-your-care')"
+        class="px-6 py-3 bg-saino-red hover:bg-saino-red-dark text-white font-black rounded-full text-xs sm:text-sm shadow-md transition whitespace-nowrap">
+        LIST YOUR CARE
+      </button>
+
+    </section>
+      <!-- 11. DIGITALLY CONNECTED (NEPAL MAP GRAPHIC) -->
+    <section class="mb-14 bg-gradient-to-r from-sky-50 via-white to-sky-50 rounded-3xl border border-sky-100 p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="max-w-md">
+        <h2 class="text-2xl sm:text-3xl font-black text-saino-gray-900 mb-2">
+          Digitally <span class="text-saino-red">Connected</span>
+        </h2>
+        <p class="text-xs sm:text-sm text-saino-gray-600 leading-relaxed">
+          An all-in-one healthcare directory linking patients to verified providers across all 7 provinces of Nepal.
+        </p>
+      </div>
+      <div class="flex-1 flex justify-center">
+        <div class="relative w-full max-w-md h-36 bg-sky-100/50 rounded-2xl border border-sky-200/60 p-4 flex items-center justify-center overflow-hidden">
+          <div class="text-center text-xs font-bold text-sky-800 space-y-1">
+            <i data-lucide="network" class="w-8 h-8 mx-auto text-saino-red"></i>
+            <span>Kathmandu · Pokhara · Chitwan · Biratnagar · Butwal · Nepalgunj · Dhangadhi</span>
+            <span class="text-[10px] text-saino-gray-500 block">7 Provinces Connected</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+function renderAppointmentsView() {
+  return `<section class="p-6 text-center">
+    <h2 class="text-xl font-bold text-saino-red">My Appointments</h2>
+    <p class="text-saino-gray-600 mt-2">Appointments page is under construction.</p>
+  </section>`;
+}
+
+function renderSavedView() {
+  return `<section class="p-6 text-center">
+    <h2 class="text-xl font-bold text-saino-red">Saved Providers</h2>
+    <p class="text-saino-gray-600 mt-2">Saved page is under construction.</p>
+  </section>`;
+}
+
+function renderFaqsView() {
+  return `<section class="p-6 text-center">
+    <h2 class="text-xl font-bold text-saino-red">FAQs</h2>
+    <p class="text-saino-gray-600 mt-2">FAQs page is under construction.</p>
+  </section>`;
+}
+
 
 // ==========================================
-// 3. DEDICATED "LIST YOUR CARE" / "LIST YOUR BUSINESS" VIEW (PAGE 1 - 8 OFFICIAL SPEC)
+// 4. DEDICATED "LIST YOUR CARE" 
 // ==========================================
 function renderListYourCareView() {
   return `
@@ -2879,7 +3743,7 @@ function handleListYourCareSubmit(e) {
   showToast('Logged in to SAINO Business Dashboard!');
 }
 
-function handleFacilityRegistration(e) {
+function handleFacilityRegistration(e) {rende
   if (e) e.preventDefault();
   const org = document.getElementById('regOrgName')?.value || 'Your Facility';
   showToast(`Registration submitted for ${org}! Compliance team will verify your license.`);
@@ -4603,7 +5467,7 @@ function getOrCreateModalContainer() {
   return container;
 }
 
-// Open Modal (DB se try karega, 404 aane par bhi fallback se show karega)
+
 window.openDiscussionModal = async function(discussionId) {
   window.activeDiscussionId = discussionId;
   window.renderFBCommentModal();
@@ -4877,20 +5741,35 @@ window.handleGlobalReviewSubmit = function(e) {
     helpful: 0,
     commentsCount: 0
   });
+  
 
   localStorage.setItem('NEPAL_HEALTH_REVIEWS', JSON.stringify(window.REVIEWS_STORE));
   if (typeof renderApp === 'function') renderApp();
 };
 
-// 3. Full Reviews Page View Renderer
+
+// 3. See more Reviews Page View Renderer
 window.renderAllReviewsView = function() {
   let allReviews = [];
-  const store = window.REVIEWS_STORE || {};
+  const store = window.REVIEWS_STORE || {
+    'disc-patan': [
+      { id: 'rev-2', author: 'Deepak Kharel', rating: 4, timestamp: Date.now() - 345600000, date: '4 days ago', text: 'The doctors at Patan Hospital were very attentive. The waiting time was manageable and the staff guided me properly.', hospitalName: 'Patan Hospital', helpful: 14, commentsCount: 2 }
+    ],
+    'disc-om': [
+      { id: 'rev-3', author: 'Anjali Singh', rating: 5, timestamp: Date.now() - 604800000, date: '1 week ago', text: 'Om Hospital provided excellent maternity care. Doctors were attentive.', hospitalName: 'Om Hospital', helpful: 20, commentsCount: 4 }
+    ],
+    'disc-mediciti': [
+      { id: 'rev-4', author: 'Ravi Thapa', rating: 3, timestamp: Date.now() - 2592000000, date: '1 month ago', text: 'Mediciti facilities are modern, but billing took longer than expected.', hospitalName: 'Nepal Mediciti Hospital', helpful: 9, commentsCount: 1 }
+    ]
+  };
+
+  // Flatten reviews
   Object.keys(store).forEach(hId => {
     const list = store[hId] || [];
     list.forEach(r => allReviews.push({ ...r, hospitalId: hId }));
   });
 
+  // Filters
   const filter = window.currentReviewFilter || 'recent';
   const searchQuery = window.currentReviewSearch || '';
 
@@ -4912,7 +5791,7 @@ window.renderAllReviewsView = function() {
   }
 
   return `
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 mb-16 text-left">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 mb-16 text-left">
       <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <button onclick="navigateTo('discovery')" class="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center space-x-1 mb-3 cursor-pointer">
@@ -4930,41 +5809,23 @@ window.renderAllReviewsView = function() {
       </div>
 
       <!-- Reviews List Feed -->
-      <div class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         ${allReviews.length === 0 ? '<p class="text-slate-400 text-center py-8 text-xs">No matching reviews found.</p>' : ''}
-        ${allReviews.map(r => {
-          const stars = Array.from({length: 5}, (_, i) => `<span class="${i < r.rating ? 'text-amber-400' : 'text-slate-300'}">★</span>`).join('');
-          const initials = r.author ? r.author.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'VP';
-          return `
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center space-x-2.5">
-                    <div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">${initials}</div>
-                    <div>
-                      <span class="font-bold text-slate-900 text-xs block">${r.author}</span>
-                      <span class="text-[10px] text-slate-400">${r.date || 'Just now'} / Verified Patient</span>
-                    </div>
-                  </div>
-                  <div class="text-xs">${stars}</div>
-                </div>
-                <p class="text-xs text-slate-600 mb-3">"${r.text}"</p>
-              </div>
-              <div class="pt-3 border-t border-slate-100 text-[11px] font-medium text-slate-700">
-                ${r.hospitalName || 'Healthcare Provider'}
-              </div>
-            </div>
-          `;
-        }).join('')}
+        ${allReviews.slice(0, 9).map(r => renderTalkReviewItem(r)).join('')}
       </div>
     </div>
+
   `;
 };
-window.setStarRating = function(rating) {
-  const input = document.getElementById('selectedStarRating');
-  if (input) input.value = rating;
-  const ratingText = document.getElementById('ratingText');
-  if (ratingText) ratingText.innerText = `(${rating}/5 ${labels[rating]})`;
+
+// Helper to set filter
+window.setReviewFilter = function(filter) {
+  window.currentReviewFilter = filter;
+  const mainContainer = document.getElementById('mainContent');
+  if (mainContainer) {
+    mainContainer.innerHTML = window.renderAllReviewsView();
+  }
+
 
   const stars = document.querySelectorAll('#starContainer .star-btn');
   stars.forEach((s, idx) => {

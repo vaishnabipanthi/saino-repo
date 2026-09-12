@@ -1465,6 +1465,81 @@ window.SAINO_DATA = {
     }
   ],
 
+  patientReviews: [
+    {
+      id: 'rev-1',
+      title: "Life-saving Coordination",
+      body: "When my uncle suffered acute chest pain at midnight, CityCare’s WhatsApp hotline answered immediately and prepared the cath lab before we arrived. Truly life-saving coordination.",
+      author: "Ramesh Sharma",
+      role: "Family Member",
+      provider: "CityCare Hospital",
+      rating: 5
+    },
+    {
+      id: 'rev-2',
+      title: "Prompt Emergency Care",
+      body: "The emergency department at Grande was incredibly efficient. My father was admitted within minutes and the staff was professional throughout.",
+      author: "Priya Maharjan",
+      role: "Daughter",
+      provider: "Grande International Hospital",
+      rating: 5
+    },
+    {
+      id: 'rev-3',
+      title: "Good Cardiologist",
+      body: "Good cardiologist but the waiting time is long. Arrived at 10am, waited nearly 2 hours before seeing Dr. Shrestha. The consultation was thorough.",
+      author: "Rajesh Thapa",
+      role: "Patient",
+      provider: "Norvic International Hospital",
+      rating: 4
+    },
+    {
+      id: 'rev-4',
+      title: "Excellent Physiotherapy",
+      body: "Three weeks of treatment for my knee injury and I'm back to normal. The therapists genuinely care.",
+      author: "Sunita Gurung",
+      role: "Patient",
+      provider: "HAMS Hospital",
+      rating: 5
+    }
+  ],
+
+  talkOfTheTown: [
+    {
+      id: 'talk-1',
+      category: 'Review and Talk of Town',
+      icon: 'sparkles',
+      author: 'Aayusha Koirala',
+      role: 'Verified Patient',
+      provider: 'CityCare Multispeciality Hospital',
+      tag: 'Trending Review',
+      title: 'Seamless emergency cardiac care at 2 AM',
+      body: 'When my uncle suffered acute chest pain at midnight, CityCare’s WhatsApp hotline answered immediately and prepared the cath lab before we arrived. Truly life-saving coordination.'
+    },
+    {
+      id: 'talk-2',
+      category: "Hospital's Talk",
+      icon: 'building-2',
+      author: 'Dr. Bharat Rawat',
+      role: 'Executive Director, Norvic Heart Institute',
+      provider: 'Norvic Heart & Vascular',
+      tag: 'Hospital Announcement',
+      title: 'Zero-Waiting Coronary Angioplasty Protocol',
+      body: 'We are thrilled to announce that SAINO HEALTH users can now reserve priority emergency slots directly via WhatsApp with zero admission queuing.'
+    },
+    {
+      id: 'talk-3',
+      category: 'Best Clinic Talk',
+      icon: 'stethoscope',
+      author: 'Dr. Smriti Pradhan',
+      role: 'Child Specialist, Grande Metro Clinic',
+      provider: 'Grande Metro Polyclinic',
+      tag: 'Pediatric Care Insight',
+      title: 'Managing Seasonal Flu and Toddler Respiratory Health',
+      body: 'With sudden temperature drops in Kathmandu Valley, keep children hydrated and ensure timely vaccinations. We are conducting free growth consultations every Sunday through SAINO.'
+    }
+  ],
+
   // Big Screen & Promotional Healthcare Campaigns (New Requirement)
   bigScreenCampaigns: [
     {

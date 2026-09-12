@@ -57,29 +57,29 @@
 
   <!-- Section 2: Header / Search & Action Bar -->
    <header class="w-full flex justify-center shadow-sm;" style="background: #E2E6EA;">
-    <div class="w-full max-w-full px-3 py-1 flex flex-col justify-center gap-0.5 overflow-x-hidden">
-      
-      <!-- Top Row: Logo + Search Box (with Search button inside) + Sign In / Get Started outside -->
-      <div class="flex items-center justify-between w-full gap-3 bg-[#E2E6EA] pt-2 flex-wrap md:flex-nowrap">
+    <div class="w-full max-w-full px-3 py-0 flex flex-col justify-center gap-0 overflow-visible">
+
+      <div class="flex items-center justify-between w-full gap-2 md:gap-3 lg:gap-4 px-2 sm:px-4 py-2 bg-[#E2E6EA] flex-nowrap">
         
-        <!-- Logo -->
-        <a href="#" data-nav="marketplace" class="flex items-center flex-shrink-0">
-          <img src="assets/logo.png" alt="SAINO HEALTH" class="h-24 sm:h-32 md:h-36 w-auto object-contain" style="mix-blend-mode: multiply;">
+        <!-- Logo (Phone: h-9, Tablet: h-12, PC/Laptop: h-20) -->
+        <a href="#" data-nav="marketplace" class="flex items-center flex-shrink-0 lg:-my-3">
+          <img src="assets/logo.png" alt="SAINO HEALTH" class="h-20 sm:h-20 md:h-20 lg:h-32 w-auto object-contain" style="mix-blend-mode: multiply;">
         </a>
 
-        <!-- Search Box (Input, Location & Search Button inside) -->
-        <div class="relative flex flex-1 max-w-2xl items-center border-2 border-slate-400 rounded-[10px] bg-[#E2E6EA] px-2 md:pl-3 md:pr-1 py-1">
-          <i data-lucide="search" class="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400 mr-1 md:mr-2 shrink-0"></i>
+        <!-- Search Box (Fluid & balanced across all screens) -->
+        <div class="search-shell relative flex flex-1 max-w-xs sm:max-w-md md:max-w-xl lg:max-w-6xl items-center border-2 border-slate-400 rounded-[10px] bg-[#E2E6EA] px-2 md:pl-3 md:pr-1 py-1 z-30">
+          <i data-lucide="search" class="w-3.5 h-3.5 md:w-6 md:h-6 text-slate-400 mr-1.5 shrink-0"></i>
           <input 
             type="text" 
             id="globalSearchInput" 
             placeholder="Search hospital, clinics, services..." 
-            class="w-full text-[11px] md:text-sm text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none"
+            class="w-full text-xs md:text-sm lg:text-base py-1 text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
           >
-          
-          <div class="flex items-center text-[11px] md:text-xs font-semibold text-slate-700 shrink-0 pr-1 md:pr-2">
-            <i data-lucide="map-pin" class="w-3 h-3 md:w-3.5 md:h-3.5 text-[#B91C1C] mr-0.5 md:mr-1"></i>
-            <select id="globalLocationSelect" class="bg-transparent focus:outline-none cursor-pointer max-w-[65px] md:max-w-none truncate">
+
+          <!-- Location Selector: Mobile pe hide taaki box squeeze na ho, Tablet & PC pe visible -->
+          <div class="hidden sm:flex items-center text-[11px] md:text-xs font-semibold text-slate-700 shrink-0 pr-1 md:pr-2 border-l border-slate-300 pl-2 ml-1">
+            <i data-lucide="map-pin" class="w-3 h-3 md:w-3.5 md:h-3.5 text-[#B91C1C] mr-1"></i>
+            <select id="globalLocationSelect" class="bg-transparent focus:outline-none cursor-pointer max-w-[70px] md:max-w-none truncate">
               <option value="Kathmandu">Kathmandu</option>
               <option value="Lalitpur">Lalitpur</option>
               <option value="Bhaktapur">Bhaktapur</option>
@@ -87,99 +87,130 @@
             </select>
           </div>
 
-          <button id="globalSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-3 md:px-5 py-1.5 rounded-[8px] text-[11px] md:text-xs font-bold transition shrink-0 ml-1">
+          <!-- Search Button -->
+          <button id="globalSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-2.5 sm:px-4 md:px-5 py-1.5 rounded-[8px] text-[11px] md:text-xs font-bold transition shrink-0 ml-1">
             Search
           </button>
+
+          <!-- Search Results Dropdown -->
+          <div id="globalResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-80 overflow-y-auto text-left"></div>
         </div>
 
-        <!-- Sign In & Get Started Outside -->
+        <!-- PC & Laptop Buttons (Desktop view: visible on md & up) -->
         <div class="hidden md:flex items-center gap-2 flex-shrink-0">
           <button onclick="openProviderSignInModal('patient')" class="px-3 py-1.5 text-xs font-bold text-slate-900 hover:text-black border-2 border-slate-700 rounded-[10px] bg-[#E2E6EA] hover:bg-slate-300 transition shadow-xs">
             Sign In
           </button>
-
           <button onclick="navigateTo('list-your-care')" class="px-3 py-2 text-xs font-semibold bg-[#B91C1C] hover:bg-[#991B1B] text-white rounded-[10px] transition shadow-xs">
             Get Started
           </button>
         </div>
 
-        <!-- Mobile + Tablet Actions -->
-        <div class="md:hidden flex items-center space-x-2 ml-auto">
-          <button onclick="openProviderSignInModal('patient')" class="h-9 px-3 rounded-lg bg-[#B91C1C] text-white font-bold text-xs flex items-center justify-center transition shadow-xs">
+        <!-- Mobile & Tablet Actions  -->
+        <div class="md:hidden flex items-center space-x-1.5 shrink-0">
+          <button onclick="openProviderSignInModal('patient')" class="h-8 px-2.5 rounded-lg bg-[#B91C1C] text-white font-bold text-xs flex items-center justify-center transition shadow-xs">
             Sign In
           </button>
-          <button id="mobileMenuBtn" class="p-2 rounded-xl text-slate-700 hover:bg-slate-200 transition">
+          <button id="mobileMenuBtn" class="p-1.5 rounded-xl text-slate-700 hover:bg-slate-200 transition">
             <i data-lucide="menu" class="w-6 h-6"></i>
           </button>
         </div>
+
       </div>
 
-      <!-- Sub-Navigation -->
-      <nav class="hidden lg:flex items-center justify-between w-full text-[13px] font-medium text-slate-700 pt-2 mt-1">
-        <div class="flex items-center gap-6">
-          <a href="#" data-nav="marketplace" class="text-[#B91C1C] font-bold">Home</a>
-          <a href="#" data-nav="discovery" class="hover:text-[#B91C1C] transition">Discover</a>
-          <a href="#" onclick="filterCategory('all')" class="hover:text-[#B91C1C] transition">Find Healthcare</a>
-          <a href="#" onclick="navigateTo('appointments')" class="hover:text-[#B91C1C] transition">My Appointments</a>
-          <a href="#" onclick="navigateTo('saved')" class="hover:text-[#B91C1C] transition">Saved</a>
-        </div>
+      <div class="hidden md:flex items-center justify-between w-full text-[12px] lg:text-[15px] font-semibold text-slate-700 pt-1 pb-2 relative z-20 mt-1">
+        <div class="flex items-center gap-4 lg:gap-6">
+      <a href="#" data-nav="marketplace" onclick="event.preventDefault(); navigateTo('marketplace')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">Home</a>
+      <a href="#" data-nav="discovery" onclick="event.preventDefault(); navigateTo('discovery')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">Discover</a>
+      <a href="#" data-nav="find-healthcare" onclick="event.preventDefault(); navigateTo('find-healthcare')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition cursor-pointer">Find Healthcare</a>
+      <a href="#" data-nav="appointments" onclick="event.preventDefault(); navigateTo('appointments')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">My Appointments</a>
+      <a href="#" data-nav="saved" onclick="event.preventDefault(); navigateTo('saved')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">Saved</a>
+    </div>
 
-        <div class="flex items-center gap-6">
-          <a href="#" onclick="navigateTo('list-your-care')" class="hover:text-[#B91C1C] transition">List Your Care</a>
-          <a href="#" data-nav="about" class="hover:text-[#B91C1C] transition">About Us</a>
-          <a href="#" data-nav="contact" class="hover:text-[#B91C1C] transition">Contact Us</a>
-          <a href="#" onclick="navigateTo('faqs')" class="hover:text-[#B91C1C] transition">FAQs</a>
-        </div>
-      </nav>
+    <div class="flex items-center gap-4 lg:gap-6">
+      <a href="#" data-nav="list-your-care" onclick="event.preventDefault(); navigateTo('list-your-care')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">List Your Care</a>
+      <a href="#" data-nav="about" onclick="event.preventDefault(); navigateTo('about')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">About Us</a>
+      <a href="#" data-nav="contact" onclick="event.preventDefault(); navigateTo('contact')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">Contact Us</a>
+      <a href="#" data-nav="faqs" onclick="event.preventDefault(); navigateTo('faqs')" 
+        class="text-slate-700 hover:text-[#B91C1C] transition">FAQs</a>
+    </div>
 
     </div>
 
-    <!-- Mobile Drawer Menu -->
-    <div id="mobileMenu" class="lg:hidden hidden border-t border-saino-gray-200 bg-white px-4 py-4 space-y-2 shadow-lg">
-      <a href="#" data-nav="marketplace" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Home</a>
-      <a href="#" data-nav="discovery" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition flex items-center justify-between">
-        <span>Discovery</span>
-        <span class="px-1.5 py-0.5 rounded text-[10px] bg-saino-red/10 text-saino-red font-bold">Explore</span>
-      </a>
-      <a href="#" data-nav="about" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">About us</a>
-      <a href="#" data-nav="contact" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Contact us</a>
-      <a href="#" data-nav="list-your-care" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-red hover:bg-saino-red/5 transition">List your care</a>
-      <div class="pt-3 border-t border-saino-gray-100 mb-2">
-        <button onclick="openProviderSignInModal('patient')" class="w-full py-2.5 text-xs font-bold text-saino-gray-800 border border-saino-gray-200 rounded-xl hover:border-saino-red hover:text-saino-red hover:bg-saino-red/5 transition flex items-center justify-center space-x-2">
-          <i data-lucide="user" class="w-4 h-4 text-saino-red"></i>
-          <span>Sign In / Register</span>
-        </button>
+    <!-- Mobile Drawer Menu  -->
+    <div id="mobileMenu" class="lg:hidden hidden fixed inset-0 z-50 bg-white w-screen h-screen flex flex-col justify-between p-5 overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+          <button type="button" onclick="document.getElementById('mobileMenu').classList.add('hidden')" class="p-2 text-slate-700 hover:text-black text-2xl font-bold leading-none">
+            ✕
+          </button>
+        </div>
+
+        <nav class="flex flex-col gap-3 py-6 text-sm font-semibold text-slate-800">
+        <a href="#" onclick="event.preventDefault(); navigateTo('marketplace'); document.getElementById('mobileMenu').classList.add('hidden')" 
+          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">Home</a>
+
+        <a href="#" onclick="event.preventDefault(); navigateTo('discovery'); document.getElementById('mobileMenu').classList.add('hidden')" 
+          class="mobile-nav-link py-2 border-b border-slate-100 flex items-center justify-between hover:text-[#B91C1C] cursor-pointer">
+          <span>Discovery</span>
+          <span class="text-[10px] bg-rose-100 text-[#B91C1C] px-2 py-0.5 rounded font-bold">Explore</span>
+        </a>
+
+        <a href="#" onclick="event.preventDefault(); filterCategory('all'); document.getElementById('mobileMenu').classList.add('hidden')" 
+          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">Find Healthcare</a>
+
+        <a href="#" onclick="event.preventDefault(); navigateTo('appointments'); document.getElementById('mobileMenu').classList.add('hidden')" 
+          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">My Appointments</a>
+
+        <a href="#" onclick="event.preventDefault(); navigateTo('saved'); document.getElementById('mobileMenu').classList.add('hidden')" 
+          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">Saved</a>
+
+        <a href="#" onclick="event.preventDefault(); navigateTo('list-your-care'); document.getElementById('mobileMenu').classList.add('hidden')" 
+          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">List Your Care</a>
+
+        <div class="py-2">
+          <button onclick="openProviderSignInModal('patient'); document.getElementById('mobileMenu').classList.add('hidden');" 
+                  class="w-full bg-[#B91C1C] hover:bg-[#991B1B] text-white py-2.5 rounded-[8px] text-xs font-bold transition shadow-sm flex items-center justify-center gap-2">
+            <i data-lucide="user" class="w-4 h-4 text-white"></i>
+            <span>Sign In / Register</span>
+          </button>
+        </div>
+        </nav>
+
       </div>
-      <a href="tel:+9779761427155" class="w-full py-2.5 text-xs font-bold bg-saino-red hover:bg-saino-red-dark text-white rounded-xl shadow flex items-center justify-center space-x-2 transition">
-        <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
-        <span>Call Hotline: +977 9761427155</span>
-      </a>
-    </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="bg-gradient-to-b from-saino-gray-50 via-white to-saino-gray-50 border-b border-saino-gray-200 pt-8 pb-8 px-4 sm:px-6 lg:px-8">
+  <section id="heroHomeSection" class="bg-gradient-to-b from-saino-gray-50 via-white to-saino-gray-50 border-b border-saino-gray-200 pt-8 pb-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto text-center">
-      <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-6">
-        Welcome back ! Start your Journey with<span class="text-[#800020]"># SAINOHEALTH</span>
+      <h1 class="text-xl sm:text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-6">
+        Welcome back ! Start your Journey with <span class="text-[#B91C1C]">#SAINOHEALTH</span>
       </h1>
 
       <!-- Quick Category Pills -->
       <div id="homeSearchSection">
-    <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 mb-6 text-[11px] sm:text-xs font-semibold text-slate-700">
-      <button onclick="filterCategory('hospital')" class="hover:text-red-600 transition">Hospital</button>
-      <button onclick="filterCategory('clinic')" class="hover:text-red-600 transition">Clinics</button>
-      <button onclick="filterCategory('diagnostic')" class="hover:text-red-600 transition">Diagnostic Centres</button>
-      <button onclick="filterCategory('wellness')" class="hover:text-red-600 transition">Wellness Centres</button>
-      <button onclick="filterCategory('ambulance')" class="hover:text-red-600 transition">Ambulance</button>
-      <button onclick="filterCategory('bloodbank')" class="hover:text-red-600 transition">Blood Banks</button>
-      <button onclick="filterCategory('homecare')" class="hover:text-red-600 transition">Homecare Centers</button>
-      <button onclick="filterCategory('insurance')" class="hover:text-red-600 transition">Insurance</button>
+    <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 mb-6 text-[11px] md:text-[13px] sm:text-xs font-semibold text-slate-700">
+      <button onclick="filterCategory('hospital')" class="hover:text-[#B91C1C] transition">Hospital</button>
+      <button onclick="filterCategory('clinic')" class="hover:text-[#B91C1C] transition">Clinics</button>
+      <button onclick="filterCategory('diagnostic')" class="hover:text-[#B91C1C] transition">Diagnostic Centres</button>
+      <button onclick="filterCategory('wellness')" class="hover:text-[#B91C1C] transition">Wellness Centres</button>
+      <button onclick="filterCategory('ambulance')" class="hover:text-[#B91C1C] transition">Ambulance</button>
+      <button onclick="filterCategory('bloodbank')" class="hover:text-[#B91C1C] transition">Blood Banks</button>
+      <button onclick="filterCategory('homecare')" class="hover:text-[#B91C1C] transition">Homecare Centers</button>
+      <button onclick="filterCategory('insurance')" class="hover:text-[#B91C1C] transition">Insurance</button>
     </div>
 
 
      <!-- Search Bar -->
-        <div class="relative w-full max-w-4xl mx-auto flex items-center border border-slate-200 rounded-[10px] bg-white px-2 md:pl-3 md:pr-1 py-1 shadow-sm">
+        <div class="search-shell relative w-full max-w-6xl mx-auto flex items-center border border-slate-200 rounded-[10px] bg-white px-2 md:pl-3 md:pr-1 py-2 shadow-sm z-30">
           <i data-lucide="search" class="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400 mr-1 md:mr-2 shrink-0"></i>
           <input type="text" id="heroSearchInput" placeholder="Search Hospital, Doctor, Scan..." class="w-full text-[11px] md:text-sm text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none">
           
@@ -197,16 +228,15 @@
               <option value="Banepa">Banepa</option>
             </select>
           </div>
-          <button onclick="renderApp()" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-3 md:px-7 py-1.5 md:py-2 rounded-[8px] text-[11px] md:text-xs font-bold transition shrink-0">
+          <button id="heroSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-3 md:px-7 py-1.5 md:py-2 rounded-[8px] text-[11px] md:text-xs font-bold transition shrink-0">
             Search
           </button>
-          <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-80 overflow-y-auto text-left">
-          </div>
+            <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-80 overflow-y-auto text-left"></div>
         </div>
       </div>
             
       <!-- Trust Badges -->
-     <div class="w-full max-w-4xl mx-auto flex items-center justify-start gap-6 sm:gap-8 text-[11px] text-slate-600 mt-3 px-1">
+     <div class="w-full max-w-6xl mx-auto flex items-center justify-start gap-6 sm:gap-8 text-[11px] md:text-[14px]  text-slate-600 mt-3 gap-x-4 px-1">
         <div class="flex items-center space-x-1.5">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 text-slate-800"></i>
           <span>Verified Information</span>
@@ -226,10 +256,7 @@
 
   <!-- Dynamic Main Content -->
   <main id="mainContent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-    <!-- Populated dynamically via app.js -->
   </main>
-
-  
 
 <!-- Footer -->
   <footer class="w-full bg-[#E5E9EE] text-slate-700 pt-16 pb-10 border-t border-slate-300">
@@ -240,9 +267,8 @@
         
         <!-- Column 1: Brand Logo, About & Social Links -->
       <div class="w-full md:flex-1 md:min-w-[220px] md:max-w-[240px] pl-0 md:pl-6 flex flex-col items-start md:items-center text-left md:text-center">
-        <!-- Logo -->
         <a href="#" class="inline-block mb-1 -ml-3">
-            <img src="assets/logo.png" alt="SAINO HEALTH"  class="h-[90px] w-auto object-contain mix-blend-multiply contrast-125">
+            <img src="assets/logo.png" alt="SAINO HEALTH"  class="h-[130px] w-auto object-contain mix-blend-multiply contrast-125">
           </a>
   
         <!-- Description -->
@@ -376,7 +402,7 @@
   <!-- Application Scripts -->
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
-    <script src="js/backend-connect.js"></script>
+  <script src="js/backend-connect.js"></script>
 
 </body>
 </html>
