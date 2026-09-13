@@ -2316,9 +2316,9 @@ function bindCampaignsEvents() {}
           <div class="grid grid-cols-2 gap-4 w-full min-w-0">
 
             <!-- 1. Hospitals -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Hospitals</h4>
-              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
@@ -2334,9 +2334,9 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 2. Clinics -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Clinics</h4>
-                <div class="flex flex-col gap-1 text-[11px] min-w-0">
+                <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
               <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
               <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
               <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
@@ -2351,9 +2351,9 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 3. Diagnostic Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Diagnostic Centers</h4>
-              <div class="flex flex-col gap-1 text-[11px] min-w-0">
+              <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
@@ -2368,9 +2368,9 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 4. Wellness Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[500px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Wellness Centers</h4>
-               <div class="flex flex-col gap-1 text-[11px] min-w-0"> 
+               <div class="flex flex-col gap-1.5 text-[11px] min-w-0"> 
                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">02</span><span class="w-5 h-5 rounded bg-emerald-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">NO</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Norvic International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.7</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">41 disc.</span></div>
                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">03</span><span class="w-5 h-5 rounded bg-purple-950 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">GR</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">Grande International Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★★</span><span class="text-[10px] text-slate-500 font-medium">4.8</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">28 disc.</span></div>
@@ -2384,7 +2384,7 @@ function bindCampaignsEvents() {}
                 </div>
               </div>
              <!-- 5. Ambulance -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[290px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[350px]">
               <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Ambulance</h4>
               <div class="flex flex-col gap-2.5 text-[11px] min-w-0">
                      <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2396,7 +2396,7 @@ function bindCampaignsEvents() {}
                 </div>
 
                  <!-- 6. Blood bank -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[290px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[350px]">
               <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Blood Bank</h4>
               <div class="flex flex-col gap-2.5 text-[11px] min-w-0">
                    <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2674,7 +2674,7 @@ function renderProvidersShowcaseView() {
             <button onclick="navigateTo('discovery')" class="text-xs font-bold text-saino-red hover:underline">Read All →</button>
           </div>
           <div class="space-y-3">
-            ${talkReviews.slice(0, 5).map((r, i) => renderTalkReviewItem(r, i)).join('')}
+            ${patientReviews.slice(0, 5).map((r, i) => renderTalkReviewItem(r, i)).join('')}
           </div>
         </div>
       </div>
@@ -3835,164 +3835,213 @@ function renderBoostView() {
 // ==========================================
 function renderAboutView() {
   return `
-    <div class="max-w-4xl mx-auto mb-16">
-      <!-- Mission & Hero with Large Official Logo -->
-      <div class="text-center mb-12">
-        <div class="inline-block p-5 sm:p-7 bg-white rounded-3xl shadow-xl border border-slate-200 mb-6">
-          <img src="assets/logo.png" alt="SAINO HEALTH" class="h-28 sm:h-36 md:h-40 w-auto max-w-[360px] object-contain mx-auto">
-        </div>
-        <div class="block">
-          <span class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold bg-rose-100 text-rose-800 uppercase tracking-widest">
-            CONNECTED. SIMPLIFIED. BETTER HEALTH.
-          </span>
-        </div>
-        <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 mt-4 mb-2">
-          Discover. Explore. Choose. Book with Confidence.
-        </h1>
-        <p class="text-sm md:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-          At SAINO Health, we bring together accurate, relevant, and thoughtfully presented information about healthcare providers and services, enabling users to discover, explore, and make more informed healthcare decisions with confidence.
-        </p>
-      </div>
+    <section class="py-10 sm:py-14 px-4 text-center max-w-4xl mx-auto space-y-4">
+            <h1 class="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Discover. Explore. Choose. <span class="text-[#b81414]">Book with Confidence.</span>
+            </h1>
 
-      <!-- Core Quote 1 (Page 4 spec) -->
-      <div class="quote-box p-6 md:p-8 rounded-2xl mb-12 shadow-sm">
-        <p class="text-base md:text-lg font-medium text-slate-800 italic leading-relaxed mb-3">
-          “Healthcare should not be a collection of disconnected services. It should be a connected ecosystem where people, providers, and information come together to make better decisions.”
-        </p>
-        <span class="text-xs font-bold text-sky-700 tracking-wider uppercase">— SAINO Health</span>
-      </div>
-
-      <!-- Our Offerings (Page 4 & 5 spec) -->
-      <div class="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm mb-12">
-        <h3 class="text-lg font-bold text-slate-900 mb-4">Our Offerings</h3>
-        <div class="space-y-4">
-          <div class="flex items-start space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">✓</span>
-            <div>
-              <strong class="text-xs md:text-sm text-slate-900 block">Comprehensive Healthcare Directory</strong>
-              <p class="text-xs text-slate-600 mt-0.5">Detailed and verified information on healthcare providers, helping users discover doctors, clinics, hospitals, diagnostic centres, and healthcare services.</p>
+            <div class="pt-2">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Our Mission</h2>
+                <p class="text-slate-600 text-xs sm:text-sm font-semibold mb-3">
+                    To make healthcare easier to discover, explore, and access.
+                </p>
+                <p class="text-slate-500 text-xs sm:text-xs leading-relaxed max-w-2xl mx-auto">
+                    At <strong class="text-[#b81414]">SAINO Health</strong>, we bring together accurate, relevant, and thoughtfully presented information about healthcare providers and services, enabling users to discover, explore, and make more informed healthcare decisions with confidence.
+                </p>
             </div>
-          </div>
 
-          <div class="flex items-start space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">✓</span>
-            <div>
-              <strong class="text-xs md:text-sm text-slate-900 block">Online Appointment Booking</strong>
-              <p class="text-xs text-slate-600 mt-0.5">Explore provider profiles, services, reviews, and availability, and book appointments conveniently through SAINO Health WhatsApp integration.</p>
+            <!-- Tags -->
+            <div class="flex flex-wrap justify-center gap-2 pt-3">
+                <span class="bg-slate-100 border border-slate-200/80 text-slate-600 text-[10px] font-medium px-3 py-1 rounded-full">8 Categories</span>
+                <span class="bg-slate-100 border border-slate-200/80 text-slate-600 text-[10px] font-medium px-3 py-1 rounded-full">Verified Providers</span>
+                <span class="bg-slate-100 border border-slate-200/80 text-slate-600 text-[10px] font-medium px-3 py-1 rounded-full">One Platform</span>
             </div>
-          </div>
+        </section>
 
-          <div class="flex items-start space-x-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">✓</span>
-            <div>
-              <strong class="text-xs md:text-sm text-slate-900 block">Connected Healthcare Services</strong>
-              <p class="text-xs text-slate-600 mt-0.5">Access a growing network of healthcare providers and services through one trusted, connected marketplace.</p>
+        <!-- DOCTOR QUOTE BANNER SECTION -->
+        <section class="bg-slate-50/70 border-y border-slate-200/80 py-8 sm:py-12 my-4">
+            <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8">
+                
+                <!-- Left Text Content -->
+                <div class="flex-1 space-y-4">
+                    <p class="text-xs sm:text-sm font-semibold text-slate-700 leading-snug">
+                        Our goal is simple: make healthcare discovery more transparent, connected, and confident.
+                    </p>
+
+                    <!-- Red Accent Quote Box -->
+                    <div class="bg-white border-l-4 border-[#b81414] border-y border-r border-slate-200/80 p-4 rounded-r-lg shadow-xs">
+                        <p class="text-slate-700 text-xs leading-relaxed font-medium">
+                            "Healthcare should not be a collection of disconnected services. It should be a connected ecosystem where people, providers, and information come together to make better decisions." 
+                            <span class="block text-[#b81414] font-bold mt-1.5">— SAINO Health</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Doctor Image -->
+                <div class="shrink-0 w-48 sm:w-60 md:w-64 flex justify-center">
+                    <img 
+                        src="https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827768.jpg" 
+                        alt="SAINO Health Doctor" 
+                        class="w-full h-auto object-cover rounded-lg shadow-sm"
+                    />
+                </div>
+
             </div>
-          </div>
-        </div>
-      </div>
+        </section>
 
-      <!-- Core Quote 2 (Page 5 spec) -->
-      <div class="quote-box p-6 md:p-8 rounded-2xl mb-12 shadow-sm">
-        <p class="text-base md:text-lg font-medium text-slate-800 italic leading-relaxed mb-3">
-          “The best care is more than a service—it is the feeling of being genuinely understood, cared for, and supported by someone you can trust.”
-        </p>
-        <span class="text-xs font-bold text-sky-700 tracking-wider uppercase">— Our Care Philosophy</span>
-      </div>
+        <!-- OUR OFFERINGS SECTION -->
+        <section class="max-w-4xl mx-auto px-4 py-10 space-y-6">
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900">Our Offerings</h2>
 
-      <!-- 4 Pillars: Connect · Trust · Transparency · Choice (Page 5 & 6 spec) -->
-      <div class="mb-12">
-        <div class="text-center mb-8">
-          <span class="text-xs font-bold uppercase tracking-wider text-sky-600">Our Approach to Healthcare</span>
-          <h2 class="text-xl md:text-2xl font-bold text-slate-900 mt-1">Connecting People with Healthcare They Can Trust</h2>
-        </div>
+            <div class="space-y-3.5">
+                <!-- Offering Card 1 -->
+                <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs flex items-start space-x-3.5">
+                    <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas fa-check text-slate-700 text-[10px]"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Comprehensive Healthcare Directory</h3>
+                        <p class="text-xs font-bold text-slate-800 mb-1">Find the right care with confidence.</p>
+                        <p class="text-slate-500 text-xs">
+                            Detailed and verified information on healthcare providers, helping users discover doctors, clinics, hospitals, diagnostic centers, and healthcare services.
+                        </p>
+                    </div>
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mb-3">
-              <i data-lucide="link" class="w-5 h-5"></i>
+                <!-- Offering Card 2 -->
+                <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs flex items-start space-x-3.5">
+                    <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas fa-check text-slate-700 text-[10px]"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Online Appointment Booking</h3>
+                        <p class="text-xs font-bold text-slate-800 mb-1">Make appointments without the hassle.</p>
+                        <p class="text-slate-500 text-xs">
+                            Explore provider profiles, services, reviews, and availability, and book appointments conveniently through SAINO Health.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Offering Card 3 -->
+                <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs flex items-start space-x-3.5">
+                    <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas fa-check text-slate-700 text-[10px]"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Connected Healthcare Services</h3>
+                        <p class="text-xs font-bold text-slate-800 mb-1">Stay connected to the care you need.</p>
+                        <p class="text-slate-500 text-xs">
+                            Access a growing network of healthcare providers and services through one trusted, connected marketplace.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-2">Connect</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              Healthcare is more than finding a doctor or booking an appointment. It is about creating meaningful connections between people and the healthcare providers they choose. SAINO Health helps bring patients and providers closer through easier discovery, access, and communication.
-            </p>
-          </div>
+        </section>
 
-          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3">
-              <i data-lucide="shield-check" class="w-5 h-5"></i>
+        <!-- OUR APPROACH SECTION -->
+        <section class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+            <div class="text-center">
+                <span class="text-xs font-bold text-slate-500 block mb-1">Our Approach</span>
+                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">Connecting People with Healthcare They Can Trust</h2>
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-2">Trust</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              Trust is at the heart of healthcare. We are committed to providing reliable provider information and maintaining a responsible verification system, helping people explore healthcare options with greater confidence.
-            </p>
-          </div>
 
-          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-3">
-              <i data-lucide="eye" class="w-5 h-5"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <!-- Grid 1: Connect -->
+                <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-eye text-slate-800 text-xs"></i>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Connect</h3>
+                    </div>
+                    <p class="text-slate-500 text-[11px] sm:text-xs leading-relaxed">
+                        Healthcare is more than finding a doctor or booking an appointment. It is about creating meaningful connections between people and the healthcare providers they choose. SAINO Health helps bring patients and providers closer through easier discovery, access, and communication.
+                    </p>
+                </div>
+
+                <!-- Grid 2: Transparency -->
+                <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-circle-nodes text-slate-800 text-xs"></i>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Transparency</h3>
+                    </div>
+                    <p class="text-slate-500 text-[11px] sm:text-xs leading-relaxed">
+                        We believe people deserve clarity when making healthcare decisions. We strive to present provider information, services, reviews, activities, and promotional placements clearly, so users can explore their options and make informed choices.
+                    </p>
+                </div>
+
+                <!-- Grid 3: Choice -->
+                <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-chart-simple text-slate-800 text-xs"></i>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Choice</h3>
+                    </div>
+                    <p class="text-slate-500 text-[11px] sm:text-xs leading-relaxed">
+                        Every individual has different healthcare needs. We believe people should have the freedom to explore relevant providers and services, understand their options, and choose the care that feels right for them.
+                    </p>
+                </div>
+
+                <!-- Grid 4: Trust -->
+                <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-lock text-slate-800 text-xs"></i>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Trust</h3>
+                    </div>
+                    <p class="text-slate-500 text-[11px] sm:text-xs leading-relaxed">
+                        Trust is at the heart of healthcare. We are committed to providing reliable provider information and maintaining a responsible verification system, helping people explore healthcare options with greater confidence.
+                    </p>
+                </div>
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-2">Transparency</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              We believe people deserve clarity when making healthcare decisions. We strive to present provider information, services, reviews, activities, and promotional placements clearly, so users can explore their options and make informed choices.
-            </p>
-          </div>
+        </section>
 
-          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
-              <i data-lucide="sparkles" class="w-5 h-5"></i>
+        <!-- YOUR DATA, YOUR CONTROL SECTION -->
+        <section class="bg-slate-50/70 border-t border-slate-200/80 py-10 sm:py-12 mt-6">
+            <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8">
+                
+                <!-- Left Details -->
+                <div class="space-y-2 text-left">
+                    <h2 class="text-sm font-extrabold tracking-wide text-slate-900">
+                        YOUR DATA, <span class="text-[#b81414]">YOUR CONTROL.</span>
+                    </h2>
+                    <p class="text-xs text-slate-600 font-medium">
+                        Data privacy and security is our top priority<br>
+                        Your data has only one owner: YOU
+                    </p>
+                    <div class="pt-2 space-y-1 text-[11px] text-slate-500">
+                        <p>SAINO does not have access to your data.</p>
+                        <p>SAINO does not sell or share your data with any third party.</p>
+                        <p>
+                            SAINO follows stringent policies so that data isn't compromised at any step. 
+                            <a href="#" class="text-[#b81414] font-medium hover:underline">Read More ...</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Security Shield Icon Badge -->
+                <div class="shrink-0 text-center flex flex-col items-center">
+                    <div class="relative w-20 h-20 text-[#00a8e8] flex items-center justify-center">
+                        <i class="fas fa-shield-halved text-6xl"></i>
+                        <i class="fas fa-lock text-slate-800 text-lg absolute top-6"></i>
+                    </div>
+                    <span class="text-[9px] font-bold text-[#00a8e8] tracking-widest uppercase mt-1">256-bit Encryption</span>
+                    <span class="text-xs font-bold text-slate-800 mt-1">256-bit<br>Encryption</span>
+                </div>
+
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-2">Choice</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              Every individual has different healthcare needs. We believe people should have the freedom to explore relevant providers and services, understand their options, and choose the care that feels right for them.
-            </p>
-          </div>
-        </div>
-      </div>
+        </section>
 
-      <!-- Data Privacy & Security (Page 6 spec) -->
-      <div class="bg-slate-900 text-white rounded-3xl p-6 md:p-8 mb-12 shadow-xl">
-        <div class="flex items-center space-x-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-            <i data-lucide="lock" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold">Data Privacy and Security is Our Top Priority</h3>
-            <p class="text-xs text-emerald-400 font-semibold">Your data has only one owner. YOU.</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-300 mb-6">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
-            <span>SAINO does not have access to your private medical data.</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
-            <span>SAINO does not sell or share your data with any third party.</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
-            <span>256-Bit Military-Grade Encryption Standards</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
-            <span>Role-Based Strict Access Governance</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Health Care Investors (Page 6 spec) -->
-      <div class="p-6 rounded-2xl bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <h4 class="text-base font-bold text-slate-900">HEALTH CARE INVESTORS</h4>
-          <p class="text-xs text-slate-600">Let’s build the future of connected healthcare together.</p>
-        </div>
-        <button onclick="navigateTo('contact')" class="px-4 py-2 bg-sky-600 text-white rounded-xl text-xs font-bold hover:bg-sky-700 transition shadow-sm">
-          [Investor Relations →]
-        </button>
-      </div>
-    </div>
+        <!-- ================= HEALTH CARE INVESTORS BANNER ================= -->
+        <section class="bg-[#172033] text-white py-8 px-4 text-center">
+            <div class="max-w-4xl mx-auto space-y-2">
+                <h2 class="text-xl sm:text-2xl font-bold tracking-wide">Health Care Investors</h2>
+                <p class="text-xs sm:text-sm text-slate-200 font-normal">
+                    Let's build the future of healthcare together
+                </p>
+                <div class="pt-1">
+                    <a href="#" class="text-xs sm:text-sm font-semibold text-white hover:text-gray-200 transition">
+                        [Investor Relations <span class="inline-block text-xs">→</span>] <span class="text-[#d92222] font-semibold hover:underline">Click link</span>
+                    </a>
+                </div>
+            </div>
+          </section>
   `;
 }
 
@@ -4001,124 +4050,214 @@ function renderAboutView() {
 // ==========================================
 function renderContactView() {
   return `
-    <div class="max-w-5xl mx-auto mb-16">
-      <div class="text-center mb-10">
-        <span class="px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 uppercase tracking-wider">
-          Contact SAINO Health
-        </span>
-        <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 mt-3 mb-2">
-          We’re Here to Connect
-        </h1>
-        <p class="text-sm md:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-          Whether you’re looking to discover healthcare, join SAINO Health as a provider, promote your services, partner with us, or learn more about our platform, our team is here to help.
-        </p>
-      </div>
+    <!-- Page Header Banner -->
+        <section class="bg-slate-50 border-b border-slate-200 py-6 sm:py-8 text-center px-4">
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 mb-1">Contact Us</h1>
+            <p class="text-slate-600 text-xs max-w-xl mx-auto">Have a question, suggestion, or opportunity to share? Get in touch with our team.</p>
+            <p class="text-[#b81414] text-xs font-medium mt-1">We'd love to hear from you.</p>
+        </section>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- Left: Audience Information Router (Page 7 spec) -->
-        <div class="lg:col-span-5 space-y-4">
-          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">How can we help?</h3>
+        <div class="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-10 sm:space-y-14">
 
-          <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
-            <h4 class="text-xs font-bold text-slate-900 flex items-center space-x-1.5 mb-1">
-              <i data-lucide="user" class="w-4 h-4 text-sky-600"></i>
-              <span>For Patients & Users</span>
-            </h4>
-            <p class="text-xs text-slate-600">Questions about finding providers, appointments, profiles, reviews, or using SAINO Health.</p>
-          </div>
+            <!-- ================= "HOW CAN WE HELP?" SECTION ================= -->
+            <section class="max-w-4xl mx-auto">
+                <h2 class="text-lg sm:text-xl font-bold text-slate-900 text-center mb-6">How can we help?</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Card 1: General Support -->
+                    <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs hover:border-slate-300 transition">
+                        <div class="flex items-center space-x-2.5 mb-2.5">
+                            <i class="fas fa-comment text-slate-800 text-xs"></i>
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">General Support</h3>
+                        </div>
+                        <p class="text-slate-600 text-xs mb-3">Questions about using Saino Health.</p>
+                        <a href="#" class="text-[#b81414] text-xs font-medium hover:underline inline-flex items-center">
+                            Get Support <span class="ml-1.5 text-sm">→</span>
+                        </a>
+                    </div>
 
-          <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
-            <h4 class="text-xs font-bold text-slate-900 flex items-center space-x-1.5 mb-1">
-              <i data-lucide="stethoscope" class="w-4 h-4 text-emerald-600"></i>
-              <span>For Healthcare Providers</span>
-            </h4>
-            <p class="text-xs text-slate-600">Join SAINO Health, create or manage your profile, get verified, reach more users, or learn about provider services.</p>
-          </div>
+                    <!-- Card 2: Appointment Help -->
+                    <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs hover:border-slate-300 transition">
+                        <div class="flex items-center space-x-2.5 mb-2.5">
+                            <i class="far fa-calendar text-slate-800 text-xs"></i>
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Appointment Help</h3>
+                        </div>
+                        <p class="text-slate-600 text-xs mb-3">Need help with an appointment or booking?</p>
+                        <a href="#" class="text-[#b81414] text-xs font-medium hover:underline inline-flex items-center">
+                            Get Appointment Help <span class="ml-1.5 text-sm">→</span>
+                        </a>
+                    </div>
 
-          <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
-            <h4 class="text-xs font-bold text-slate-900 flex items-center space-x-1.5 mb-1">
-              <i data-lucide="building" class="w-4 h-4 text-purple-600"></i>
-              <span>For Healthcare Businesses & Advertisers</span>
-            </h4>
-            <p class="text-xs text-slate-600">Explore visibility, campaigns, promotions, and other opportunities to grow your presence on SAINO Health.</p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
-            <h4 class="text-xs font-bold text-slate-900 flex items-center space-x-1.5 mb-1">
-              <i data-lucide="handshake" class="w-4 h-4 text-amber-600"></i>
-              <span>For Partnerships & Investors</span>
-            </h4>
-            <p class="text-xs text-slate-600">Connect with us for strategic healthcare networks, technology collaborations, and investment opportunities.</p>
-          </div>
-
-          <!-- Office Details (Page 8 spec) -->
-          <div class="p-5 rounded-2xl bg-slate-900 text-white shadow-md">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">Our Office: KATHMANDU, NEPAL</h4>
-            <p class="text-xs text-slate-300 leading-relaxed mb-3">
-              <strong>SAINO Tech Ventures Pvt. Ltd.</strong><br>
-              Tejasswee Girls Hostel, opp<br>
-              Suruchi Marg, Kathmandu-31<br>
-              Kathmandu 44600, Nepal
-            </p>
-            <div class="space-y-1 text-xs text-slate-300 mb-3">
-              <div>✉ info@sainotechventures.com</div>
-              <div>✉ sales@sainotechventures.com</div>
-              <div>✉ support@sainohealth.com</div>
-            </div>
-            <button onclick="showToast('Opening Google Maps Directions to Kathmandu Office')" class="text-xs font-bold text-sky-400 hover:text-sky-300 inline-flex items-center space-x-1">
-              <span>Get Directions →</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Right: Interactive Inquiry Form (Page 8 spec) -->
-        <div class="lg:col-span-7">
-          <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-bold text-slate-900 mb-2">Send an Inquiry</h3>
-            <p class="text-xs text-slate-500 mb-6">Have a question, suggestion, or opportunity to share? Reach out to us.</p>
-
-            <form id="contactForm" onsubmit="handleContactSubmit(event)" class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Interested In: (BOX)</label>
-                <select id="contactTopic" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                  <option value="Patient Appointment Inquiry">Patient Appointment / Healthcare Finding</option>
-                  <option value="Healthcare Provider Verification & Badge Upgrade">Healthcare Provider Verification & Badge Upgrade</option>
-                  <option value="Healthcare Business Advertising & Campaigns (SAINO Boost)">Healthcare Business Advertising & Campaigns (SAINO Boost)</option>
-                  <option value="Corporate / Health Insurance Partnership">Corporate / Health Insurance Partnership</option>
-                  <option value="Investor Relations & Strategic Support">Investor Relations & Strategic Support</option>
-                </select>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
-                  <input type="text" id="contactName" required placeholder="e.g. Dr. Ramesh Karki / Sita Sharma" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    <!-- Card 3: Provider Support -->
+                    <div class="border border-slate-200/80 rounded-xl p-4 sm:p-5 bg-white shadow-xs hover:border-slate-300 transition">
+                        <div class="flex items-center space-x-2.5 mb-2.5">
+                            <i class="fas fa-building text-slate-800 text-xs"></i>
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Provider Support</h3>
+                        </div>
+                        <p class="text-slate-600 text-xs mb-3">Already listed or want to join Saino?</p>
+                        <a href="#" class="text-[#b81414] text-xs font-medium hover:underline inline-flex items-center">
+                            Provider Support <span class="ml-1.5 text-sm">→</span>
+                        </a>
+                    </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Phone / WhatsApp Number</label>
-                  <input type="tel" id="contactPhone" required placeholder="+977-98XXXXXXXX" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </section>
+
+            <!-- ================= CONTACT FORM & SIDEBAR SECTION ================= -->
+            <section class="bg-slate-50/70 border border-slate-200 rounded-xl p-4 sm:p-6 md:p-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Contact Form (7 Cols on Desktop) -->
+                    <div class="lg:col-span-7 bg-white border border-slate-200 rounded-lg p-4 sm:p-6 shadow-sm">
+                        <h3 class="text-base font-bold text-slate-900 mb-0.5">Send Us a Message</h3>
+                        <p class="text-[11px] text-slate-500 mb-5">Talk to <span class="text-[#b81414] font-semibold">Saino Health</span></p>
+
+                        <form class="space-y-3.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Full Name</label>
+                                <input type="text" placeholder="Write your name" class="w-full px-3 py-2 text-xs border border-slate-200 rounded focus:outline-none focus:border-[#b81414]">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Email Address</label>
+                                <input type="email" placeholder="Write your email address" class="w-full px-3 py-2 text-xs border border-slate-200 rounded focus:outline-none focus:border-[#b81414]">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Subject</label>
+                                <input type="text" placeholder="Write standard subject" class="w-full px-3 py-2 text-xs border border-slate-200 rounded focus:outline-none focus:border-[#b81414]">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Message</label>
+                                <textarea rows="3" placeholder="Write your message..." class="w-full px-3 py-2 text-xs border border-slate-200 rounded focus:outline-none focus:border-[#b81414]"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full sm:w-auto bg-[#b81414] hover:bg-[#961010] text-white font-semibold text-xs px-5 py-2.5 rounded transition">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Get In Touch Sidebar (5 Cols on Desktop) -->
+                    <div class="lg:col-span-5 space-y-5 pt-2">
+                        <h3 class="text-base font-bold text-slate-900 mb-4">Get in Touch</h3>
+
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-phone text-slate-500 text-xs mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-xs">Call us</h4>
+                                <p class="text-[10px] text-slate-400 mb-0.5">Call our team Mon-Fri 9am to 6pm</p>
+                                <a href="tel:+9779871040212" class="text-xs font-semibold text-slate-800 hover:text-[#b81414]">+977-9871040212</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-envelope text-slate-500 text-xs mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-xs">Email us</h4>
+                                <a href="mailto:support@sainohealth.com" class="text-xs font-semibold text-[#b81414] hover:underline">support@sainohealth.com</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-location-dot text-slate-500 text-xs mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-xs">Visit us</h4>
+                                <p class="text-xs text-slate-500">Kathmandu, Nepal</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <p class="text-[11px] text-slate-500 mb-2 font-medium">Follow SAINO Health</p>
+                            <div class="flex space-x-2">
+                                <a href="#" class="w-7 h-7 rounded-full bg-[#b81414] text-white flex items-center justify-center hover:bg-[#961010] text-[10px] transition"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="w-7 h-7 rounded-full bg-[#b81414] text-white flex items-center justify-center hover:bg-[#961010] text-[10px] transition"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="w-7 h-7 rounded-full bg-[#b81414] text-white flex items-center justify-center hover:bg-[#961010] text-[10px] transition"><i class="fab fa-twitter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-              </div>
+            </section>
+  `;
+}
+  function renderFaqsView() {
+  return `
+  <section class="max-w-4xl mx-auto">
+                <div class="text-center mb-6 sm:mb-8">
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 mb-1.5">Frequently Asked Questions</h2>
+                    <p class="text-slate-500 text-xs">Find quick answers to common questions about Saino Health.</p>
+                </div>
 
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                <input type="email" id="contactEmail" required placeholder="your.email@provider.com" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-              </div>
+                <div class="space-y-3">
+                    <!-- FAQ Item 1 -->
+                    <div class="border border-slate-200 rounded-xl p-3.5 sm:p-4 bg-white shadow-xs">
+                        <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm pr-2">01. What is Saino Health?</h3>
+                            <i class="fas fa-plus text-slate-800 text-xs cursor-pointer shrink-0"></i>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                            Saino Health is a healthcare discovery platform that helps users find, explore, compare and connect with healthcare providers and services across Nepal.
+                        </p>
+                    </div>
 
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Message / Requirements</label>
-                <textarea id="contactMessage" rows="4" required placeholder="Describe your inquiry, clinic details, or advertising timeline..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
-              </div>
+                    <!-- FAQ Item 2 -->
+                    <div class="border border-slate-200 rounded-xl p-3.5 sm:p-4 bg-white shadow-xs">
+                        <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm pr-2">02. How can I find a healthcare provider?</h3>
+                            <i class="fas fa-plus text-slate-800 text-xs cursor-pointer shrink-0"></i>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                            Use the search bar or Discovery page to find hospitals, clinics, diagnostic centres, wellness centres, ambulance services and blood banks near you.
+                        </p>
+                    </div>
 
-              <button type="submit" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-xs md:text-sm transition shadow-md flex items-center justify-center space-x-2">
-                <i data-lucide="send" class="w-4 h-4"></i>
-                <span>Submit Inquiry</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+                    <!-- FAQ Item 3 -->
+                    <div class="border border-slate-200 rounded-xl p-3.5 sm:p-4 bg-white shadow-xs">
+                        <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm pr-2">03. How do I book an appointment?</h3>
+                            <i class="fas fa-plus text-slate-800 text-xs cursor-pointer shrink-0"></i>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                            Open a provider's profile, check the available services and appointment options, then select your preferred date and time to book.
+                        </p>
+                    </div>
+
+                    <!-- FAQ Item 4 -->
+                    <div class="border border-slate-200 rounded-xl p-3.5 sm:p-4 bg-white shadow-xs">
+                        <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm pr-2">04. How are healthcare providers verified?</h3>
+                            <i class="fas fa-plus text-slate-800 text-xs cursor-pointer shrink-0"></i>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                            Saino uses a verification system to identify providers whose information has been verified. Look for the Saino Verified badge on provider listings.
+                        </p>
+                    </div>
+
+                    <!-- FAQ Item 5 -->
+                    <div class="border border-slate-200 rounded-xl p-3.5 sm:p-4 bg-white shadow-xs">
+                        <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm pr-2">05. Can I read or write reviews?</h3>
+                            <i class="fas fa-plus text-slate-800 text-xs cursor-pointer shrink-0"></i>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                            Yes. Users can share their healthcare experiences, rate providers and mark helpful reviews. You can also participate in provider-specific discussions.
+                        </p>
+                    </div>
+
+                    <!-- FAQ Item 6 -->
+                    <div class="border border-slate-200 rounded-xl p-3.5 sm:p-4 bg-white shadow-xs">
+                        <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm pr-2">06. Can I ask other patients questions?</h3>
+                            <i class="fas fa-plus text-slate-800 text-xs cursor-pointer shrink-0"></i>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                            Yes. You can join provider discussions or ask the community about other patients' experiences with a healthcare provider.
+                        </p>
+                    </div>
+                </div>
+            </section>
+  
   `;
 }
 
