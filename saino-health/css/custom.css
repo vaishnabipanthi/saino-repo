@@ -329,3 +329,70 @@ button.bg-white.btn-clicked-active {
   transform: scale(0.94) !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
 }
+
+
+/* Desktop par band */
+@media (min-width: 769px) {
+  #mobileBottomNav { display: none !important; }
+    }
+
+/* Phone view par screen ke bottom par chipkega */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #mobileBottomNav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    inset: auto 0 0 !important;
+    height: calc(60px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    background-color: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
+    z-index: 9999999 !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.12) !important;
+  }
+
+.mobile-tab-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 700;
+        gap: 2px;
+        cursor: pointer;
+      }
+    }
+
+  .m-btn.active-btn,
+  .m-btn:active {
+    color: #B91C1C !important;
+  }
+
+/* Keep the mobile bar available on touch phones whose CSS viewport is wider than 768px. */
+@media (hover: none) and (pointer: coarse) {
+  body {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #mobileBottomNav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    inset: auto 0 0 !important;
+    height: calc(60px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    z-index: 9999999 !important;
+  }
+}

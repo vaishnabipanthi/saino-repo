@@ -51,23 +51,22 @@
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/custom.css?v=20260918">
 </head>
- <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen w-full overflow-x-hidden flex flex-col selection:bg-rose-500 selection:text-white">
-
-  <!-- Section 2: Header / Search & Action Bar -->
+ <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen w-full overflow-x-hidden flex flex-col selection:bg-rose-500 selection:text-white pb-16 md:pb-0">
    <header class="w-full flex justify-center shadow-sm;" style="background: #E2E6EA;">
     <div class="w-full max-w-full px-3 py-0 flex flex-col justify-center gap-0 overflow-visible">
 
       <div class="flex items-center justify-between w-full gap-2 md:gap-3 lg:gap-4 px-2 sm:px-4 py-2 bg-[#E2E6EA] flex-nowrap">
-        
-        <!-- Logo (Phone: h-9, Tablet: h-12, PC/Laptop: h-20) -->
+      
         <a href="#" data-nav="marketplace" class="flex items-center flex-shrink-0 lg:-my-3">
           <img src="assets/logo.png" alt="SAINO HEALTH" class="h-20 sm:h-20 md:h-20 lg:h-32 w-auto object-contain" style="mix-blend-mode: multiply;">
         </a>
-
-        <!-- Search Box (Fluid & balanced across all screens) -->
-        <div class="search-shell relative flex flex-1 max-w-xs sm:max-w-md md:max-w-xl lg:max-w-6xl items-center border-2 border-slate-400 rounded-[10px] bg-[#E2E6EA] px-2 md:pl-3 md:pr-1 py-1 z-30">
+        <button onclick="alert('No new notifications')" class="p-2 text-slate-600 hover:text-[#B91C1C] hover:bg-slate-100 rounded-full transition relative" aria-label="Notifications">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2  rounded-full"></span>
+        </button>
+        <div class="search-shell relative hidden md:flex flex-1 max-w-xs sm:max-w-md md:max-w-xl lg:max-w-6xl items-center border-2 border-slate-400 rounded-[10px] bg-[#E2E6EA] px-2 md:pl-3 md:pr-1 py-1 z-30">
           <i data-lucide="search" class="w-3.5 h-3.5 md:w-6 md:h-6 text-slate-400 mr-1.5 shrink-0"></i>
           <input 
             type="text" 
@@ -76,7 +75,7 @@
             class="w-full text-xs md:text-sm lg:text-base py-1 text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
           >
 
-          <!-- Location Selector: Mobile pe hide taaki box squeeze na ho, Tablet & PC pe visible -->
+          <!-- Location Selector -->
           <div class="hidden sm:flex items-center text-[11px] md:text-xs font-semibold text-slate-700 shrink-0 pr-1 md:pr-2 border-l border-slate-300 pl-2 ml-1">
             <i data-lucide="map-pin" class="w-3 h-3 md:w-3.5 md:h-3.5 text-[#B91C1C] mr-1"></i>
             <select id="globalLocationSelect" class="bg-transparent focus:outline-none cursor-pointer max-w-[70px] md:max-w-none truncate">
@@ -86,17 +85,14 @@
               <option value="Pokhara">Pokhara</option>
             </select>
           </div>
-
-          <!-- Search Button -->
           <button id="globalSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-2.5 sm:px-4 md:px-5 py-1.5 rounded-[8px] text-[11px] md:text-xs font-bold transition shrink-0 ml-1">
             Search
           </button>
 
-          <!-- Search Results Dropdown -->
           <div id="globalResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-80 overflow-y-auto text-left"></div>
         </div>
 
-        <!-- PC & Laptop Buttons (Desktop view: visible on md & up) -->
+        <!-- PC & Laptop Buttons  -->
         <div class="hidden md:flex items-center gap-2 flex-shrink-0">
           <button onclick="openProviderSignInModal('patient')" class="px-3 py-1.5 text-xs font-bold text-slate-900 hover:text-black border-2 border-slate-700 rounded-[10px] bg-[#E2E6EA] hover:bg-slate-300 transition shadow-xs">
             Sign In
@@ -105,17 +101,6 @@
             Get Started
           </button>
         </div>
-
-        <!-- Mobile & Tablet Actions  -->
-        <div class="md:hidden flex items-center space-x-1.5 shrink-0">
-          <button onclick="openProviderSignInModal('patient')" class="h-8 px-2.5 rounded-lg bg-[#B91C1C] text-white font-bold text-xs flex items-center justify-center transition shadow-xs">
-            Sign In
-          </button>
-          <button id="mobileMenuBtn" class="p-1.5 rounded-xl text-slate-700 hover:bg-slate-200 transition">
-            <i data-lucide="menu" class="w-6 h-6"></i>
-          </button>
-        </div>
-
       </div>
 
       <div class="hidden md:flex items-center justify-between w-full text-[12px] lg:text-[15px] font-semibold text-slate-700 pt-1 pb-2 relative z-20 mt-1">
@@ -144,50 +129,8 @@
     </div>
 
     </div>
-
-    <!-- Mobile Drawer Menu  -->
-    <div id="mobileMenu" class="lg:hidden hidden fixed inset-0 z-50 bg-white w-screen h-screen flex flex-col justify-between p-5 overflow-y-auto">
-      <div>
-        <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-          <button type="button" onclick="document.getElementById('mobileMenu').classList.add('hidden')" class="p-2 text-slate-700 hover:text-black text-2xl font-bold leading-none">
-            ✕
-          </button>
-        </div>
-
-        <nav class="flex flex-col gap-3 py-6 text-sm font-semibold text-slate-800">
-        <a href="#" onclick="event.preventDefault(); navigateTo('marketplace'); document.getElementById('mobileMenu').classList.add('hidden')" 
-          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">Home</a>
-
-        <a href="#" onclick="event.preventDefault(); navigateTo('discovery'); document.getElementById('mobileMenu').classList.add('hidden')" 
-          class="mobile-nav-link py-2 border-b border-slate-100 flex items-center justify-between hover:text-[#B91C1C] cursor-pointer">
-          <span>Discovery</span>
-          <span class="text-[10px] bg-rose-100 text-[#B91C1C] px-2 py-0.5 rounded font-bold">Explore</span>
-        </a>
-
-        <a href="#" onclick="event.preventDefault(); filterCategory('all'); document.getElementById('mobileMenu').classList.add('hidden')" 
-          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">Find Healthcare</a>
-
-        <a href="#" onclick="event.preventDefault(); navigateTo('appointments'); document.getElementById('mobileMenu').classList.add('hidden')" 
-          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">My Appointments</a>
-
-        <a href="#" onclick="event.preventDefault(); navigateTo('saved'); document.getElementById('mobileMenu').classList.add('hidden')" 
-          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">Saved</a>
-
-        <a href="#" onclick="event.preventDefault(); navigateTo('list-your-care'); document.getElementById('mobileMenu').classList.add('hidden')" 
-          class="mobile-nav-link py-2 border-b border-slate-100 hover:text-[#B91C1C] cursor-pointer">List Your Care</a>
-
-        <div class="py-2">
-          <button onclick="openProviderSignInModal('patient'); document.getElementById('mobileMenu').classList.add('hidden');" 
-                  class="w-full bg-[#B91C1C] hover:bg-[#991B1B] text-white py-2.5 rounded-[8px] text-xs font-bold transition shadow-sm flex items-center justify-center gap-2">
-            <i data-lucide="user" class="w-4 h-4 text-white"></i>
-            <span>Sign In / Register</span>
-          </button>
-        </div>
-        </nav>
-
-      </div>
   </header>
-
+  
   <!-- Hero Section -->
   <section id="heroHomeSection" class="bg-gradient-to-b from-saino-gray-50 via-white to-saino-gray-50 border-b border-saino-gray-200 pt-8 pb-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto text-center">
@@ -195,18 +138,109 @@
         Welcome back ! Start your Journey with <span class="text-[#B91C1C]">#SAINOHEALTH</span>
       </h1>
 
-      <!-- Quick Category Pills -->
-      <div id="homeSearchSection">
-    <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 mb-6 text-[11px] md:text-[13px] sm:text-xs font-semibold text-slate-700">
-      <button onclick="filterCategory('hospital')" class="hover:text-[#B91C1C] transition">Hospital</button>
-      <button onclick="filterCategory('clinic')" class="hover:text-[#B91C1C] transition">Clinics</button>
-      <button onclick="filterCategory('diagnostic')" class="hover:text-[#B91C1C] transition">Diagnostic Centres</button>
-      <button onclick="filterCategory('wellness')" class="hover:text-[#B91C1C] transition">Wellness Centres</button>
-      <button onclick="filterCategory('ambulance')" class="hover:text-[#B91C1C] transition">Ambulance</button>
-      <button onclick="filterCategory('bloodbank')" class="hover:text-[#B91C1C] transition">Blood Banks</button>
-      <button onclick="filterCategory('homecare')" class="hover:text-[#B91C1C] transition">Homecare Centers</button>
-      <button onclick="filterCategory('insurance')" class="hover:text-[#B91C1C] transition">Insurance</button>
-    </div>
+     <!-- Quick Category Navigation (Desktop untouched + Mobile 4-5 Icon Slider) -->
+      <div id="homeSearchSection" class="w-full">
+        
+        <!-- 1. DESKTOP & TABLET (100% Untouched) -->
+        <div class="hidden md:flex flex-wrap items-center justify-center gap-6 sm:gap-8 mb-6 text-[11px] md:text-[13px] sm:text-xs font-semibold text-slate-700">
+          <button onclick="filterCategory('hospital')" class="hover:text-[#B91C1C] transition">Hospital</button>
+          <button onclick="filterCategory('clinic')" class="hover:text-[#B91C1C] transition">Clinics</button>
+          <button onclick="filterCategory('diagnostic')" class="hover:text-[#B91C1C] transition">Diagnostic Centres</button>
+          <button onclick="filterCategory('wellness')" class="hover:text-[#B91C1C] transition">Wellness Centres</button>
+          <button onclick="filterCategory('ambulance')" class="hover:text-[#B91C1C] transition">Ambulance</button>
+          <button onclick="filterCategory('bloodbank')" class="hover:text-[#B91C1C] transition">Blood Banks</button>
+          <button onclick="filterCategory('homecare')" class="hover:text-[#B91C1C] transition">Homecare Centers</button>
+          <button onclick="filterCategory('insurance')" class="hover:text-[#B91C1C] transition">Insurance</button>
+        </div>
+
+        <!-- 2. MOBILE PHONE ONLY  -->
+        <div class="md:hidden relative w-full mb-5 px-1">
+          <div class="flex items-center justify-between gap-1">
+  
+            <button type="button" onclick="document.getElementById('mobileCatScroller').scrollBy({left: -180, behavior: 'smooth'})" class="w-6 h-6 rounded-full bg-white shadow border border-slate-200 text-slate-700 flex items-center justify-center shrink-0 active:scale-90 transition z-10">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div id="mobileCatScroller" onscroll="updateMobileCatDots()" class="flex flex-row items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 flex-1">
+          <!-- Hospital -->
+          <button type="button" onclick="filterCategory('hospital')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Hospital</span>
+          </button>
+
+          <!-- Clinics -->
+          <button type="button" onclick="filterCategory('clinic')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.5l7-7m0 0l7 7m-7-7v16"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Clinics</span>
+          </button>
+
+          <!-- Diagnostic -->
+          <button type="button" onclick="filterCategory('diagnostic')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Diagnostic</span>
+          </button>
+
+          <!-- Wellness -->
+          <button type="button" onclick="filterCategory('wellness')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Wellness</span>
+          </button>
+
+          <!-- Ambulance -->
+          <button type="button" onclick="filterCategory('ambulance')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10h10zm0 0h4l3 3v2h-7v-5z"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Ambulance</span>
+          </button>
+
+          <!-- Blood Bank -->
+          <button type="button" onclick="filterCategory('bloodbank')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Blood Bank</span>
+          </button>
+
+          <!-- Homecare -->
+          <button type="button" onclick="filterCategory('homecare')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Homecare</span>
+          </button>
+
+          <!-- Insurance -->
+          <button type="button" onclick="filterCategory('insurance')" class="flex flex-col items-center shrink-0 w-[64px] active:scale-95 transition">
+            <div class="w-11 h-11 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-700">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 mt-1 truncate max-w-[62px] text-center">Insurance</span>
+          </button>
+
+            </div>
+
+            <!-- Right Arrow -->
+            <button type="button" onclick="document.getElementById('mobileCatScroller').scrollBy({left: 180, behavior: 'smooth'})" class="w-6 h-6 rounded-full bg-white shadow border border-slate-200 text-slate-700 flex items-center justify-center shrink-0 active:scale-90 transition z-10">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <!-- Indicator Dots -->
+          <div class="flex items-center justify-center space-x-1.5 mt-2">
+            <span id="mCatDot0" class="cat-dot inline-block h-1 rounded-full transition-all duration-300 w-4 bg-[#B91C1C]"></span>
+            <span id="mCatDot1" class="cat-dot inline-block h-1 rounded-full transition-all duration-300 w-1.5 bg-slate-300"></span>
+          </div>
+        </div>
+
+      </div>
 
 
      <!-- Search Bar -->
@@ -218,7 +252,7 @@
           
           <div class="flex items-center text-[11px] md:text-xs font-semibold text-slate-700 shrink-0 pr-1 md:pr-2">
             <i data-lucide="map-pin" class="w-3 h-3 md:w-3.5 md:h-3.5 text-[#B91C1C] mr-0.5 md:mr-1"></i>
-            <select id="heroLocationSelect" class="bg-transparent focus:outline-none cursor-pointer max-w-[70px] md:max-w-none truncate">
+            <select id="heroLocationSelect" class="bg-transparent focus:outline-none cursor-pointer max-w-[95px] md:max-w-none text-[11px] md:text-xs">
               <option value="Kathmandu">Kathmandu</option>
               <option value="Lalitpur">Lalitpur</option>
               <option value="Bhaktapur">Bhaktapur</option>
@@ -228,15 +262,15 @@
               <option value="Banepa">Banepa</option>
             </select>
           </div>
-          <button id="heroSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-3 md:px-7 py-1.5 md:py-2 rounded-[8px] text-[11px] md:text-xs font-bold transition shrink-0">
-            Search
-          </button>
+              <button id="heroSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white p-2 rounded-[8px] transition shrink-0 flex items-center justify-center ml-1" aria-label="Search">
+              <i data-lucide="search" class="w-4 h-4 text-white"></i>
+            </button>
             <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-80 overflow-y-auto text-left"></div>
         </div>
       </div>
             
       <!-- Trust Badges -->
-     <div class="w-full max-w-6xl mx-auto flex items-center justify-start gap-6 sm:gap-8 text-[11px] md:text-[14px]  text-slate-600 mt-3 gap-x-4 px-1">
+     <div class="w-full max-w-6xl mx-auto hidden md:flex items-center justify-start gap-6 sm:gap-8 text-[11px] md:text-[14px]  text-slate-600 mt-3 gap-x-4 px-1">
         <div class="flex items-center space-x-1.5">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 text-slate-800"></i>
           <span>Verified Information</span>
@@ -251,7 +285,6 @@
         </div>
       </div>
     </div>
-
   </section>
 
   <!-- Dynamic Main Content -->
@@ -451,7 +484,7 @@
             </div>
         </section>
 
-        <!-- ================= HEALTH CARE INVESTORS BANNER ================= -->
+        <!-- HEALTH CARE INVESTORS BANNER  -->
         <section class="bg-[#172033] text-white py-8 px-4 text-center">
             <div class="max-w-4xl mx-auto space-y-2">
                 <h2 class="text-xl sm:text-2xl font-bold tracking-wide">Health Care Investors</h2>
@@ -465,23 +498,19 @@
                 </div>
             </div>
           </section>
+  
 
   </main>
-
+ 
 <!-- Footer -->
   <footer class="w-full bg-[#E5E9EE] text-slate-700 pt-16 pb-10 border-t border-slate-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Footer Columns (Exact Specification from Pages 2 & 3) -->
       <div class="flex flex-col md:flex-row justify-between items-start gap-8 md:gap-4 mb-12 text-xs w-full">
-        
-        <!-- Column 1: Brand Logo, About & Social Links -->
       <div class="w-full md:flex-1 md:min-w-[220px] md:max-w-[240px] pl-0 md:pl-6 flex flex-col items-start md:items-center text-left md:text-center">
         <a href="#" class="inline-block mb-1 -ml-3">
             <img src="assets/logo.png" alt="SAINO HEALTH"  class="h-[130px] w-auto object-contain mix-blend-multiply contrast-125">
           </a>
-  
-        <!-- Description -->
        <p class="text-[9px] leading-snug text-slate-500 font-bold mb-4 text-left inline-block">
         Saino Health is Nepal's trusted<br>
         healthcare discovery platform.
@@ -491,10 +520,8 @@
         healthcare you can trust.
         </span>
        </p>
-        <!-- Follow Us Header -->
         <h5 class="text-sm font-bold text-black mb-1.5">Follow Us</h5>
 
-        <!-- Social Icons (Facebook, Instagram, LinkedIn) -->
         <div class="flex items-center space-x-2.5">
           <!-- Facebook -->
           <a href="#" class="w-7 h-7 rounded-full bg-[#c82026] text-white flex items-center justify-center hover:bg-red-600 transition shadow-sm" aria-label="Facebook">
@@ -519,7 +546,7 @@
         </div>
       </div>
 
-        <!-- Column 2: Patients (Clean List without 'Find' prefix) -->
+        <!-- Column 2: Patients  -->
         <div>
           <h4 class="text-sm font-bold text-black mb-4">Patients</h4>
           <ul class="space-y-2">
@@ -546,8 +573,8 @@
             <li><a href="#" data-nav="boost" class="font-bold text-slate-500 hover:text-red-600 hover:underline transition">SAINO Boost</a></li>
             <li><a href="#" data-nav="campaigns" class="font-bold text-slate-500 hover:text-red-600 hover:underline transition">SAINO CAMPAIGNS</a></li>
              <li><a href="#" data-nav="upgrade" class="font-bold text-slate-500 hover:text-red-600 hover:underline transition">Upgrade your Badge</a></li>
-            <li><a href="#" data-nav="discovery" class="font-bold text-slate-500 hover:text-red-600 hover:underline transition">Healthcare Directory (30 Logos)</a></li>
-             <li><a href="#" data-nav="quickly" class="font-bold text-slate-500 hover:text-red-600 hover:underline transition whitespace-nowrap">Quickle by SAINO (Coming Soon)</a></li>
+            <li><a href="#" data-nav="discovery" class="font-bold text-slate-500 hover:text-red-600 hover:underline transition">Healthcare Directory </a></li>
+            <li><span class="font-bold text-slate-500 whitespace-nowrap">Quickle by SAINO(Coming soon)</span></li>
             <li><a href="#" data-nav="about" class="font-bold text-slate-500 hover:text-red-600 hover:underline transition whitespace-nowrap">Learn about verification process</a></li>
           </ul>
         </div>
@@ -585,7 +612,6 @@
 
       </div>
 
-      <!-- Bottom Bar with Darker, Visible Line & Proper Alignment -->
       <div class="w-full border-t-2 border-slate-500 mt-10 pt-6 mb-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-700 font-medium">
           <div class="flex items-center space-x-1.5 mb-2 sm:mb-0">
@@ -598,10 +624,7 @@
   </footer>
 
 
-  <!-- Global Modal Container -->
   <div id="modalContainer"></div>
-
-  <!-- Toast Notification -->
   <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300">
     <div class="bg-saino-gray-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-saino-gray-700 flex items-center space-x-3 text-xs font-semibold">
       <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i>
@@ -609,10 +632,64 @@
     </div>
   </div>
 
+  <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 z-[999999] bg-white border-t border-slate-200 h-[60px] flex items-center justify-around shadow-lg">
+    <button type="button" onclick="navigateTo('marketplace')" data-bottom-btn="marketplace" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #B91C1C; cursor: pointer; gap: 2px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span style="font-size: 10px; font-weight: 700;">Home</span>
+    </button>
+
+    <!-- 2. Discover -->
+    <button type="button" onclick="navigateTo('discovery')" data-bottom-btn="discovery" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #64748b; cursor: pointer; gap: 2px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+      <span style="font-size: 10px; font-weight: 700;">Discover</span>
+    </button>
+
+    <!-- 3. Appointments -->
+    <button type="button" onclick="navigateTo('appointments')" data-bottom-btn="appointments" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #64748b; cursor: pointer; gap: 2px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span style="font-size: 10px; font-weight: 700;">Appointments</span>
+    </button>
+
+    <!-- 4. Saved -->
+    <button type="button" onclick="navigateTo('saved')" data-bottom-btn="saved" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #64748b; cursor: pointer; gap: 2px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      <span style="font-size: 10px; font-weight: 700;">Saved</span>
+    </button>
+
+    <!-- 5. Profile -->
+    <button type="button" onclick="openProviderSignInModal('patient')" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #64748b; cursor: pointer; gap: 2px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      <span style="font-size: 10px; font-weight: 700;">Profile</span>
+    </button>
+
+  </nav>
+
   <!-- Application Scripts -->
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script src="js/backend-connect.js"></script>
-
+  <script>
+    function updateMobileCatDots(element) {
+    if (!element) return;
+    
+    const scrollLeft = element.scrollLeft;
+    const maxScrollLeft = element.scrollWidth - element.clientWidth;
+    
+    const dots = document.querySelectorAll('.cat-dot');
+    if (dots.length > 0 && maxScrollLeft > 0) {
+      const activeIndex = Math.round((scrollLeft / maxScrollLeft) * (dots.length - 1));
+      dots.forEach((dot, index) => {
+        if (index === activeIndex) {
+          dot.classList.add('bg-[#B91C1C]', 'w-4');
+          dot.classList.remove('bg-slate-300', 'w-2');
+        } else {
+          dot.classList.remove('bg-[#B91C1C]', 'w-4');
+          dot.classList.add('bg-slate-300', 'w-2');
+        }
+      });
+    }
+  }
+  </script>
+  
 </body>
 </html>

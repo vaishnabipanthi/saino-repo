@@ -13,8 +13,6 @@ async function fetchProviders(query, city) {
     return null;
   }
 }
-
-// 2. Render Results on Screen Dropdown
 function renderDropdownList(providers, container) {
   if (!container) return;
 
@@ -63,7 +61,7 @@ function closeDropdown(container) {
   }
 }
 
-// 3. Live Search Setup
+//  Live Search Setup
 function setupLiveSearch({ inputId, selectId, dropdownId, btnId }) {
   const input = document.getElementById(inputId);
   const select = document.getElementById(selectId);
@@ -99,7 +97,7 @@ function setupLiveSearch({ inputId, selectId, dropdownId, btnId }) {
   });
 }
 
-// active both search bars
+
 setupLiveSearch({
   inputId: 'globalSearchInput',
   selectId: 'globalLocationSelect',

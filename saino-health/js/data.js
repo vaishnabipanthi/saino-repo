@@ -4,7 +4,7 @@
  */
 
 window.SAINO_DATA = {
-  // 9 Healthcare Categories
+ 
   categories: [
     {
       id: 'hospital',
@@ -80,7 +80,6 @@ window.SAINO_DATA = {
     }
   ],
 
-  // 8 Specific Booking Categories
   bookingCategories: [
     { id: 'hosp_consult', title: 'Hospital Doctor Consultation Appointment Bookings', icon: 'user-check' },
     { id: 'home_doc', title: 'Homecare Doctor', icon: 'home' },
@@ -92,7 +91,7 @@ window.SAINO_DATA = {
     { id: 'bloodbank_booking', title: 'Bloodbank Booking', icon: 'droplet' }
   ],
 
-  // 8 Promotional Ads (with 1 specialized for Health Insurance)
+
   promotionalAds: [
     {
       id: 'ad-1',
@@ -200,7 +199,6 @@ window.SAINO_DATA = {
     }
   ],
 
-  // 25 Rich Dummy Providers in Nepal
   providers: [
     {
       id: 'prov-1',
@@ -1177,7 +1175,7 @@ window.SAINO_DATA = {
       location: 'Narayangarh, Chitwan',
       city: 'Chitwan',
       openingHours: '07:00 AM - 05:00 PM (Sun - Fri)',
-      phone: '', // Not disclosed
+      phone: '',
       showPhone: false,
       website: 'https://chitwanayurveda.np',
       image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&auto=format&fit=crop&q=80',
@@ -1219,7 +1217,7 @@ window.SAINO_DATA = {
       location: 'Gongabu, Kathmandu',
       city: 'Kathmandu',
       openingHours: '07:00 AM - 07:00 PM (Sun - Sat)',
-      phone: '', // Not disclosed
+      phone: '',
       showPhone: false,
       website: 'https://lifetrustdiag.np',
       image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600&auto=format&fit=crop&q=80',
@@ -1284,7 +1282,6 @@ window.SAINO_DATA = {
     }
   ],
 
-  // 30 Dummy Vendor Logos Grid (Verified vs Non-Verified) to drive competition
   vendorLogos: [
     { id: 'v1', name: 'CityCare Multispeciality', verified: true, tier: 'pro', icon: 'building-2', color: 'blue', isClickable: true, providerId: 'prov-1' },
     { id: 'v2', name: 'Grande Metro Clinic', verified: true, tier: 'prime', icon: 'stethoscope', color: 'emerald', isClickable: true, providerId: 'prov-2' },
@@ -1318,7 +1315,7 @@ window.SAINO_DATA = {
     { id: 'v30', name: 'Universal Dental Implants Nepal', verified: false, tier: 'listed', icon: 'smile', color: 'gray', isClickable: false, providerId: null }
   ],
 
-  // 4 Verification Tiers & Subscriptions (Per Official Specification: Free Listed, Pro, VIP, VVIP)
+
   subscriptionTiers: [
     {
       id: 'listed',
@@ -1445,7 +1442,7 @@ window.SAINO_DATA = {
     }
   ],
 
-  // Advertising & Boost FAQ (Page 4 requirement)
+  // Advertising & Boost FAQ 
   boostFaqs: [
     {
       q: 'How does SAINO Boost improve my hospital or clinic visibility?',
@@ -1540,7 +1537,6 @@ window.SAINO_DATA = {
     }
   ],
 
-  // Big Screen & Promotional Healthcare Campaigns (New Requirement)
   bigScreenCampaigns: [
     {
       id: 'camp-1',
@@ -1706,9 +1702,7 @@ window.SAINO_DATA = {
     }
   ],
 
-  // ==========================================
-  // SAINO RATED DIRECTORY (Discovery Screen Matrices: Hospital 10, Clinic 10, Diag 5, Ambulance 5, Labs 5, Blood 5)
-  // ==========================================
+  
   sainoRated: {
     hospitals: [
       { id: 'h-1', name: 'Norvic Heart & Vascular Institute', area: 'Thapathali, Kathmandu', rating: 4.9, reviews: 340, badge: 'SAINO VVIP', badgeType: 'vvip', opd: '24/7 Emergency & ICU', fee: 'Rs. 950', phone: '+977-1-5970032', image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&auto=format&fit=crop&q=80', special: 'Cath Lab, Angioplasty, Cardiac ICU' },
@@ -1813,7 +1807,7 @@ window.SAINO_DATA = {
     }
   ],
 
-  // Online / Immediate Doctors for Consultation Row
+  // Online 
   onlineDoctors: [
     {
       id: 'doc-1',

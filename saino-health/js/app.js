@@ -63,7 +63,7 @@ function initNavigation() {
     });
   });
 
-  // Mobile menu toggle
+  // Mobile menu toggle (Safe check taaki crash na ho)
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const mobileMenu = document.getElementById('mobileMenu');
   if (mobileMenuBtn && mobileMenu) {
@@ -73,6 +73,7 @@ function initNavigation() {
   }
 }
 
+// Global SPA Routing Engine
 function navigateTo(viewName, filterParams = null) {
   AppState.activeView = viewName;
   
@@ -82,15 +83,25 @@ function navigateTo(viewName, filterParams = null) {
     mobileMenu.classList.add('hidden');
   }
 
+  // Desktop Navbar Active Highlight
   document.querySelectorAll('[data-nav]').forEach(link => {
-  if (link.getAttribute('data-nav') === viewName) {
-    link.classList.add('nav-active');
-    link.classList.remove('text-slate-700');
-  } else {
-    link.classList.remove('nav-active');
-    link.classList.add('text-slate-700');
-  }
-});
+    if (link.getAttribute('data-nav') === viewName) {
+      link.classList.add('nav-active');
+      link.classList.remove('text-slate-700');
+    } else {
+      link.classList.remove('nav-active');
+      link.classList.add('text-slate-700');
+    }
+  });
+
+  // Mobile Bottom Bar Active Highlight (Red for active, Slate for inactive)
+  document.querySelectorAll('[data-bottom-btn]').forEach(btn => {
+    if (btn.getAttribute('data-bottom-btn') === viewName) {
+      btn.style.color = '#B91C1C';
+    } else {
+      btn.style.color = '#64748b';
+    }
+  });
 
   if (filterParams) {
     if (filterParams.category) AppState.selectedCategory = filterParams.category;
@@ -100,6 +111,21 @@ function navigateTo(viewName, filterParams = null) {
 
   renderApp();
   window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function mobileSearchSubmit() {
+  const input = document.getElementById('mobileSearchInput');
+  if (!input) return;
+
+  const query = input.value.trim();
+  if (!query) return;
+
+  AppState.searchQuery = query;
+  AppState.activeView = 'marketplace';
+
+  if (typeof renderApp === 'function') renderApp();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Render Master Controller
@@ -348,7 +374,7 @@ function renderMarketplaceView() {
       </div>
     </section>
 
-    <section class="mb-14">
+    <section class="hidden md:block mb-14">
       <div class="flex items-center justify-between mb-6">
         <div>
           <span class="text-xs font-black uppercase tracking-wider text-saino-red">
