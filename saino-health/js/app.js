@@ -143,6 +143,16 @@ function renderApp() {
       mainContainer.innerHTML = renderMarketplaceView();
       bindMarketplaceEvents();
       break;
+      case 'hospital':
+      case 'clinic':
+      case 'diagnostic':
+      case 'wellness':
+      case 'ambulance':
+      case 'bloodbank':
+      case 'homecare':
+      case 'insurance':
+      mainContainer.innerHTML = renderCategoryListView(AppState.activeView);
+        break;
     case 'discovery':
       mainContainer.innerHTML = renderDiscoveryView();
       bindProvidersShowcaseEvents();
@@ -489,120 +499,83 @@ function renderMarketplaceView() {
         <!-- PATIENT REVIEWS -->
 
         <div class="lg:col-span-5">
-
           <div class="flex items-center justify-between mb-5 pb-2 border-b border-saino-gray-200">
-
             <div>
-
               <span class="text-xs font-black uppercase tracking-wider text-saino-red">
                 Community
               </span>
-
               <h2 class="text-base sm:text-lg font-black text-saino-gray-900">
                 Patient Reviews
               </h2>
-
             </div>
-
             <button
               onclick="navigateTo('patient')"
               class="text-xs font-bold text-saino-red hover:underline">
               See More Reviews →
             </button>
-
           </div>
-
           <div class="space-y-3">
-
           ${patientReviews.slice(0, 5)
         .map((r, i) => renderTalkReviewItem(r, i))
         .join('')}
-
           </div>
-
         </div>
-
       </div>
-
     </section>
-
-
+    
     <!-- ==========================================
          7. DISCOVERY / SOCIAL ENGAGEMENT
     =========================================== -->
 
     <section class="mb-14 rounded-3xl bg-saino-gray-50 border border-saino-gray-200 p-6 sm:p-8">
-
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-
         <div>
-
           <span class="text-xs font-black uppercase tracking-wider text-saino-red">
             SAINO Discovery
           </span>
-
           <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900 mt-1">
             Like · Comment · Interested · Saved
           </h2>
-
           <p class="text-xs sm:text-sm text-saino-gray-600 mt-1 max-w-2xl">
             Discover healthcare providers, read real patient experiences,
             share your opinion and save providers for later.
           </p>
-
         </div>
-
         <button
           onclick="navigateTo('discovery')"
           class="px-5 py-3 rounded-xl bg-white border border-saino-gray-200 text-saino-gray-800 text-xs font-black hover:border-saino-red/30 hover:text-saino-red transition shadow-xs">
           EXPLORE DISCOVERY
         </button>
-
       </div>
-
     </section>
-
 
     <!-- ==========================================
          8. DIAGNOSTICS / LABS
     =========================================== -->
 
     <section class="mb-14">
-
       <div class="flex items-center justify-between mb-6">
-
         <div>
-
           <span class="text-xs font-black uppercase tracking-wider text-saino-red">
             Diagnostics & Laboratory
           </span>
-
           <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
             Diagnostic Centres & Labs
           </h2>
-
           <p class="text-xs text-saino-gray-500 mt-1">
             Pathology · MRI · CT · Ultrasound · X-Ray · Home Sample Collection
           </p>
-
         </div>
-
         <button
           onclick="filterCategory('diagnostic')"
           class="text-xs font-bold text-saino-red hover:underline">
           View All →
         </button>
-
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
         ${diagnostics.map(p => renderProviderCard(p)).join('')}
-
       </div>
-
     </section>
-
 
     <!-- ==========================================
          9. DIAGNOSTIC PACKAGES
@@ -611,141 +584,97 @@ function renderMarketplaceView() {
     <section
       id="diagnostic-packages-section"
       class="mb-14">
-
       <div class="flex items-center justify-between mb-6">
-
         <div>
-
           <span class="text-xs font-black uppercase tracking-wider text-saino-red">
             Preventive Healthcare
           </span>
-
           <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
             Diagnostic Packages
           </h2>
-
           <p class="text-xs text-saino-gray-500 mt-1">
             Choose complete health screening packages for you and your family.
           </p>
-
         </div>
-
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
         ${diagnosticPackages
           .slice(0, 6)
           .map(pkg => renderDiagnosticPackageCard(pkg))
           .join('')}
-
       </div>
-
     </section>
-
 
     <!-- ==========================================
          10. HOMECARE & ELDERLY CARE
     =========================================== -->
 
     <section class="mb-14">
-
       <div class="rounded-3xl bg-white border border-saino-gray-200 shadow-sm overflow-hidden">
-
         <div class="p-6 sm:p-8">
-
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-7">
-
             <div>
-
               <span class="text-xs font-black uppercase tracking-wider text-saino-red">
                 Care at Home
               </span>
-
               <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900 mt-1">
                 Homecare & Elderly Care
               </h2>
-
               <p class="text-xs sm:text-sm text-saino-gray-600 mt-1 max-w-2xl">
                 Professional healthcare support at home — from elderly care
                 and home nursing to doctor visits and post-operative support.
               </p>
-
             </div>
-
             <button
               onclick="filterCategory('homecare')"
               class="px-5 py-2.5 rounded-xl bg-saino-red text-white text-xs font-black hover:bg-saino-red-dark transition">
               VIEW HOMECARE
             </button>
-
           </div>
-
 
           <!-- HOMECARE SERVICES -->
 
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-7">
-
             <button
               onclick="filterBookingType('home_nurse')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="heart-handshake"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Home Nurse
               </span>
-
             </button>
-
-
             <button
               onclick="filterBookingType('home_doc')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="stethoscope"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Home Doctor
               </span>
-
             </button>
-
-
             <button
               onclick="filterCategory('homecare')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="accessibility"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Elderly Care
               </span>
-
             </button>
-
-
             <button
               onclick="filterCategory('homecare')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="heart-pulse"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Post-Op Care
               </span>
-
             </button>
-
-
             <button
               onclick="filterCategory('homecare')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
@@ -753,7 +682,6 @@ function renderMarketplaceView() {
               <i data-lucide="activity"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Home Physio
               </span>
@@ -2593,10 +2521,366 @@ window.renderReviewsPage = function() {
   `;
 };
 
+
+//for separate page of hospital, clinic ....
+
 function renderProvidersShowcaseView() {
   return renderDiscoveryView();
 }
- 
+function renderCategoryListView(categoryKey) {
+  if (categoryKey === 'hospital') {
+  return renderHospitalDirectoryView();
+    }
+  if (categoryKey === 'homecare') {
+    return renderHomecareDirectoryView();
+  }
+  if (categoryKey === 'ambulance') {
+    return renderAmbulanceDirectoryView(); 
+  }
+  if (categoryKey === 'hospital') {
+  return renderHospitalDirectoryView();
+}
+ const cleanKey = String(categoryKey || '').toLowerCase();
+  if (cleanKey.includes('blood')) {
+    return renderBloodBankDirectoryView();
+  }
+
+  const allProviders = AppState.providers || window.SAINO_DATA.providers || [];
+  const filteredItems = allProviders.filter(p => p.category === categoryKey);
+  const categoryTitle = categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+  let cardsHTML = '';
+
+  if (filteredItems.length === 0) {
+    cardsHTML = `
+      <div class="col-span-full text-center py-16 bg-white rounded-3xl border border-slate-200">
+        <p class="text-slate-500 text-sm font-semibold">No providers available for ${categoryTitle} right now.</p>
+        <button onclick="navigateTo('marketplace')" class="mt-4 px-5 py-2.5 bg-saino-red text-white text-xs font-bold rounded-xl">
+          Back to Home
+        </button>
+      </div>`;
+  } else {
+    cardsHTML = filteredItems.map(p => renderProviderCard(p)).join('');
+  }
+
+  return `
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-16">
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
+        <div>
+          <span class="text-xs font-black uppercase tracking-wider text-saino-red">SAINO Directory</span>
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1"> ${categoryTitle}s</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Explore verified and trusted ${categoryKey} providers near you.</p>
+        </div>
+        <button onclick="navigateTo('marketplace')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+          ← Back to Marketplace
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${cardsHTML}
+      </div>
+    </div>
+  `;
+}
+
+
+/* ============================================================
+   HOMECARE DIRECTORY VIEW  
+   ============================================================ */
+const HOMECARE_ICON = (paths, cls = "w-5 h-5") =>
+  `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">${paths}</svg>`;
+
+const HOMECARE_ICONS = {
+  nurse:   (c) => HOMECARE_ICON(`<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 8v6M9 11h6"/>`, c),
+  doctor:  (c) => HOMECARE_ICON(`<path d="M6 3v6a4 4 0 0 0 8 0V3"/><path d="M10 13v2a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/>`, c),
+  elderly: (c) => HOMECARE_ICON(`<circle cx="12" cy="7" r="4"/><path d="M5 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/>`, c),
+  physio:  (c) => HOMECARE_ICON(`<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>`, c),
+  support: (c) => HOMECARE_ICON(`<path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/><path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 15 6 6"/>`, c),
+  postop:  (c) => HOMECARE_ICON(`<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14h6"/>`, c),
+  shield:  (c) => HOMECARE_ICON(`<path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/>`, c),
+  idcard:  (c) => HOMECARE_ICON(`<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M14 10h5M14 14h4M5 16c.5-1.5 1.7-2 3-2s2.5.5 3 2"/>`, c),
+  search:  (c) => HOMECARE_ICON(`<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>`, c),
+  award:   (c) => HOMECARE_ICON(`<circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/>`, c),
+  pin:     (c) => HOMECARE_ICON(`<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>`, c),
+  star:    () => `<svg class="w-3 h-3 text-amber-500" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L8 14.2 3 9.3l6.9-1L12 2Z"/></svg>`,
+};
+
+/* ---------- Data ---------- */
+const HOMECARE_CATEGORIES = [
+  { key: "nurse",   title: "Home Nurse",   sub: "Injections, wound care",  icon: "nurse" },
+  { key: "doctor",  title: "Home Doctor",  sub: "General consultation",   icon: "doctor" },
+  { key: "elderly", title: "Elderly Care", sub: "Daily support",           icon: "elderly" },
+  { key: "physio",  title: "Home Physio",  sub: "Mobility, rehab",      icon: "physio" },
+  { key: "support", title: "Care Support", sub: "Non-medical help",        icon: "support" },
+  { key: "postop",  title: "Post-Op Care", sub: "Recovery monitoring",     icon: "postop" },
+];
+
+const HOMECARE_CAREGIVERS = {
+  nurse: [
+    { name: "Anjali Karki",    role: "RN", rating: 4.9, years: 6, rate: 1500, tier: "Saino VIP",      cert: "Nursing Council registration valid", bg: "Cleared, August 2026" },
+    { name: "Bimala Shrestha", role: "RN", rating: 4.7, years: 4, rate: 1300, tier: "Saino Verified", cert: "Nursing Council registration valid", bg: "Cleared, July 2026" },
+    { name: "Sujita Rana",     role: "RN", rating: 4.8, years: 8, rate: 1700, tier: "Saino VVIP",     cert: "Nursing Council registration valid", bg: "Cleared, August 2026" },
+  ],
+  doctor: [
+    { name: "Dr. Prakash Adhikari", role: "MD", rating: 4.9, years: 12, rate: 3500, tier: "Saino VIP",  cert: "NMC registration valid", bg: "Cleared, June 2026" },
+    { name: "Dr. Sunita Pandey",    role: "MBBS", rating: 4.6, years: 7, rate: 2800, tier: "Saino Verified", cert: "NMC registration valid", bg: "Cleared, August 2026" },
+  ],
+  elderly: [
+    { name: "Kamala Gurung",  role: "Caregiver", rating: 4.8, years: 9, rate: 1200, tier: "Saino VIP",  cert: "Elder care training certified", bg: "Cleared, August 2026" },
+    { name: "Ram Bahadur Thapa", role: "Caregiver", rating: 4.5, years: 3, rate: 900, tier: "Saino Verified", cert: "Elder care training certified", bg: "Cleared, May 2026" },
+  ],
+  physio: [
+    { name: "Nabin Maharjan", role: "BPT", rating: 4.8, years: 6, rate: 2000, tier: "Saino VIP",  cert: "Nepal Health Professional Council valid", bg: "Cleared, July 2026" },
+    { name: "Rita Joshi",     role: "BPT", rating: 4.7, years: 5, rate: 1800, tier: "Saino Verified", cert: "Nepal Health Professional Council valid", bg: "Cleared, August 2026" },
+  ],
+  support: [
+    { name: "Mina Tamang", role: "Attendant", rating: 4.6, years: 4, rate: 800, tier: "Saino Verified", cert: "First aid certified", bg: "Cleared, June 2026" },
+  ],
+  postop: [
+    { name: "Sarita Bhandari", role: "RN", rating: 4.9, years: 10, rate: 2200, tier: "Saino VIP",  cert: "Nursing Council registration valid", bg: "Cleared, August 2026" },
+    { name: "Dipesh Koirala",  role: "RN", rating: 4.7, years: 5,  rate: 1900, tier: "Saino Verified", cert: "Nursing Council registration valid", bg: "Cleared, July 2026" },
+  ],
+};
+
+const homecareInitials = (name) =>
+  name.replace(/^Dr\.\s*/, "").split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
+const homecareMoney = (n) => `NPR ${n.toLocaleString("en-US")}`;
+
+/* ---------- Small reusable pieces ---------- */
+function homecareBadges(c) {
+  return `
+    <div class="flex flex-wrap items-center gap-1.5">
+      <span class="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap">
+        ${HOMECARE_ICONS.idcard("w-3 h-3")} ID Verified
+      </span>
+      <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap">
+        ${HOMECARE_ICONS.shield("w-3 h-3")} Background Checked
+      </span>
+      <span class="inline-flex items-center bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap">${c.tier}</span>
+    </div>`;
+}
+
+function homecareCategoryTiles(activeKey) {
+  return HOMECARE_CATEGORIES.map(cat => {
+    const active = cat.key === activeKey;
+    return `
+      <button onclick="selectHomecareCategory('${cat.key}')"
+        class="flex flex-col items-center text-center gap-1 p-4 rounded-xl border transition
+        ${active ? "bg-red-50 border-red-300 ring-1 ring-red-200" : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"}">
+        <span class="w-9 h-9 rounded-full flex items-center justify-center
+          ${active ? "bg-white text-red-700" : "bg-slate-100 text-slate-600"}">
+          ${HOMECARE_ICONS[cat.icon]("w-4 h-4")}
+        </span>
+        <span class="text-xs font-bold ${active ? "text-red-800" : "text-slate-900"}">${cat.title}</span>
+        <span class="text-[11px] text-slate-500 leading-tight">${cat.sub}</span>
+      </button>`;
+  }).join("");
+}
+
+function homecareCaregiverCards(catKey, selectedIdx) {
+  const list = HOMECARE_CAREGIVERS[catKey] || [];
+  return list.map((c, i) => `
+    <div class="bg-white border rounded-xl p-4 flex flex-col gap-3 transition
+      ${i === selectedIdx ? "border-red-300 ring-1 ring-red-200" : "border-slate-200"}">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+          ${homecareInitials(c.name)}
+        </div>
+        <div class="min-w-0">
+          <div class="text-sm font-bold text-slate-900 truncate">${c.name}, ${c.role}</div>
+          <div class="flex items-center gap-1 text-xs text-slate-500">
+            ${c.rating} ${HOMECARE_ICONS.star()} <span>· ${c.years} yrs experience</span>
+          </div>
+        </div>
+      </div>
+      ${homecareBadges(c)}
+      <div class="flex items-center justify-between mt-auto pt-1">
+        <span class="text-xs font-bold text-slate-900">${homecareMoney(c.rate)} / visit</span>
+        <button onclick="selectHomecareCaregiver(${i})"
+          class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+          View profile
+        </button>
+      </div>
+    </div>`).join("");
+}
+
+function homecareDetailPanel(catKey, idx) {
+  const c = (HOMECARE_CAREGIVERS[catKey] || [])[idx];
+  if (!c) return "";
+  return `
+    <div class="bg-white border border-slate-200 rounded-xl p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      <!-- Left: identity + actions -->
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
+            ${homecareInitials(c.name)}
+          </div>
+          <div>
+            <div class="text-base font-bold text-slate-900">${c.name}, ${c.role}</div>
+            <div class="flex items-center gap-1 text-xs text-slate-500">
+              ${c.rating} ${HOMECARE_ICONS.star()} <span>· ${c.years} years experience</span>
+            </div>
+          </div>
+        </div>
+        ${homecareBadges(c)}
+
+        <div class="flex flex-wrap gap-3 mt-5">
+          <button onclick="bookHomecare('${c.name}')"
+            class="flex-1 min-w-[140px] bg-red-700 hover:bg-red-800 text-white text-sm font-semibold py-3 rounded-xl transition">
+            Book now
+          </button>
+          <button onclick="shareHomecareWithFamily('${c.name}')"
+            class="flex-1 min-w-[140px] border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm font-semibold py-3 rounded-xl transition">
+            Share with family
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-3 leading-snug">
+          Turning on "Share with family" lets one contact follow this visit live, once the caregiver checks in. The caregiver is notified when sharing is on.
+        </p>
+      </div>
+
+      <!-- Right: verification rows -->
+      <dl class="text-sm divide-y divide-slate-100 self-start">
+        <div class="flex justify-between gap-4 py-2.5">
+          <dt class="text-slate-500">ID verification</dt>
+          <dd class="font-medium text-slate-900 text-right">Verified — NIC matched</dd>
+        </div>
+        <div class="flex justify-between gap-4 py-2.5">
+          <dt class="text-slate-500">Background check</dt>
+          <dd class="font-medium text-slate-900 text-right">${c.bg}</dd>
+        </div>
+        <div class="flex justify-between gap-4 py-2.5">
+          <dt class="text-slate-500">Certification</dt>
+          <dd class="font-medium text-slate-900 text-right">${c.cert}</dd>
+        </div>
+        <div class="flex justify-between gap-4 py-2.5">
+          <dt class="text-slate-500">Rate</dt>
+          <dd class="font-bold text-slate-900 text-right">${homecareMoney(c.rate)} / visit</dd>
+        </div>
+      </dl>
+    </div>`;
+}
+
+/* ---------- Page ---------- */
+let HOMECARE_STATE = { cat: "nurse", idx: 0 };
+
+let HOMECARE_START_CAT = "nurse";
+
+// Homepage ke kisi bhi button se: openHomecare('nurse') / openHomecare('doctor') / openHomecare()
+window.openHomecare = function (catKey) {
+  HOMECARE_START_CAT = HOMECARE_CATEGORIES.some(c => c.key === catKey) ? catKey : "nurse";
+  AppState.selectedCategory = "homecare";   // renderCategoryListView isi se homecare page chunta hai
+  renderApp();
+  window.scrollTo({ top: 0, behavior: "instant" });
+};
+
+function renderHomecareDirectoryView() {
+  HOMECARE_STATE = { cat: HOMECARE_START_CAT, idx: 0 };
+  const cat = HOMECARE_CATEGORIES.find(c => c.key === HOMECARE_START_CAT);
+  const count = HOMECARE_CAREGIVERS[HOMECARE_STATE.cat].length;
+
+  return `
+    <!-- Page header -->
+    <div class="bg-white border-y border-slate-200">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-5">
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900">Home care services</h1>
+        <p class="text-sm text-slate-500 mt-1">Find home care according to your needs.</p>
+      </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 mb-16">
+
+      <!-- Hero -->
+      <div class="bg-teal-50 border border-teal-100 rounded-2xl p-6 mb-6">
+        <h1 class="text-2xl font-black text-slate-900 mb-1">Home Care Services</h1>
+        <p class="text-sm text-slate-600 max-w-md mb-3">
+          Vetted nurses, doctors and caregivers who come to you — booked in minutes, tracked the whole visit.
+        </p>
+        <p class="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
+          ${HOMECARE_ICONS.shield("w-4 h-4 text-emerald-700 shrink-0")}
+          Every caregiver is ID-verified and background-checked before they're listed on Saino.
+        </p>
+      </div>
+
+      <!-- Category tiles -->
+      <div id="homecare-categories" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        ${homecareCategoryTiles(HOMECARE_STATE.cat)}
+      </div>
+
+      <!-- Showing + count -->
+      <div class="flex items-center justify-between mb-3">
+        <h2 id="homecare-showing" class="text-sm font-bold text-slate-900">Showing: ${cat.title}</h2>
+        <span id="homecare-count" class="text-xs text-slate-400">${count} available nearby</span>
+      </div>
+
+      <!-- Caregiver cards -->
+      <div id="homecare-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        ${homecareCaregiverCards(HOMECARE_STATE.cat, HOMECARE_STATE.idx)}
+      </div>
+
+      <!-- Safety by design -->
+      <div class="bg-slate-900 rounded-2xl p-6 sm:p-8 mb-8 text-white">
+        <h2 class="text-lg font-bold mb-1">Booking home care is safe, by design</h2>
+        <p class="text-xs text-slate-300 mb-6 max-w-md">
+          Every step — from who you're letting in, to what happens during the visit — is built around verification and visibility.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div>
+            <span class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">${HOMECARE_ICONS.idcard("w-4 h-4")}</span>
+            <div class="text-sm font-semibold mb-1">ID Verification</div>
+            <p class="text-xs text-slate-300 leading-snug">National ID matched and checked before a caregiver is listed.</p>
+          </div>
+          <div>
+            <span class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">${HOMECARE_ICONS.search("w-4 h-4")}</span>
+            <div class="text-sm font-semibold mb-1">Background Checks</div>
+            <p class="text-xs text-slate-300 leading-snug">Criminal record and reference checks, renewed periodically.</p>
+          </div>
+          <div>
+            <span class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">${HOMECARE_ICONS.award("w-4 h-4")}</span>
+            <div class="text-sm font-semibold mb-1">Certified Professionals</div>
+            <p class="text-xs text-slate-300 leading-snug">Licenses and registrations verified against issuing bodies.</p>
+          </div>
+          <div>
+            <span class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">${HOMECARE_ICONS.pin("w-4 h-4")}</span>
+            <div class="text-sm font-semibold mb-1">Live Location Sharing</div>
+            <p class="text-xs text-slate-300 leading-snug">Track the caregiver's visit in real time, with consent.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected caregiver detail -->
+      <div id="homecare-detail">
+        ${homecareDetailPanel(HOMECARE_STATE.cat, HOMECARE_STATE.idx)}
+      </div>
+    </div>
+  `;
+}
+
+/* ---------- Interactions (page ko dobara render kiye bina update) ---------- */
+window.selectHomecareCategory = function (key) {
+  HOMECARE_STATE = { cat: key, idx: 0 };
+  const cat = HOMECARE_CATEGORIES.find(c => c.key === key);
+  document.getElementById("homecare-categories").innerHTML = homecareCategoryTiles(key);
+  document.getElementById("homecare-showing").textContent = `Showing: ${cat.title}`;
+  document.getElementById("homecare-count").textContent = `${HOMECARE_CAREGIVERS[key].length} available nearby`;
+  document.getElementById("homecare-cards").innerHTML = homecareCaregiverCards(key, 0);
+  document.getElementById("homecare-detail").innerHTML = homecareDetailPanel(key, 0);
+};
+
+window.selectHomecareCaregiver = function (idx) {
+  HOMECARE_STATE.idx = idx;
+  document.getElementById("homecare-cards").innerHTML = homecareCaregiverCards(HOMECARE_STATE.cat, idx);
+  document.getElementById("homecare-detail").innerHTML = homecareDetailPanel(HOMECARE_STATE.cat, idx);
+  document.getElementById("homecare-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+};
+
+window.bookHomecare = function (name) {
+  alert(`Booking request started for ${name}`);   // yahan apna booking flow lagayein
+};
+
+window.shareHomecareWithFamily = function (name) {
+  alert(`Share link for ${name}'s visit`);         // yahan apna share logic lagayein
+};
+
 // ==========================================
 // 3.find healthcare 
 // ==========================================
@@ -2796,84 +3080,57 @@ function renderProvidersShowcaseView() {
 
 
           <!-- HOMECARE SERVICES -->
-
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-7">
-
             <button
               onclick="filterBookingType('home_nurse')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="heart-handshake"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Home Nurse
               </span>
-
             </button>
-
-
             <button
               onclick="filterBookingType('home_doc')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="stethoscope"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Home Doctor
               </span>
-
             </button>
-
-
             <button
               onclick="filterCategory('homecare')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="accessibility"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Elderly Care
               </span>
-
             </button>
-
-
             <button
               onclick="filterCategory('homecare')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="heart-pulse"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Post-Op Care
               </span>
-
             </button>
-
-
-            <button
+            <button>
               onclick="filterCategory('homecare')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
-
               <i data-lucide="activity"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Home Physio
               </span>
-
             </button>
-
-
             <button
               onclick="filterCategory('homecare')"
               class="p-4 rounded-2xl bg-saino-gray-50 border border-saino-gray-200 hover:border-saino-red/30 transition">
@@ -2881,42 +3138,28 @@ function renderProvidersShowcaseView() {
               <i data-lucide="pill"
                  class="w-5 h-5 text-saino-red mx-auto">
               </i>
-
               <span class="block mt-2 text-[10px] font-black text-saino-gray-800">
                 Care Support
               </span>
-
             </button>
-
           </div>
-
 
           <!-- HOMECARE PROVIDERS -->
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-
             ${homecare.map(p => renderProviderCard(p)).join('')}
-
           </div>
-
-
           <div class="mt-6">
-
             <button
               onclick="filterBookingType('home_nurse')"
               class="w-full sm:w-auto px-7 py-3 rounded-xl bg-saino-red hover:bg-saino-red-dark text-white text-xs font-black shadow-md transition">
-
               BOOK HOMECARE
-
             </button>
-
           </div>
-
         </div>
-
       </div>
-
     </section>
+    
 
 
     <!-- ==========================================
@@ -3769,7 +4012,7 @@ function handleListYourCareSubmit(e) {
   showToast('Logged in to SAINO Business Dashboard!');
 }
 
-function handleFacilityRegistration(e) {rende
+function handleFacilityRegistration(e) {
   if (e) e.preventDefault();
   const org = document.getElementById('regOrgName')?.value || 'Your Facility';
   showToast(`Registration submitted for ${org}! Compliance team will verify your license.`);
@@ -4374,6 +4617,8 @@ function getFilteredProviders() {
 
 function filterCategory(catId) {
   AppState.selectedCategory = catId;
+  AppState.activeView = catId;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   renderApp();
 }
 
@@ -5389,6 +5634,24 @@ window.toggleSpecialties = function(cardId) {
       moreSpan.classList.remove('flex');
       btn.textContent = '+ 10 more specialties';
     }
+  }
+};
+window.toggleFilterSection = function(contentId, arrowId) {
+  const content = document.getElementById(contentId);
+  const arrow = document.getElementById(arrowId);
+  if (!content || !arrow) return;
+  
+  content.classList.toggle('hidden');
+  
+  if (content.classList.contains('hidden')) {
+    arrow.innerHTML = '⌄'; // Down arrow when closed
+  } else {
+    arrow.innerHTML = '⌃'; // Up arrow when open
+  }
+  
+  // Re-initialize Lucide icons if required in your project
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
   }
 };
 // =========================================================
