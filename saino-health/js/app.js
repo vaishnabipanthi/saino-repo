@@ -1,9 +1,20 @@
-/**
- * SAINO HEALTH - Core Frontend Application Controller
- * Handles Routing, State, Search/Filters, Modals, WhatsApp Engine, and Carousel
- */
 
-// Application State
+window.renderUserProfileIcon = function(sizeClass = "w-8 h-8", iconSizeClass = "w-4 h-4", extraClass = "", displayName = "") {
+  const initials = String(displayName || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase();
+  return `
+    <span class="${sizeClass} rounded-full bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 ${extraClass}" aria-hidden="true">
+      ${initials ? `<span class="${iconSizeClass} font-extrabold leading-none">${escapeCommunityText(initials)}</span>` : `<i data-lucide="user-round" class="${iconSizeClass}"></i>`}
+    </span>
+  `;
+};
+
 const AppState = {
   activeView: 'marketplace', // 'marketplace' | 'discovery' | 'campaigns' | 'boost' | 'about' | 'contact' | 'list-your-care'
   activeBigScreenIndex: 0,
@@ -35,12 +46,41 @@ const quickServices = [
   { id: 'insurance', title: 'Health Insurance', icon: 'shield-check', description: 'Protect your health' },
   { id: 'bloodbank', title: 'Blood Bank', icon: 'droplets', description: 'Emergency blood services' }
 ];
-
-// Initialize App
-document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
   // Deep clone initial data so user likes/reviews mutate locally
   AppState.providers = JSON.parse(JSON.stringify(window.SAINO_DATA.providers));
   
+  // Base state lock karein taaki back dabane par live server ke folder par na jaye
+  if (!history.state) {
+    history.replaceState({ view: 'marketplace', filterParams: null }, '', window.location.href.split('#')[0] + '#marketplace');
+  }
+
+  // Browser Back Button dabane par step-by-step piche aane ke liye
+  window.addEventListener('popstate', (e) => {
+    // Agar koi booking modal ya popup khula hai toh pehle use band karein
+    const modalContainer = document.getElementById('modalContainer');
+    if (modalContainer && modalContainer.innerHTML.trim() !== '') {
+      modalContainer.innerHTML = '';
+      return;
+    }
+
+    if (AppState.activeView === 'appointment-booking' &&
+        (!e.state || e.state.view !== 'appointment-booking') &&
+        window.__sainoProviderReturnView) {
+      window.returnToProviderSource();
+      return;
+    }
+
+    if (e.state && e.state.view) {
+      if (e.state.view === 'appointment-booking' && !window.__sainoProviderReturnView) {
+        window.captureProviderReturnView();
+      }
+      navigateTo(e.state.view, e.state.filterParams, true);
+    } else {
+      navigateTo('marketplace', null, true);
+    }
+  });
+
   initNavigation();
   initAdCarousel();
   initBigScreenAutoPlay();
@@ -72,12 +112,59 @@ function initNavigation() {
     });
   }
 }
+  window.backToHospitalList = function () {
+  navigateTo(window.__directoryCategory || "hospital");
+};
 
 // Global SPA Routing Engine
-function navigateTo(viewName, filterParams = null) {
+function navigateTo(viewName, filterParams = null, isPopState = false) {
+  if (viewName === 'back') {
+    navigateTo('marketplace', null, false);
+    return;
+  }
+
+  if (viewName === "patient" && AppState.activeView !== "patient") {
+    window.__sainoReviewReturnState = {
+      view: AppState.activeView,
+      selectedCategory: AppState.selectedCategory,
+      selectedLocation: AppState.selectedLocation,
+      selectedVerification: AppState.selectedVerification,
+      selectedBookingType: AppState.selectedBookingType,
+      searchQuery: AppState.searchQuery,
+      scrollY: window.scrollY
+    };
+  }
+
+  if (viewName === "homecare" && AppState.activeView !== "homecare") {
+    window.captureServiceReturnView();
+  }
   AppState.activeView = viewName;
-  
-  // Close mobile menu if open
+  if (viewName === 'provider-reviews' && filterParams && filterParams.providerId) {
+    AppState.activeProvider = AppState.providers.find(provider =>
+      String(provider.id) === String(filterParams.providerId)
+    ) || null;
+  }
+
+  if (!isPopState) {
+    history.pushState({ view: viewName, filterParams: filterParams }, '', window.location.href.split('#')[0] + '#' + viewName);
+  }
+
+  window.returnFromAllReviews = function() {
+    const previous = window.__sainoReviewReturnState;
+    if (!previous) {
+      navigateTo("marketplace");
+      return;
+    }
+    AppState.selectedCategory = previous.selectedCategory;
+    AppState.selectedLocation = previous.selectedLocation;
+    AppState.selectedVerification = previous.selectedVerification;
+    AppState.selectedBookingType = previous.selectedBookingType;
+    AppState.searchQuery = previous.searchQuery;
+    window.__sainoReviewReturnState = null;
+    navigateTo(previous.view || "marketplace");
+    window.scrollTo({ top: previous.scrollY || 0, behavior: "instant" });
+  };
+
   const mobileMenu = document.getElementById('mobileMenu');
   if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
     mobileMenu.classList.add('hidden');
@@ -94,7 +181,7 @@ function navigateTo(viewName, filterParams = null) {
     }
   });
 
-  // Mobile Bottom Bar Active Highlight (Red for active, Slate for inactive)
+  // Mobile Bottom Bar Active Highlight
   document.querySelectorAll('[data-bottom-btn]').forEach(btn => {
     if (btn.getAttribute('data-bottom-btn') === viewName) {
       btn.style.color = '#B91C1C';
@@ -112,6 +199,7 @@ function navigateTo(viewName, filterParams = null) {
   renderApp();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
+
 
 function mobileSearchSubmit() {
   const input = document.getElementById('mobileSearchInput');
@@ -143,15 +231,21 @@ function renderApp() {
       mainContainer.innerHTML = renderMarketplaceView();
       bindMarketplaceEvents();
       break;
-      case 'hospital':
+    case 'hospital':
+      case 'hospitals':
       case 'clinic':
+      case 'clinics':
       case 'diagnostic':
+      case 'diagnostics':
       case 'wellness':
+      case 'insurance':
+        mainContainer.innerHTML = window.renderHospitalDirectoryView ? window.renderHospitalDirectoryView(AppState.activeView) : renderCategoryListView(AppState.activeView);
+        if (typeof applyLaptopScale === 'function') setTimeout(applyLaptopScale, 30);
+        break;
       case 'ambulance':
       case 'bloodbank':
       case 'homecare':
-      case 'insurance':
-      mainContainer.innerHTML = renderCategoryListView(AppState.activeView);
+        mainContainer.innerHTML = renderCategoryListView(AppState.activeView);
         break;
     case 'discovery':
       mainContainer.innerHTML = renderDiscoveryView();
@@ -162,6 +256,9 @@ function renderApp() {
       break;
     case 'appointments':
       mainContainer.innerHTML = renderAppointmentsView();
+      break;
+    case 'appointment-booking':
+      mainContainer.innerHTML = window.renderAppointmentBookingView ? window.renderAppointmentBookingView() : '';
       break;
     case 'saved':
       mainContainer.innerHTML = renderSavedView();
@@ -192,6 +289,9 @@ function renderApp() {
     case 'patient':
     mainContainer.innerHTML = window.renderAllReviewsView();
     break
+    case 'provider-reviews':
+      mainContainer.innerHTML = window.renderProviderReviewsPage();
+      break;
     case 'discussions':
     mainContainer.innerHTML = window.renderAllDiscussionsView();
     break;
@@ -200,60 +300,77 @@ function renderApp() {
       bindMarketplaceEvents();
   }
 
+  if (typeof applyLaptopScale === 'function') applyLaptopScale();
   if (window.lucide) {
     window.lucide.createIcons();
   }
 }
 document.addEventListener("DOMContentLoaded", () => {
-  // Ads data (customize as needed)
+  // Ads data with high-res responsive images
   const ads = [
-    { title: "Catalogue / Ads Section", desc: "Rotating healthcare promotions, sponsored placements & platform announcements" },
-    { title: "Special Offer", desc: "Get 20% off on diagnostic packages" },
-    { title: "Insurance Plans", desc: "Protect your family with cashless health insurance" },
-    { title: "Homecare Services", desc: "Book nurses and doctors at your doorstep" }
+    { 
+      title: "Catalogue / Ads Section", 
+      desc: "Rotating healthcare promotions, sponsored placements & platform announcements",
+      image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80" 
+    },
+    { 
+      title: "Special Offer", 
+      desc: "Get 20% off on diagnostic packages",
+      image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1200&q=80" 
+    },
+    { 
+      title: "Insurance Plans", 
+      desc: "Protect your family with cashless health insurance",
+      image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80" 
+    },
+    { 
+      title: "Homecare Services", 
+      desc: "Book nurses and doctors at your doorstep",
+      image: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=1200&q=80" 
+    }
   ];
 
   let currentAd = 0;
   const adTitle = document.getElementById("adTitle");
   const adDescription = document.getElementById("adDescription");
+  const adImageBanner = document.getElementById("adImageBanner");
   const dots = document.querySelectorAll(".ad-dot");
 
-  // Show ad function
   function showAd(index) {
-  currentAd = index;
-  if (adTitle && adDescription) {
-    adTitle.textContent = ads[index].title;
-    adDescription.textContent = ads[index].desc;
+    currentAd = index;
+    const item = ads[index];
+
+    if (adTitle && adDescription) {
+      adTitle.textContent = item.title;
+      adDescription.textContent = item.desc;
+    }
+
+    if (adImageBanner) {
+      adImageBanner.src = item.image;
+    }
+
+    if (dots && dots.length) {
+      dots.forEach((dot, i) => {
+        dot.classList.remove("bg-white");
+        dot.classList.add("bg-white/40");
+        if (i === index) {
+          dot.classList.add("bg-white");
+          dot.classList.remove("bg-white/40");
+        }
+      });
+    }
   }
 
-  if (dots && dots.length) {
-    dots.forEach((dot, i) => {
-      dot.classList.remove("bg-white");
-      dot.classList.add("bg-white/40");
-      if (i === index) {
-        dot.classList.add("bg-white");
-        dot.classList.remove("bg-white/40");
-      }
-    });
-  }
-}
-
-
-  // Dot click event
   dots.forEach((dot, i) => {
-    dot.setAttribute("data-index", i); // ensure index set
-    dot.addEventListener("click", () => {
-      showAd(i);
-    });
+    dot.setAttribute("data-index", i);
+    dot.addEventListener("click", () => showAd(i));
   });
 
-  // Auto swipe every 3 seconds
   setInterval(() => {
     let nextAd = (currentAd + 1) % ads.length;
     showAd(nextAd);
-  }, 3000);
+  }, 3500);
 
-  // Initial load
   showAd(0);
 });
 
@@ -261,6 +378,25 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 // 1. MARKETPLACE VIEW RENDERING 
 // ==========================================
+function renderBloodBankEnquiryAction(bank) {
+  const phone = String(bank.phone || "").replace(/[^\d+]/g, "");
+  if (/^\+?\d{7,15}$/.test(phone)) {
+    return `
+      <a href="tel:${phone}" aria-label="Call ${bank.name} at ${phone}"
+        class="mt-2 inline-flex flex-wrap items-center gap-x-1.5 gap-y-0.5 px-3 py-1.5 bg-saino-red text-white rounded-lg text-[10px] font-bold">
+        Enquire Now
+      </a>
+    `;
+  }
+  const safeName = String(bank.name || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  return `
+    <button type="button" onclick="openCustomWhatsApp('Blood Bank Enquiry: ${safeName}', 'Hello SAINO, I need blood availability information from ${safeName}.')"
+      class="mt-2 px-3 py-1.5 bg-saino-red text-white rounded-lg text-[10px] font-bold">
+      Enquire Now
+    </button>
+  `;
+}
+
 function renderMarketplaceView() {
 
   const allProviders = AppState.providers || window.SAINO_DATA.providers || []
@@ -360,69 +496,39 @@ function renderMarketplaceView() {
 
   return `
       <!-- Scrolling Ad Card -->
-      <section class="mb-8 bg-saino-red text-white w-full h-[180px] sm:h-[200px] md:h-[240px] lg:h-[300px] 
-      flex items-center justify-center shadow-md relative overflow-hidden -mx-0 sm:-mx-4 md:-mx-6 lg:-mx-0 lg:rounded-lg">
-        <div class="text-center relative z-10 px-4">
+    <section class="mb-8 w-full h-[180px] sm:h-[200px] md:h-[240px] lg:h-[300px] 
+      flex items-center justify-center shadow-md relative overflow-hidden -mx-0 sm:-mx-4 md:-mx-6 lg:-mx-0 lg:rounded-lg bg-slate-900">
+      
+      <!-- 1. Background Image Tag (Sizing exact aapki screen ke hisaab se stretch hogi) -->
+      <img 
+        id="adImageBanner" 
+        src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80" 
+        alt="Promotion Banner" 
+        class="absolute inset-0 w-full h-full object-cover object-center"
+      />
+
+      <!-- 2. Transparent Red Overlay (Isse Saino Red theme bhi bani rahegi aur text white me clear dikhega) -->
+  
+
+      <!-- 3. Text aur Dots (Aapka original layout, z-10 se overlay ke upar dikhega) -->
+      <div class="text-center relative z-10 px-4">
         <h2
           id="adTitle"
-          class="text-sm sm:text-base font-bold mb-1 transition-opacity duration-500">
+          class="text-base sm:text-lg md:text-xl font-bold mb-1 text-white drop-shadow-md">
           Catalogue / Ads Section
         </h2>
         <p
           id="adDescription"
-          class="text-[9px] sm:text-[10px] text-white/70 mb-2 transition-opacity duration-500">
+          class="text-xs sm:text-sm text-white/90 mb-3 drop-shadow">
           Rotating healthcare promotions, sponsored placements & platform announcements
         </p>
 
         <div class="flex justify-center items-center gap-1.5">
-          <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white"></span>
-          <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white/40"></span>
-          <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white/40"></span>
-          <span class="ad-dot w-1.5 h-1.5 rounded-full bg-white/40"></span>
-
+          <span class="ad-dot w-2 h-2 rounded-full bg-white transition-all cursor-pointer"></span>
+          <span class="ad-dot w-2 h-2 rounded-full bg-white/40 transition-all cursor-pointer"></span>
+          <span class="ad-dot w-2 h-2 rounded-full bg-white/40 transition-all cursor-pointer"></span>
+          <span class="ad-dot w-2 h-2 rounded-full bg-white/40 transition-all cursor-pointer"></span>
         </div>
-      </div>
-    </section>
-
-    <section class="hidden md:block mb-14">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <span class="text-xs font-black uppercase tracking-wider text-saino-red">
-            Healthcare Services
-          </span>
-          <h2 class="text-xl sm:text-2xl font-black text-saino-gray-900">
-            Explore Healthcare
-          </h2>
-          <p class="text-xs text-saino-gray-500 mt-1">
-            Everything you need across the healthcare journey.
-          </p>
-        </div>
-      </div>
-
-
-      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-
-        ${quickServices.map(service => `
-
-          <button
-            onclick="${
-              service.id === 'packages'
-                ? "document.getElementById('diagnostic-packages-section')?.scrollIntoView({behavior:'smooth'})"
-                : `filterCategory('${service.id}')`
-            }"
-            class="group bg-white rounded-2xl border border-saino-gray-200 p-4 text-center hover:border-saino-red/30 hover:shadow-md transition">
-
-            <div class="w-11 h-11 mx-auto rounded-xl bg-saino-red/10 text-saino-red flex items-center justify-center group-hover:bg-saino-red group-hover:text-white transition">
-              <i data-lucide="${service.icon}" class="w-5 h-5"></i>
-            </div>
-            <h3 class="mt-3 text-[11px] sm:text-xs font-black text-saino-gray-900">
-              ${service.title}
-            </h3>
-            <p class="mt-1 text-[9px] text-saino-gray-500 leading-tight">
-              ${service.description}
-            </p>
-          </button>
-        `).join('')}
       </div>
     </section>
     <!-- ==========================================
@@ -543,7 +649,7 @@ function renderMarketplaceView() {
         </div>
         <button
           onclick="navigateTo('discovery')"
-          class="px-5 py-3 rounded-xl bg-white border border-saino-gray-200 text-saino-gray-800 text-xs font-black hover:border-saino-red/30 hover:text-saino-red transition shadow-xs">
+          class="px-5 py-3 rounded-xl bg-saino-red border border-saino-red text-white text-xs font-black hover:bg-saino-red-dark hover:border-saino-red-dark transition shadow-xs">
           EXPLORE DISCOVERY
         </button>
       </div>
@@ -714,18 +820,6 @@ function renderMarketplaceView() {
 
           </div>
 
-
-          <div class="mt-6">
-
-            <button
-              onclick="filterBookingType('home_nurse')"
-              class="w-full sm:w-auto px-7 py-3 rounded-xl bg-saino-red hover:bg-saino-red-dark text-white text-xs font-black shadow-md transition">
-
-              BOOK HOMECARE
-
-            </button>
-
-          </div>
 
         </div>
 
@@ -999,10 +1093,9 @@ function renderMarketplaceView() {
                   ${b.area || ''}
                 </span>
 
-                <button
-                  onclick="openCustomWhatsApp('Blood Bank Enquiry: ${b.name}', 'Hello SAINO, I need blood availability information from ${b.name}.')"
-                  class="mt-2 px-3 py-1.5 bg-saino-red text-white rounded-lg text-[10px] font-bold">
-                  Enquire Now
+                ${renderBloodBankEnquiryAction(b)}
+                <button type="button" onclick="openProviderByName('${String(b.name).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}', 'bloodbank')" class="mt-2 ml-1 px-3 py-1.5 border border-red-700 text-red-700 rounded-lg text-[10px] font-bold">
+                  View Profile
                 </button>
 
               </div>
@@ -1095,7 +1188,9 @@ function renderMarketplaceView() {
 
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
 
-        ${onlineDoctors.slice(0, 10).map(doc => `
+        ${onlineDoctors.slice(0, 10).map(doc => {
+          const safeDoctorId = String(doc.id || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+          return `
 
           <div class="bg-white rounded-2xl border border-saino-gray-200 p-4 text-center shadow-xs">
 
@@ -1121,14 +1216,15 @@ function renderMarketplaceView() {
             </span>
 
             <button
-              onclick="openCustomWhatsApp('Doctor OPD Consultation: ${doc.name}', 'Hi SAINO Health, I would like to book an OPD consultation with ${doc.name} at ${doc.hospital}.')"
+              onclick="openDoctorOpdBooking('${safeDoctorId}')"
               class="mt-3 w-full py-2 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-xl text-[10px]">
               BOOK OPD
             </button>
 
           </div>
 
-        `).join('')}
+          `;
+        }).join('')}
 
       </div>
 
@@ -1188,26 +1284,50 @@ function renderMarketplaceView() {
   `;
 }
 
+window.openDiagnosticPackageBooking = function(packageId) {
+  const packages = (window.SAINO_DATA && window.SAINO_DATA.diagnosticPackages) || [];
+  const pkg = packages.find(item => String(item.id) === String(packageId));
+  if (!pkg) {
+    showToast("This diagnostic package is no longer available.");
+    return;
+  }
+
+  const packageProviders = { "pkg-1": "prov-3", "pkg-2": "prov-10" };
+  const partnerId = packageProviders[String(pkg.id)];
+  window.BOOKING_STATE.bookingType = "diagnostic-package";
+  window.BOOKING_STATE.packageTitle = pkg.title;
+  window.BOOKING_STATE.packageTests = pkg.testsCount;
+  window.BOOKING_STATE.fee = pkg.discountedPrice;
+  window.BOOKING_STATE.hospitalName = pkg.hospital;
+  window.BOOKING_STATE.providerId = partnerId || "";
+  window.BOOKING_STATE.location = "Partner location will be confirmed";
+  window.captureProviderReturnView();
+  window.openAppointmentBooking(partnerId || "", pkg.title, "Diagnostic Package");
+};
+
 
 // Render Horizontal Clinic Card
 function renderHorizontalClinicCard(c) {
+  const clinicProfileId = String(c.id || c.name || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   return `
     <div class="bg-white rounded-2xl border border-saino-gray-200 p-4 shadow-xs hover:shadow-md transition flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-36 h-32 sm:h-auto rounded-xl overflow-hidden bg-saino-gray-100 flex-shrink-0 relative">
+      <button type="button" onclick="openProviderProfile('${clinicProfileId}')" aria-label="Open ${c.name} profile" class="w-full sm:w-36 h-32 sm:h-auto rounded-xl overflow-hidden bg-saino-gray-100 flex-shrink-0 relative">
         <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover">
         <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-black bg-saino-red text-white shadow-xs">
           ${c.badge || 'SAINO PRO'}
         </span>
-      </div>
+      </button>
       <div class="flex-1 flex flex-col justify-between text-xs">
         <div>
           <div class="flex items-center justify-between mb-1">
-            <h4 class="text-sm font-bold text-saino-gray-900 leading-tight">${c.name}</h4>
+            <h4 class="text-sm font-bold text-saino-gray-900 leading-tight">
+              <button type="button" onclick="openProviderProfile('${clinicProfileId}')" class="text-left hover:text-saino-red">${c.name}</button>
+            </h4>
           </div>
           <div class="flex items-center space-x-1 text-amber-500 font-bold text-xs mb-1.5">
             <span>⭐</span>
             <span class="text-saino-gray-900">${c.rating}</span>
-            <span class="text-saino-gray-400 font-normal">(${c.reviews} Reviews)</span>
+            <button type="button" onclick="openProviderReviews('${clinicProfileId}')" class="text-saino-gray-400 font-normal hover:text-saino-red hover:underline">(${c.reviews} Reviews)</button>
           </div>
           <div class="text-[11px] text-saino-gray-600 mb-1">
             <strong class="text-saino-gray-800">${c.doctor || c.special || 'Specialist Consultant'}</strong>
@@ -1218,10 +1338,10 @@ function renderHorizontalClinicCard(c) {
           </div>
         </div>
         <div class="pt-2 border-t border-saino-gray-100 flex items-center justify-between">
-          <button onclick="openCustomWhatsApp('Clinic Booking: ${c.name}', 'Hi SAINO, I want to book an appointment at ${c.name}.')" class="px-3.5 py-1.5 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-lg text-[11px] transition shadow-xs">
-            Book on WhatsApp
+          <button type="button" onclick="openAppointmentBooking('${clinicProfileId}')" class="px-3.5 py-1.5 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-lg text-[11px] transition shadow-xs">
+            Book appointment
           </button>
-          <button onclick="filterCategory('clinic')" class="text-sky-600 hover:text-sky-800 font-semibold text-[11px] flex items-center space-x-0.5">
+          <button type="button" onclick="openProviderProfile('${clinicProfileId}')" class="text-red-700 hover:text-red-900 font-semibold text-[11px] flex items-center space-x-0.5">
             <span>View Profile</span>
             <i data-lucide="chevron-right" class="w-3 h-3"></i>
           </button>
@@ -1233,21 +1353,24 @@ function renderHorizontalClinicCard(c) {
 
 // Render Patient Review in Right Column (Talk of the Town)
 function renderTalkReviewItem(t, idx) {
-  const avatarColors = ['bg-emerald-600', 'bg-sky-600', 'bg-purple-600', 'bg-rose-600', 'bg-amber-600'];
-  const colorClass = avatarColors[idx % avatarColors.length];
-  const initials = t.author ? t.author.split(' ').map(n => n[0]).join('').substring(0, 2) : 'PT';
+  const cleanValue = value => {
+    const text = String(value || '').trim();
+    return text && !['undefined', 'null'].includes(text.toLowerCase()) ? text : '';
+  };
+  const author = cleanValue(t.author) || cleanValue(t.user) || 'Patient';
+  const reviewText = cleanValue(t.body) || cleanValue(t.text) || cleanValue(t.comment) || cleanValue(t.title) || 'A patient shared their healthcare experience.';
+  const providerName = cleanValue(t.provider) || cleanValue(t.hospitalName) || 'Healthcare provider';
+  const rating = Number(t.rating) > 0 ? Math.min(5, Number(t.rating)) : 5;
 
   return `
     <div class="bg-white rounded-2xl border border-saino-gray-200 p-4 shadow-xs hover:shadow-md transition text-xs">
       <div class="flex items-center space-x-3 mb-2">
-        <div class="w-8 h-8 rounded-full ${colorClass} text-white font-bold flex items-center justify-center text-xs flex-shrink-0 shadow-xs">
-          ${initials}
-        </div>
+        ${window.renderUserProfileIcon("w-8 h-8", "text-[10px] shadow-xs", "", author)}
         <div class="truncate flex-1">
-          <strong class="text-saino-gray-900 block font-bold text-xs truncate">${t.author}</strong>
+          <strong class="text-saino-gray-900 block font-bold text-xs truncate">${escapeCommunityText(author)}</strong>
           <div class="flex items-center space-x-1 text-amber-500 text-[10px]">
-            <span>★★★★★</span>
-            <span class="text-saino-gray-400">· 5.0</span>
+            <span>${'★'.repeat(Math.max(0, Math.min(5, Math.round(rating))))}${'☆'.repeat(5 - Math.max(0, Math.min(5, Math.round(rating))))}</span>
+            <span class="text-saino-gray-400">· ${rating.toFixed(1)}</span>
           </div>
         </div>
         <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
@@ -1255,10 +1378,10 @@ function renderTalkReviewItem(t, idx) {
         </span>
       </div>
       <p class="text-saino-gray-600 text-[11px] italic leading-relaxed mb-2">
-        "${t.body || t.title}"
+        "${escapeCommunityText(reviewText)}"
       </p>
       <div class="text-[10px] text-saino-gray-400 flex items-center justify-between pt-1 border-t border-saino-gray-100">
-        <span>Care at: <strong class="text-saino-gray-700">${t.provider}</strong></span>
+        <span>Care at: <strong class="text-saino-gray-700">${escapeCommunityText(providerName)}</strong></span>
         <button onclick="showToast('Liked review!')" class="text-saino-red font-bold hover:underline">
           ♥ Helpful
         </button>
@@ -1295,6 +1418,7 @@ function renderPatientStoryCard(s) {
 
 // Render Diagnostic Package Card
 function renderDiagnosticPackageCard(pkg) {
+  const safePackageId = String(pkg.id || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   return `
     <div class="bg-white rounded-3xl border border-saino-gray-200 p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between">
       <div>
@@ -1317,7 +1441,7 @@ function renderDiagnosticPackageCard(pkg) {
           <span class="text-xs text-saino-gray-400 line-through block">${pkg.originalPrice}</span>
           <strong class="text-base font-black text-saino-gray-900">${pkg.discountedPrice}</strong>
         </div>
-        <button onclick="openCustomWhatsApp('Diagnostic Package: ${pkg.title}', 'Hi SAINO, I would like to book the ${pkg.title} (${pkg.discountedPrice}) with home sample collection / lab visit.')" class="px-4 py-2 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-xl text-xs transition shadow-xs">
+        <button type="button" onclick="openDiagnosticPackageBooking('${safePackageId}')" class="px-4 py-2 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-xl text-xs transition shadow-xs">
           BOOK NOW
         </button>
       </div>
@@ -1326,83 +1450,206 @@ function renderDiagnosticPackageCard(pkg) {
 }
 
 // Render Individual Provider Card (Matching Exact Layout from Screenshot & Figma)
-function renderProviderCard(p) {
- let badgeHtml = '';
+window.captureProviderReturnView = function() {
+  const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
+  if (!main) return false;
+  const hero = document.getElementById("heroHomeSection");
+  window.__sainoProviderReturnView = {
+    html: main.innerHTML,
+    scrollY: window.scrollY,
+    heroDisplay: hero ? hero.style.display : "",
+    historyState: history.state,
+    url: window.location.href,
+    activeView: AppState.activeView
+  };
+  return true;
+};
 
-const verification = String(p.verification || '').toLowerCase();
+window.returnToProviderSource = function() {
+  const previous = window.__sainoProviderReturnView;
+  const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
+  if (!previous || !main) {
+    navigateTo("marketplace");
+    return;
+  }
+  main.innerHTML = previous.html;
+  window.__sainoProviderReturnView = null;
+  AppState.activeView = previous.activeView || AppState.activeView;
+  history.replaceState(previous.historyState, '', previous.url);
+  const hero = document.getElementById("heroHomeSection");
+  if (hero) hero.style.display = previous.heroDisplay;
+  if (window.lucide && typeof window.lucide.createIcons === "function") window.lucide.createIcons();
+  if (typeof window.updateSavedHearts === "function") window.updateSavedHearts();
+  window.scrollTo({ top: previous.scrollY, behavior: "instant" });
+};
 
-if (verification === 'vvip') {
+window.captureServiceReturnView = function() {
+  const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
+  if (!main) return false;
+  const hero = document.getElementById("heroHomeSection");
+  window.__sainoServiceReturnView = {
+    html: main.innerHTML,
+    scrollY: window.scrollY,
+    activeView: typeof AppState !== "undefined" ? AppState.activeView : "",
+    heroDisplay: hero ? hero.style.display : ""
+  };
+  return true;
+};
 
-  badgeHtml = `
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-      text-xs font-black
-      bg-gradient-to-r from-indigo-600 to-purple-700
-      text-white shadow-md">
+window.returnToServiceSource = function() {
+  const previous = window.__sainoServiceReturnView;
+  const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
+  if (!previous || !main) {
+    navigateTo("marketplace");
+    return;
+  }
+  main.innerHTML = previous.html;
+  window.__sainoServiceReturnView = null;
+  if (previous.activeView && typeof AppState !== "undefined") {
+    AppState.activeView = previous.activeView;
+    history.replaceState({ view: previous.activeView }, "", window.location.href.split("#")[0] + "#" + previous.activeView);
+    document.querySelectorAll("[data-nav]").forEach(link => {
+      const isActive = link.getAttribute("data-nav") === previous.activeView;
+      link.classList.toggle("nav-active", isActive);
+      link.classList.toggle("text-slate-700", !isActive);
+    });
+    document.querySelectorAll("[data-bottom-btn]").forEach(button => {
+      button.style.color = button.getAttribute("data-bottom-btn") === previous.activeView ? "#B91C1C" : "#64748b";
+    });
+  }
+  const hero = document.getElementById("heroHomeSection");
+  if (hero) hero.style.display = previous.heroDisplay;
+  if (window.lucide && typeof window.lucide.createIcons === "function") window.lucide.createIcons();
+  if (typeof window.updateSavedHearts === "function") window.updateSavedHearts();
+  window.scrollTo({ top: previous.scrollY, behavior: "instant" });
+};
 
-      <i data-lucide="award" class="w-4 h-4 text-amber-300"></i>
+window.renderSainoTierBadge = function(provider, compact = false) {
+  const tier = String(provider && (provider.verification || provider.verificationTier || provider.badgeType) || "listed").toLowerCase();
+  const size = compact
+    ? "gap-1 px-2 py-0.5 text-[10px]"
+    : "gap-1.5 px-3 py-1 text-xs";
+  const iconSize = compact ? "w-3.5 h-3.5" : "w-4 h-4";
 
-      <span>🏆 SAINO VVIP</span>
+  if (tier === "vvip") {
+    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-gradient-to-r from-indigo-600 to-purple-700 text-white shadow-md"><i data-lucide="award" class="${iconSize} text-amber-300"></i><span>🏆 SAINO VVIP</span></span>`;
+  }
+  if (tier === "vip") {
+    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-gradient-to-r from-amber-500 to-amber-600 text-saino-gray-950 shadow-md"><i data-lucide="crown" class="${iconSize}"></i><span>👑 SAINO VIP</span></span>`;
+  }
+  if (tier === "pro") {
+    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-saino-red text-white shadow-md"><i data-lucide="check-circle-2" class="${iconSize}"></i><span>✓ SAINO Pro</span></span>`;
+  }
+  if (tier === "prime" || tier === "verified") {
+    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-emerald-600 text-white shadow-md"><i data-lucide="badge-check" class="${iconSize}"></i><span>SAINO Prime</span></span>`;
+  }
+  return `<span class="inline-flex items-center ${size} rounded-full font-black bg-saino-gray-800 text-white shadow-md"><i data-lucide="compass" class="${iconSize}"></i><span>SAINO Discovery</span></span>`;
+};
 
-    </span>
-  `;
+window.openProviderByName = function(providerName, categoryHint) {
+  const providers = (window.AppState && window.AppState.providers) || (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
+  const normalize = value => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const queryWords = normalize(providerName).split(/\s+/).filter(word =>
+    word.length > 2 && !["hospital", "blood", "bank", "service", "center", "centre"].includes(word)
+  );
+  const match = providers
+    .map(provider => {
+      const name = normalize(provider.name);
+      const score = queryWords.reduce((total, word) => total + (name.includes(word) ? 1 : 0), 0);
+      const categoryMatch = String(provider.category || "").toLowerCase() === String(categoryHint || "").toLowerCase();
+      return { provider, score, categoryMatch };
+    })
+    .filter(result => result.score > 0)
+    .sort((a, b) => b.score - a.score || Number(b.categoryMatch) - Number(a.categoryMatch))[0];
 
-} else if (verification === 'vip') {
+  if (match) {
+    window.openProviderProfile(match.provider.id || match.provider.name);
+  } else if (categoryHint) {
+    filterCategory(categoryHint);
+  } else {
+    showToast("We couldn't find this provider's profile.");
+  }
+};
 
-  badgeHtml = `
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-      text-xs font-black
-      bg-gradient-to-r from-amber-500 to-amber-600
-      text-saino-gray-950 shadow-md">
+window.openLeadDoctorProfile = function(providerId, doctorName, doctorRole) {
+  window.openAppointmentBooking(providerId, doctorName, doctorRole);
+};
 
-      <i data-lucide="crown" class="w-4 h-4"></i>
+window.openDoctorOpdBooking = function(doctorId) {
+  const doctors = (window.SAINO_DATA && window.SAINO_DATA.onlineDoctors) || [];
+  const doctor = doctors.find(item => String(item.id) === String(doctorId));
+  if (!doctor) {
+    showToast("We couldn't find this doctor's booking details.");
+    return;
+  }
 
-      <span>👑 SAINO VIP</span>
+  const providers = (window.AppState && window.AppState.providers) || (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
+  const normalize = value => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const hospitalName = normalize(doctor.hospital);
+  const provider = providers.find(item => {
+    const providerName = normalize(item.name);
+    return providerName === hospitalName ||
+      providerName.includes(hospitalName) ||
+      hospitalName.includes(providerName) ||
+      (hospitalName.includes("norvic") && providerName.includes("norvic"));
+  });
 
-    </span>
-  `;
+  window.openAppointmentBooking(
+    provider ? provider.id : doctor.hospital,
+    doctor.name,
+    doctor.role,
+    doctor.fee
+  );
+};
 
-} else if (verification === 'pro') {
+function getLeadDoctorImage(provider) {
+  if (provider.leadDoctorImage || provider.doctorImage) {
+    return provider.leadDoctorImage || provider.doctorImage;
+  }
 
-  badgeHtml = `
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-      text-xs font-black
-      bg-saino-red text-white shadow-md">
-
-      <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-
-      <span>✓ SAINO Pro</span>
-
-    </span>
-  `;
-
-} else {
-
-  // Everything else becomes the free Discovery badge.
-
-  badgeHtml = `
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-      text-xs font-black
-      bg-saino-gray-800 text-white shadow-md">
-
-      <i data-lucide="compass" class="w-4 h-4"></i>
-
-      <span>🆓 SAINO Discovery</span>
-
-    </span>
-  `;
+  const femaleDoctorNames = ['Smriti', 'Manisha', 'Radhika', 'Anjali', 'Rita'];
+  const leadDoctorName = String(provider.leadDoctor || '');
+  const isFemaleDoctor = femaleDoctorNames.some(name =>
+    new RegExp(`\\b${name}\\b`, 'i').test(leadDoctorName)
+  );
+  const availableDoctors = (window.SAINO_DATA && window.SAINO_DATA.onlineDoctors) || [];
+  const maleImages = ['doc-1', 'doc-3', 'doc-5']
+    .map(id => availableDoctors.find(doctor => doctor.id === id))
+    .filter(doctor => doctor && doctor.image)
+    .map(doctor => doctor.image);
+  const femaleDoctorImage = availableDoctors.find(doctor => doctor.id === 'doc-4');
+  const femaleImages = [
+    'assets/doctor2.jpg',
+    ...(femaleDoctorImage && femaleDoctorImage.image ? [femaleDoctorImage.image] : [])
+  ];
+  const images = isFemaleDoctor ? femaleImages : maleImages;
+  const firstName = leadDoctorName.replace(/^Dr\.?\s*/i, '').split(/\s+/)[0] || leadDoctorName;
+  const nameHash = [...firstName.toLowerCase()].reduce((total, character) => total + character.charCodeAt(0), 0);
+  return images.length ? images[nameHash % images.length] : 'assets/doctor2.jpg';
 }
-  const categoryObj = window.SAINO_DATA.categories.find(c => c.id === p.category);
-  const categoryName = categoryObj ? categoryObj.name : p.category;
 
-  const leadInitial = p.leadDoctor ? p.leadDoctor.replace('Dr. ', '').replace('Pharm. ', '').charAt(0) : 'D';
+function renderProviderCard(p) {
+const badgeHtml = window.renderSainoTierBadge(p);
+const profileTargetId = p.id || p.name || '';
+const safeProfileTargetId = String(profileTargetId).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+const cardKey = String(profileTargetId).replace(/[^a-zA-Z0-9_-]/g, "-");
+const doctorImage = getLeadDoctorImage(p);
+const departments = Array.isArray(p.departments) ? p.departments : [];
+const extraDepartments = departments.slice(3);
+const safeDoctorName = String(p.leadDoctor || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/[\r\n]/g, " ");
+const safeDoctorRole = String(p.leadDoctorRole || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/[\r\n]/g, " ");
+
+ const categoryObj = window.SAINO_DATA.categories.find(c => c.id === p.category);
+  const categoryName = categoryObj ? categoryObj.name : p.category;
 
   return `
     <div class="provider-card bg-white rounded-3xl border border-saino-gray-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
       <div>
-        <!-- Provider Photo / Header Cover with Top Badges -->
         <div class="relative h-48 sm:h-52 w-full bg-saino-gray-100 overflow-hidden">
-          <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+          <button type="button" onclick="openProviderProfile('${safeProfileTargetId}')" aria-label="Open ${p.name} profile" class="absolute inset-0 z-0 block w-full p-0 border-0 bg-transparent cursor-pointer">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+          </button>
+          <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
           
           <!-- Top Badge & Category (Exact Match to User Screenshot) -->
           <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
@@ -1415,7 +1662,9 @@ if (verification === 'vvip') {
           <!-- Bottom Title on Image with Location and Logo Thumbnail -->
           <div class="absolute bottom-3.5 left-3.5 right-3.5 flex items-end justify-between z-10">
             <div class="text-white max-w-[75%]">
-              <h3 class="text-base sm:text-lg font-black leading-tight drop-shadow">${p.name}</h3>
+              <h3 class="text-base sm:text-lg font-black leading-tight drop-shadow">
+                <button type="button" onclick="openProviderProfile('${safeProfileTargetId}')" class="text-left">${p.name}</button>
+              </h3>
               <p class="text-xs text-sky-200 flex items-center mt-1">
                 <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-sky-400 flex-shrink-0"></i>
                 <span class="truncate">${p.location}</span>
@@ -1435,7 +1684,7 @@ if (verification === 'vvip') {
             <div class="flex items-center space-x-1 text-amber-500 font-extrabold text-sm">
               <span>⭐</span>
               <span class="text-saino-gray-900">${p.rating}</span>
-              <span class="text-saino-gray-400 font-medium text-xs">(${p.reviewsCount} Reviews)</span>
+              <button type="button" onclick="openProviderReviews('${safeProfileTargetId}')" class="text-saino-gray-400 font-medium text-xs hover:text-saino-red hover:underline">(${p.reviewsCount} Reviews)</button>
             </div>
             <div class="flex items-center space-x-3 text-xs">
               <span class="flex items-center space-x-1 text-saino-gray-600 font-semibold">
@@ -1452,11 +1701,11 @@ if (verification === 'vvip') {
           <!-- Lead Specialist / Doctor Card (Pill Container) -->
           ${p.leadDoctor ? `
             <div class="bg-saino-gray-50 p-3 rounded-2xl border border-saino-gray-100 flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center flex-shrink-0 font-extrabold text-sm">
-                ${leadInitial}
-              </div>
+              <button type="button" onclick="openLeadDoctorProfile('${safeProfileTargetId}', '${safeDoctorName}', '${safeDoctorRole}')" aria-label="Book an appointment with ${p.leadDoctor}" class="shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-500">
+                <img src="${doctorImage}" alt="${p.leadDoctor}" class="w-10 h-10 rounded-full object-cover">
+              </button>
               <div class="text-xs truncate">
-                <span class="font-extrabold text-saino-gray-900 block truncate text-xs sm:text-sm leading-snug">${p.leadDoctor}</span>
+                <button type="button" onclick="openLeadDoctorProfile('${safeProfileTargetId}', '${safeDoctorName}', '${safeDoctorRole}')" aria-label="Book an appointment with ${p.leadDoctor}" class="font-extrabold text-saino-gray-900 block truncate text-xs sm:text-sm leading-snug text-left">${p.leadDoctor}</button>
                 <span class="text-[11px] text-saino-gray-500 truncate block mt-0.5">${p.leadDoctorRole}</span>
               </div>
             </div>
@@ -1466,13 +1715,18 @@ if (verification === 'vvip') {
           <div>
             <span class="text-xs font-bold text-saino-gray-500 block mb-2">Departments / Services:</span>
             <div class="flex flex-wrap gap-1.5">
-              ${p.departments.slice(0, 3).map(dept => `
-                <span class="px-3 py-1 bg-sky-50 text-sky-800 border border-sky-100 text-xs font-semibold rounded-xl">
+              ${departments.slice(0, 3).map(dept => `
+                <span class="px-3 py-1 bg-sky-50 text-slate-900 border border-sky-100 text-xs font-semibold rounded-xl">
                   ${dept}
                 </span>
               `).join('')}
-              ${p.departments.length > 3 ? `
-                <span class="px-2 py-1 bg-saino-gray-100 text-saino-gray-500 text-xs font-bold rounded-xl">+${p.departments.length - 3} more</span>
+              ${extraDepartments.length ? `
+                <span id="home-extra-${cardKey}" class="hidden flex-wrap gap-1.5">
+                  ${extraDepartments.map(dept => `<span class="px-3 py-1 bg-sky-50 text-slate-900 border border-sky-100 text-xs font-semibold rounded-xl">${dept}</span>`).join('')}
+                </span>
+                <button type="button" id="home-more-${cardKey}" data-label="+${extraDepartments.length} more" onclick="toggleHomeDepartments('${cardKey}')" class="px-2 py-1 bg-saino-gray-100 text-saino-gray-500 text-xs font-bold rounded-xl hover:bg-saino-gray-200">
+                  +${extraDepartments.length} more
+                </button>
               ` : ''}
             </div>
           </div>
@@ -1501,7 +1755,7 @@ if (verification === 'vvip') {
       <!-- Action Buttons & Large WhatsApp Booking CTA -->
       <div class="p-5 pt-0 space-y-3">
         <!-- Interactive Engagement Row (Like, Interested, View Profile) -->
-        <div class="flex items-center justify-between text-xs py-2 border-t border-saino-gray-100">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs py-2 border-t border-saino-gray-100">
           <button onclick="toggleLike('${p.id}')" class="flex items-center space-x-1 transition font-bold ${p.isLiked ? 'text-saino-red' : 'text-saino-gray-600 hover:text-saino-red'}">
             <span>${p.isLiked ? '❤️' : '♡'}</span>
             <span>${p.isLiked ? 'Liked' : 'Like'}</span>
@@ -1512,16 +1766,18 @@ if (verification === 'vvip') {
             <span>${p.isInterested ? 'Interested' : 'Mark Interested'}</span>
           </button>
 
-          <button onclick="openProviderModal('${p.id}')" class="text-[#0284c7] hover:text-sky-800 font-extrabold flex items-center space-x-0.5">
+          ${typeof savedHeartButton === "function" ? savedHeartButton(profileTargetId, "p-1") : ""}
+
+          <button type="button" onclick="openProviderProfile('${safeProfileTargetId}')" class="text-red-700 hover:text-red-900 font-extrabold flex items-center space-x-0.5">
             <span>View Profile</span>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
           </button>
         </div>
 
-        <!-- Prominent Green WhatsApp Appointment Button -->
-        <button onclick="openBookingWhatsApp('${p.id}')" class="w-full py-3 px-4 rounded-2xl bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-black flex items-center justify-center space-x-2 transition shadow-md hover:shadow-lg">
-          <i data-lucide="message-circle" class="w-4 h-4"></i>
-          <span>Book Appointment via WhatsApp</span>
+        <!-- Direct appointment booking -->
+        <button type="button" onclick="openAppointmentBooking('${safeProfileTargetId}')" class="w-full py-3 px-4 rounded-2xl bg-saino-red hover:bg-saino-red-dark text-white text-xs sm:text-sm font-black flex items-center justify-center space-x-2 transition shadow-md hover:shadow-lg">
+          <i data-lucide="calendar-check" class="w-4 h-4"></i>
+          <span>Book appointment</span>
         </button>
       </div>
     </div>
@@ -1877,11 +2133,112 @@ function bindCampaignsEvents() {}
 
   return `
     <div class="w-full mb-16 px-0">  
-       <section class="relative overflow-hidden bg-[#0a0f1d] text-white shadow-xl mb-8 border-y border-slate-800 w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[350px] md:h-[530px]">
+      <style>
+        @media (max-width: 767px) {
+          #discoveryCampaignHero {
+            height: auto;
+            min-height: 390px;
+            overflow: hidden;
+          }
+          #discoveryCampaignHero > .absolute.inset-y-0.right-0 {
+            display: none;
+          }
+          #discoveryCampaignHero .discovery-campaign-layout {
+            height: auto;
+            min-height: 390px;
+            flex-direction: row;
+            align-items: center;
+          }
+          #discoveryCampaignHero .discovery-campaign-layout > div:first-child {
+            width: 42%;
+            height: clamp(112px, 32vw, 136px);
+            flex: 0 0 42%;
+            margin: 0;
+            padding: 6px 4px 6px 6px;
+          }
+          #discoveryCampaignHero #discSlideImg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          #discoveryCampaignHero .discovery-campaign-layout > div:last-child {
+            width: auto;
+            height: auto;
+            min-width: 0;
+            flex: 1 1 0;
+            overflow: visible;
+            padding: 28px 34px 38px 4px;
+          }
+          #discoveryCampaignHero #discSlideTitle {
+            font-size: clamp(11px, 3.3vw, 13px);
+            line-height: 1.15;
+            overflow-wrap: break-word;
+          }
+          #discoveryCampaignHero #discSlideHospital {
+            font-size: clamp(8px, 2.5vw, 10px);
+            line-height: 1.2;
+            overflow-wrap: break-word;
+          }
+          #discoveryCampaignHero #discSlideNote {
+            font-size: 8px;
+            line-height: 1.2;
+          }
+          #discoveryCampaignHero .discovery-campaign-layout > div:last-child > div > .mb-3\\.5 {
+            margin-bottom: 6px;
+          }
+          #discoveryCampaignHero #discSlideMiddleLabel,
+          #discoveryCampaignHero #discSlidePackageName {
+            font-size: 8px;
+          }
+          #discoveryCampaignHero #discSlidePrice {
+            font-size: 9px;
+          }
+          #discoveryCampaignHero #discSlideMiddleLabel + div {
+            font-size: 8px;
+          }
+          #discoveryCampaignHero #discSlideMiddleBox {
+            font-size: 8px;
+          }
+          #discoveryCampaignHero .discovery-campaign-layout > div:last-child .mb-3\\.5.text-\\[11px\\] {
+            min-height: 36px;
+            margin-bottom: 6px;
+          }
+          #discoveryCampaignHero button[aria-label="Next featured campaign"] {
+            top: 50%;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            transform: translateY(-50%);
+            touch-action: manipulation;
+          }
+          #nearbyProvidersList,
+          #nearbyProvidersList > [data-location][data-category] {
+            width: 100%;
+            min-width: 0;
+          }
+          #nearbyProvidersList h4 {
+            max-width: 100%;
+            min-width: 0;
+            white-space: normal;
+            overflow-wrap: anywhere;
+          }
+          #sainoRatedResults > .grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+          #sainoRatedResults .truncate {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            overflow-wrap: anywhere;
+          }
+        }
+      </style>
+       <section id="discoveryCampaignHero" class="relative overflow-hidden bg-[#0a0f1d] text-white shadow-xl mb-8 border-y border-slate-800 w-full h-[350px] md:h-[530px]">
             <a 
                 href="#video-library" 
-                onclick="navigateTo('marketplace')" 
-               class="absolute top-2 right-2 md:top-8 md:right-24 z-20 inline-flex items-center space-x-1 px-1.5 py-1 md:px-4 md:py-2.5 rounded-md bg-[#334155]/80 border border-slate-400/40 text-slate-200 text-[9px] md:text-xs">
+                onclick="event.preventDefault(); navigateTo('campaigns')"
+               class="absolute top-2 right-4 sm:right-6 md:top-8 md:right-12 z-20 inline-flex items-center space-x-1 px-1.5 py-1 md:px-4 md:py-2.5 rounded-md bg-[#334155]/80 border border-slate-400/40 text-slate-200 text-[9px] md:text-xs">
               <svg class="w-3 h-3 sm:w-5 sm:h-5 text-slate-200 shrink-0 stroke-[1.5]" 
                   viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <rect x="2" y="3" width="20" height="14" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1898,7 +2255,7 @@ function bindCampaignsEvents() {}
               </svg>
             </a>
         <div class="absolute inset-y-0 right-0 w-[450px] md:w-[610px] bg-gradient-to-l from-slate-800 via-slate-800/60 to-transparent pointer-events-none z-0"></div>
-        <div class="flex flex-row items-stretch h-full">
+        <div class="discovery-campaign-layout flex flex-row items-stretch h-full">
           <div class="w-[200px] md:w-[400px] md:h-[460px] md:ml-20 h-[300px] mt-[19px] mb-[16px] ml-18 relative overflow-hidden p-2 shrink-0">
             <img 
               id="discSlideImg" 
@@ -1936,6 +2293,7 @@ function bindCampaignsEvents() {}
         </h3>
 
         <p id="discSlideNote" class="text-[8px] md:text-xs text-slate-300 max-w-sm leading-tight mb-1 md:mb-3.5">
+          ${s.note || ''}
         </p>
 
         <div class="mb-3.5 text-[11px] text-slate-300 min-h-[72px]">
@@ -1946,8 +2304,8 @@ function bindCampaignsEvents() {}
         </div>
         
       <div class="mb-3.5 leading-tight">
-        <span class="text-[10px] text-slate-300 font-medium block mb-0.5">Full Body Health Checkup</span>
-        <span class="text-xs font-bold text-white tracking-wide">NPR 2,999</span>
+        <span id="discSlidePackageName" class="text-[10px] text-slate-300 font-medium block mb-0.5">${s.packageName}</span>
+        <span id="discSlidePrice" class="text-xs font-bold text-white tracking-wide">${s.price}</span>
         </div>
       </div>
       <div class="flex items-center space-x-2 mt-1 mb-1 z-20">
@@ -1969,7 +2327,7 @@ function bindCampaignsEvents() {}
           <p id="discSlideValidity" class="text-[9px] sm:text-xs md:text-sm text-slate-400/60 font-normal tracking-wide mt-1 sm:mt-2 select-none">
             ${s.validity || 'Valid until 30 September 2026'}
           </p>
-            <button onclick="nextDiscoverySlide()" class="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-10 sm:h-10 rounded-full bg-white text-black 
+            <button type="button" onclick="window.nextDiscoverySlide()" aria-label="Next featured campaign" class="absolute right-6 sm:right-12 md:right-32 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-10 sm:h-10 rounded-full bg-white text-black
                flex items-center justify-center shadow-xl z-30"> <svg class="w-3 h-3 sm:w-5 sm:h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
               </svg>
@@ -1989,14 +2347,14 @@ function bindCampaignsEvents() {}
       </section>
 
       <!-- MAIN SIDE-BY-SIDE GRID LAYOUT -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full px-4 sm:px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch w-full px-4 sm:px-6">
 
         <!-- ================= LEFT COLUMN: NEARBY PROVIDERS ================= -->
-        <div class="lg:col-span-5 space-y-4 text-left">
+        <div class="lg:col-span-5 space-y-4 text-left lg:flex lg:flex-col">
           <div>
             <div class="flex items-center justify-between">
               <h3 class="text-xl font-bold text-slate-900 tracking-tight">Nearby Healthcare Providers</h3>
-              <span class="text-xs text-slate-500 font-medium">4 results found</span>
+              <span id="nearbyResultsCount" class="text-xs text-slate-500 font-medium">4 results found</span>
             </div>
             <div class="flex items-center gap-1 text-xs text-slate-500 mt-1">
               <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -2015,7 +2373,6 @@ function bindCampaignsEvents() {}
             <input 
               type="text" 
               id="providerSearchInput"
-              oninput="handleProviderSearch(this.value)"
               placeholder="Explore hospitals, clinics, and doctors in this area..." 
               class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-white border border-slate-300 rounded-xl placeholder-slate-400 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs"
             />
@@ -2024,7 +2381,8 @@ function bindCampaignsEvents() {}
           <div class="flex flex-wrap items-center gap-2 pt-0.5">
             <div class="relative">
               <select id="nearbyLocationSelect" class="appearance-none bg-white border border-slate-300 hover:border-slate-400 text-slate-700 text-xs font-semibold py-2 pl-3.5 pr-8 rounded-xl cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-xs">
-                <option value="all">📍 All Locations</option>
+                <option value="all" selected>📍 All Locations</option>
+                <option value="kathmandu">Kathmandu</option>
                 <option value="lalitpur">Lalitpur</option>
                 <option value="bhaktapur">Bhaktapur</option>
                 <option value="pokhara">Pokhara</option>
@@ -2065,13 +2423,13 @@ function bindCampaignsEvents() {}
           </div>
 
           <!-- 4 Cards Stack -->
-          <div id="nearbyProvidersList" class="flex flex-col gap-4 pt-1">
+          <div id="nearbyProvidersList" class="flex flex-col gap-4 pt-1 lg:flex-1">
             <!-- Card 1: Grande International Hospital -->
             <div data-location="baneshwor" data-category="hospital" class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col sm:flex-row gap-5 items-start">
               <div class="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-slate-200/90 block hover:scale-[1.02] transition-transform duration-200"
                    style="background-color: #f8fafc; background-image: repeating-linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9), repeating-linear-gradient(45deg, #f1f5f9 25%, #f8fafc 25%, #f8fafc 75%, #f1f5f9 75%, #f1f5f9); background-position: 0 0, 8px 8px; background-size: 16px 16px;"></div>
-              <div class="flex-1 w-full">
-                <h4 class="text-base sm:text-lg font-bold text-slate-900 leading-snug">Grande International Hospital</h4>
+              <div class="flex-1 w-full min-w-0">
+                <h4 class="break-words text-base sm:text-lg font-bold leading-snug text-slate-900 [overflow-wrap:anywhere]">Grande International Hospital</h4>
                 <div class="flex items-center space-x-1.5 mt-1">
                   <svg class="w-3.5 h-3.5 text-emerald-500 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                   <span class="text-xs font-semibold text-emerald-700">Saino Verified</span>
@@ -2116,8 +2474,8 @@ function bindCampaignsEvents() {}
             <div data-location="baneshwor" data-category="hospital" class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col sm:flex-row gap-5 items-start">
               <div class="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-slate-200/90 block hover:scale-[1.02] transition-transform duration-200"
                    style="background-color: #f8fafc; background-image: repeating-linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9), repeating-linear-gradient(45deg, #f1f5f9 25%, #f8fafc 25%, #f8fafc 75%, #f1f5f9 75%, #f1f5f9); background-position: 0 0, 8px 8px; background-size: 16px 16px;"></div>
-              <div class="flex-1 w-full">
-                <h4 class="text-base sm:text-lg font-bold text-slate-900 leading-snug">City Hospital</h4>
+              <div class="flex-1 w-full min-w-0">
+                <h4 class="break-words text-base sm:text-lg font-bold leading-snug text-slate-900 [overflow-wrap:anywhere]">City Hospital</h4>
                 <div class="flex items-center space-x-1.5 mt-1">
                   <svg class="w-3.5 h-3.5 text-amber-500 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                   <span class="text-xs font-semibold text-amber-700">Saino VIP</span>
@@ -2161,8 +2519,8 @@ function bindCampaignsEvents() {}
             <div data-location="bhaktapur" data-category="hospital" class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col sm:flex-row gap-5 items-start">
               <div class="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-slate-200/90 block hover:scale-[1.02] transition-transform duration-200"
                    style="background-color: #f8fafc; background-image: repeating-linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9), repeating-linear-gradient(45deg, #f1f5f9 25%, #f8fafc 25%, #f8fafc 75%, #f1f5f9 75%, #f1f5f9); background-position: 0 0, 8px 8px; background-size: 16px 16px;"></div>
-              <div class="flex-1 w-full">
-                <h4 class="text-base sm:text-lg font-bold text-slate-900 leading-snug">Madhyapur Hospital</h4>
+              <div class="flex-1 w-full min-w-0">
+                <h4 class="break-words text-base sm:text-lg font-bold leading-snug text-slate-900 [overflow-wrap:anywhere]">Madhyapur Hospital</h4>
                 <div class="flex items-center space-x-1.5 mt-1">
                   <svg class="w-3.5 h-3.5 text-amber-500 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                   <span class="text-xs font-semibold text-amber-700">Saino VVIP</span>
@@ -2206,8 +2564,8 @@ function bindCampaignsEvents() {}
             <div data-location="bhaktapur" data-category="hospital" class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col sm:flex-row gap-5 items-start">
               <div class="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl border border-slate-200/90 block hover:scale-[1.02] transition-transform duration-200"
                    style="background-color: #f8fafc; background-image: repeating-linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9), repeating-linear-gradient(45deg, #f1f5f9 25%, #f8fafc 25%, #f8fafc 75%, #f1f5f9 75%, #f1f5f9); background-position: 0 0, 8px 8px; background-size: 16px 16px;"></div>
-              <div class="flex-1 w-full">
-                <h4 class="text-base sm:text-lg font-bold text-slate-900 leading-snug">Bhaktapur Hospital</h4>
+              <div class="flex-1 w-full min-w-0">
+                <h4 class="break-words text-base sm:text-lg font-bold leading-snug text-slate-900 [overflow-wrap:anywhere]">Bhaktapur Hospital</h4>
                 <div class="flex items-center space-x-1.5 mt-1">
                   <svg class="w-3.5 h-3.5 text-blue-500 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                   <span class="text-xs font-semibold text-blue-700">Saino Pro</span>
@@ -2256,7 +2614,7 @@ function bindCampaignsEvents() {}
         </div>
 
         <!-- ================= RIGHT COLUMN: SAINO RATED ================= -->
-        <div class="lg:col-span-7 space-y-4 text-left min-w-0">
+        <div id="sainoRatedResults" class="lg:col-span-7 space-y-4 text-left min-w-0">
           
           <!-- Header: Title & Red LIVE Badge -->
           <div class="flex items-center justify-between pb-1">
@@ -2270,7 +2628,7 @@ function bindCampaignsEvents() {}
           <div class="grid grid-cols-2 gap-4 w-full min-w-0">
 
             <!-- 1. Hospitals -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Hospitals</h4>
               <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2288,7 +2646,7 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 2. Clinics -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Clinics</h4>
                 <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
               <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2305,7 +2663,7 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 3. Diagnostic Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Diagnostic Centers</h4>
               <div class="flex flex-col gap-1.5 text-[11px] min-w-0">
                 <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2322,7 +2680,7 @@ function bindCampaignsEvents() {}
             </div>
 
             <!-- 4. Wellness Centers -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[550px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
               <h4 class="text-xs font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">Wellness Centers</h4>
                <div class="flex flex-col gap-1.5 text-[11px] min-w-0"> 
                   <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2338,7 +2696,7 @@ function bindCampaignsEvents() {}
                 </div>
               </div>
              <!-- 5. Ambulance -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[350px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
               <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Ambulance</h4>
               <div class="flex flex-col gap-2.5 text-[11px] min-w-0">
                      <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2350,7 +2708,7 @@ function bindCampaignsEvents() {}
                 </div>
 
                  <!-- 6. Blood bank -->
-            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0 h-[350px]">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3 shadow-sm min-w-0">
               <h4 class="text-xs font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-100">Blood Bank</h4>
               <div class="flex flex-col gap-2.5 text-[11px] min-w-0">
                    <div class="flex items-start justify-between py-1 min-w-0 gap-2 text-left"><div class="flex items-start space-x-2 min-w-0 flex-1 text-left"><span class="font-extrabold text-[#B91C1C] w-4 shrink-0 pt-0.5">01</span><span class="w-5 h-5 rounded bg-slate-900 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">B&B</span><div class="min-w-0 flex-1 text-left"><span class="font-semibold text-slate-800 block leading-snug truncate">B&B Hospital</span><div class="flex items-center space-x-1 mt-0.5"><span class="text-amber-500 text-[10px]">★★★★☆</span><span class="text-[10px] text-slate-500 font-medium">4.5</span></div></div></div><span class="text-[10px] text-slate-400 shrink-0 pt-0.5">56 disc.</span></div>
@@ -2373,11 +2731,11 @@ function bindCampaignsEvents() {}
             <span class="text-xs font-bold uppercase tracking-wider text-rose-600">COMMUNITY</span>
             <h2 class="text-[11px] sm:text-2xl font-bold text-slate-800">People Are Talking About</h2>
           </div>
-           <a href="#discussions" onclick="navigateTo('discussions')" class="text-xs sm:text-sm font-bold text-rose-600 hover:text-rose-700 cursor-pointer">View All Discussions →</a>
+           <a href="#discussions" onclick="event.preventDefault(); navigateTo('discussions')" class="text-xs sm:text-sm font-bold text-rose-600 hover:text-rose-700 cursor-pointer">View All Discussions →</a>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
           <!-- Grande -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+          <div class="bg-gradient-to-br from-rose-50 via-white to-white rounded-2xl border border-rose-100 border-l-4 border-l-rose-500 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between">
             <div>
               <div class="flex items-center space-x-3 mb-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs">GI</div>
@@ -2387,12 +2745,12 @@ function bindCampaignsEvents() {}
             </div>
             <div>
               <div class="text-[11px] text-slate-500 mb-3">14 replies • 9 helpful</div>
-              <button onclick="openDiscussionModal('disc-grande')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+              <button onclick="window.openDiscussionPage('disc-grande')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
               
             </div>
           </div>
           <!-- Norvic -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+          <div class="bg-gradient-to-br from-rose-50 via-white to-white rounded-2xl border border-rose-100 border-l-4 border-l-rose-500 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between">
             <div>
               <div class="flex items-center space-x-3 mb-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-900 text-white flex items-center justify-center font-bold text-xs">NI</div>
@@ -2402,11 +2760,11 @@ function bindCampaignsEvents() {}
             </div>
             <div>
               <div class="text-[11px] text-slate-500 mb-3">22 replies • 17 helpful</div>
-             <button onclick="openDiscussionModal('disc-norvic')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+             <button onclick="window.openDiscussionPage('disc-norvic')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
             </div>
           </div>
           <!-- HAMS -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+          <div class="bg-gradient-to-br from-rose-50 via-white to-white rounded-2xl border border-rose-100 border-l-4 border-l-rose-500 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between">
             <div>
               <div class="flex items-center space-x-3 mb-3">
                 <div class="w-10 h-10 rounded-xl bg-purple-950 text-white flex items-center justify-center font-bold text-xs">HA</div>
@@ -2416,11 +2774,11 @@ function bindCampaignsEvents() {}
             </div>
             <div>
               <div class="text-[11px] text-slate-500 mb-3">8 replies • 5 helpful</div>
-              <button onclick="openDiscussionModal('disc-hams')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+              <button onclick="window.openDiscussionPage('disc-hams')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
             </div>
           </div>
           <!-- B&B -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+          <div class="bg-gradient-to-br from-rose-50 via-white to-white rounded-2xl border border-rose-100 border-l-4 border-l-rose-500 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between">
             <div>
               <div class="flex items-center space-x-3 mb-3">
                 <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs">BB</div>
@@ -2430,7 +2788,7 @@ function bindCampaignsEvents() {}
             </div>
             <div>
               <div class="text-[11px] text-slate-500 mb-3">11 replies • 8 helpful</div>
-              <button onclick="openDiscussionModal('disc-bb')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
+              <button onclick="window.openDiscussionPage('disc-bb')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">View Discussion</button>
             </div>
           </div>
         </div>
@@ -2440,31 +2798,14 @@ function bindCampaignsEvents() {}
 
   <!-- 2. What Patients Are Saying -->
     <section class="mb-14 px-4 sm:px-6">
-    
-     <div class="bg-white rounded-3xl border border-saino-gray-200 p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center space-x-1 text-amber-500 text-sm">
-            <span>★★★★★</span>
-          </div>
-          <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-            Verified Patient
-          </span>
-        </div>
-        <h4 class="text-sm font-bold text-saino-gray-900 mb-2 leading-snug">${s.title}</h4>
-        <p class="text-xs text-saino-gray-600 mb-4 leading-relaxed italic">"${s.body}"</p>
-      </div>
-      <div class="pt-3 border-t border-saino-gray-100 flex items-center justify-between text-xs">
-        <div>
-          <strong class="text-saino-gray-900 block font-bold">${s.author}</strong>
-          <span class="text-[11px] text-saino-gray-500">${s.role} · <span class="text-saino-red font-semibold">${s.provider}</span></span>
-        </div>
-      </div>
-    </div>
-    <div class="mt-8 text-center">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-base sm:text-lg font-black text-saino-gray-900">What Patients Are Saying</h2>
         <button onclick="navigateTo('patient')" class="text-xs font-bold text-saino-red hover:underline">
-        See More Reviews →
+          See More Reviews →
         </button>
+      </div>
+      <div class="max-w-2xl">
+        ${reviews.length ? renderTalkReviewItem(reviews[0]) : '<p class="rounded-2xl border border-saino-gray-200 bg-white p-5 text-sm text-saino-gray-500">No patient reviews are available yet.</p>'}
       </div>
   </section>
   
@@ -2491,7 +2832,7 @@ function bindCampaignsEvents() {}
           </p>
 
           <!-- Button -->
-          <button onclick="navigateTo('community')" 
+          <button onclick="navigateTo('discussions')"
             class="mt-4 sm:mt-6 px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4 bg-[#B91C1C] text-white 
                   text-xs sm:text-sm lg:text-base font-bold rounded-full hover:bg-[#991B1B] 
                   transition shadow-lg inline-flex items-center gap-2">
@@ -2509,9 +2850,9 @@ window.renderReviewsPage = function() {
     <section class="p-6">
       <div class="flex items-center justify-between mb-6 pb-2 border-b border-slate-200">
         <h2 class="text-xl sm:text-2xl font-bold text-slate-900">All Patient Reviews</h2>
-        <button onclick="navigateTo('discovery')" 
+        <button onclick="returnFromAllReviews()" 
                 class="text-xs font-bold text-saino-red hover:underline">
-          ← Back to Directory
+          ← Back to previous page
         </button>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 text-left">
@@ -2537,9 +2878,7 @@ function renderCategoryListView(categoryKey) {
   if (categoryKey === 'ambulance') {
     return renderAmbulanceDirectoryView(); 
   }
-  if (categoryKey === 'hospital') {
-  return renderHospitalDirectoryView();
-}
+  
  const cleanKey = String(categoryKey || '').toLowerCase();
   if (cleanKey.includes('blood')) {
     return renderBloodBankDirectoryView();
@@ -2571,7 +2910,7 @@ function renderCategoryListView(categoryKey) {
           <p class="text-xs text-slate-500 mt-0.5">Explore verified and trusted ${categoryKey} providers near you.</p>
         </div>
         <button onclick="navigateTo('marketplace')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
-          ← Back to Marketplace
+          ← Back to previous page
         </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -2640,8 +2979,6 @@ const HOMECARE_CAREGIVERS = {
   ],
 };
 
-const homecareInitials = (name) =>
-  name.replace(/^Dr\.\s*/, "").split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 const homecareMoney = (n) => `NPR ${n.toLocaleString("en-US")}`;
 
 /* ---------- Small reusable pieces ---------- */
@@ -2681,9 +3018,7 @@ function homecareCaregiverCards(catKey, selectedIdx) {
     <div class="bg-white border rounded-xl p-4 flex flex-col gap-3 transition
       ${i === selectedIdx ? "border-red-300 ring-1 ring-red-200" : "border-slate-200"}">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
-          ${homecareInitials(c.name)}
-        </div>
+        ${window.renderUserProfileIcon("w-10 h-10", "w-5 h-5")}
         <div class="min-w-0">
           <div class="text-sm font-bold text-slate-900 truncate">${c.name}, ${c.role}</div>
           <div class="flex items-center gap-1 text-xs text-slate-500">
@@ -2711,9 +3046,7 @@ function homecareDetailPanel(catKey, idx) {
       <!-- Left: identity + actions -->
       <div>
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
-            ${homecareInitials(c.name)}
-          </div>
+          ${window.renderUserProfileIcon("w-12 h-12", "w-6 h-6")}
           <div>
             <div class="text-base font-bold text-slate-900">${c.name}, ${c.role}</div>
             <div class="flex items-center gap-1 text-xs text-slate-500">
@@ -2767,8 +3100,10 @@ let HOMECARE_START_CAT = "nurse";
 
 // Homepage ke kisi bhi button se: openHomecare('nurse') / openHomecare('doctor') / openHomecare()
 window.openHomecare = function (catKey) {
+  if (AppState.activeView !== "homecare") window.captureServiceReturnView();
   HOMECARE_START_CAT = HOMECARE_CATEGORIES.some(c => c.key === catKey) ? catKey : "nurse";
-  AppState.selectedCategory = "homecare";   // renderCategoryListView isi se homecare page chunta hai
+  AppState.selectedCategory = "homecare";
+  AppState.activeView = "homecare";
   renderApp();
   window.scrollTo({ top: 0, behavior: "instant" });
 };
@@ -2782,6 +3117,10 @@ function renderHomecareDirectoryView() {
     <!-- Page header -->
     <div class="bg-white border-y border-slate-200">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 py-5">
+        <button onclick="returnToServiceSource()"
+            class="flex items-center gap-1 text-xs font-semibold text-red-700 hover:underline mb-2">
+            ← Back to previous page
+          </button>
         <h1 class="text-xl sm:text-2xl font-black text-slate-900">Home care services</h1>
         <p class="text-sm text-slate-500 mt-1">Find home care according to your needs.</p>
       </div>
@@ -2981,7 +3320,7 @@ window.shareHomecareWithFamily = function (name) {
               <span class="text-xs font-black uppercase tracking-wider text-saino-red">Community</span>
               <h2 class="text-base sm:text-lg font-black text-saino-gray-900">Patient Reviews</h2>
             </div>
-            <button onclick="navigateTo('discovery')" class="text-xs font-bold text-saino-red hover:underline">Read All →</button>
+            <button onclick="navigateTo('patient')" class="text-xs font-bold text-saino-red hover:underline">Read All →</button>
           </div>
           <div class="space-y-3">
             ${patientReviews.slice(0, 5).map((r, i) => renderTalkReviewItem(r, i)).join('')}
@@ -3000,7 +3339,7 @@ window.shareHomecareWithFamily = function (name) {
             Discover healthcare providers, read real patient experiences, share your opinion and save providers for later.
           </p>
         </div>
-        <button onclick="navigateTo('discovery')" class="px-5 py-3 rounded-xl bg-white border border-saino-gray-200 text-saino-gray-800 text-xs font-black hover:border-saino-red/30 hover:text-saino-red transition shadow-xs">
+        <button onclick="navigateTo('discovery')" class="px-5 py-3 rounded-xl bg-saino-red border border-saino-red text-white text-xs font-black hover:bg-saino-red-dark transition shadow-xs">
           EXPLORE DISCOVERY
         </button>
       </div>
@@ -3148,13 +3487,6 @@ window.shareHomecareWithFamily = function (name) {
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             ${homecare.map(p => renderProviderCard(p)).join('')}
-          </div>
-          <div class="mt-6">
-            <button
-              onclick="filterBookingType('home_nurse')"
-              class="w-full sm:w-auto px-7 py-3 rounded-xl bg-saino-red hover:bg-saino-red-dark text-white text-xs font-black shadow-md transition">
-              BOOK HOMECARE
-            </button>
           </div>
         </div>
       </div>
@@ -3427,11 +3759,7 @@ window.shareHomecareWithFamily = function (name) {
                   ${b.area || ''}
                 </span>
 
-                <button
-                  onclick="openCustomWhatsApp('Blood Bank Enquiry: ${b.name}', 'Hello SAINO, I need blood availability information from ${b.name}.')"
-                  class="mt-2 px-3 py-1.5 bg-saino-red text-white rounded-lg text-[10px] font-bold">
-                  Enquire Now
-                </button>
+                ${renderBloodBankEnquiryAction(b)}
 
               </div>
 
@@ -3523,7 +3851,9 @@ window.shareHomecareWithFamily = function (name) {
 
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
 
-        ${onlineDoctors.slice(0, 10).map(doc => `
+        ${onlineDoctors.slice(0, 10).map(doc => {
+          const safeDoctorId = String(doc.id || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+          return `
 
           <div class="bg-white rounded-2xl border border-saino-gray-200 p-4 text-center shadow-xs">
 
@@ -3549,14 +3879,15 @@ window.shareHomecareWithFamily = function (name) {
             </span>
 
             <button
-              onclick="openCustomWhatsApp('Doctor OPD Consultation: ${doc.name}', 'Hi SAINO Health, I would like to book an OPD consultation with ${doc.name} at ${doc.hospital}.')"
+              onclick="openDoctorOpdBooking('${safeDoctorId}')"
               class="mt-3 w-full py-2 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-xl text-[10px]">
               BOOK OPD
             </button>
 
           </div>
 
-        `).join('')}
+          `;
+        }).join('')}
 
       </div>
 
@@ -3614,19 +3945,6 @@ window.shareHomecareWithFamily = function (name) {
       </div>
     </section>
   `;
-}
-function renderAppointmentsView() {
-  return `<section class="p-6 text-center">
-    <h2 class="text-xl font-bold text-saino-red">My Appointments</h2>
-    <p class="text-saino-gray-600 mt-2">Appointments page is under construction.</p>
-  </section>`;
-}
-
-function renderSavedView() {
-  return `<section class="p-6 text-center">
-    <h2 class="text-xl font-bold text-saino-red">Saved Providers</h2>
-    <p class="text-saino-gray-600 mt-2">Saved page is under construction.</p>
-  </section>`;
 }
 
 function renderFaqsView() {
@@ -4616,10 +4934,13 @@ function getFilteredProviders() {
 }
 
 function filterCategory(catId) {
+  if (catId === "homecare" && AppState.activeView !== "homecare") {
+    window.captureServiceReturnView();
+  }
   AppState.selectedCategory = catId;
   AppState.activeView = catId;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
   renderApp();
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function filterBookingType(bookingId) {
@@ -4680,6 +5001,162 @@ function toggleInterested(providerId) {
   renderApp();
   showToast(p.isInterested ? `Marked Interested in ${p.name}` : `Removed Interest`);
 }
+
+function openProviderProfile(providerId) {
+  const p = AppState.providers.find(
+    x => String(x.id) === String(providerId) ||
+         String(x.name) === String(providerId)
+  );
+
+  if (!p) return;
+
+  const category = String(p.category || '').toLowerCase();
+
+  // Clinic → Clinic Profile
+  if (category === 'clinic' && typeof window.openClinicProfile === 'function') {
+    window.openClinicProfile(providerId);
+    return;
+  }
+
+  // Hospital → Hospital Profile
+  if (category === 'hospital' && typeof window.openHospitalProfile === 'function') {
+    window.openHospitalProfile(providerId);
+    return;
+  }
+
+  // Diagnostic → Same full profile layout as Hospital
+  if (category === 'diagnostic' && typeof window.openDiagnosticProfile === 'function') {
+    window.openDiagnosticProfile(providerId);
+    return;
+  }
+
+  // Wellness → Same full profile layout as Hospital
+  if (category === 'wellness' && typeof window.openWellnessProfile === 'function') {
+    window.openWellnessProfile(providerId);
+    return;
+  }
+
+  // Insurance → Same full profile layout as Hospital
+  if (category === 'insurance' && typeof window.openHospitalProfile === 'function') {
+    window.openHospitalProfile(providerId);
+    return;
+  }
+
+  if (["homecare", "bloodbank"].includes(category) && typeof window.openHospitalProfile === "function") {
+    window.openHospitalProfile(providerId);
+    return;
+  }
+
+  // Fallback only for other categories
+  openProviderModal(providerId);
+}
+
+window.openProviderProfile = openProviderProfile;
+
+function getSavedProviderReviews() {
+  const savedReviews = localStorage.getItem('SAINO_PROVIDER_REVIEWS');
+  return savedReviews ? JSON.parse(savedReviews) : {};
+}
+
+function escapeReviewHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
+
+function getProviderReviewEntries(provider) {
+  const savedReviews = getSavedProviderReviews();
+  const storedReviews = savedReviews[provider.id] || [];
+  const communityReviews = (window.REVIEWS_STORE && window.REVIEWS_STORE[provider.id]) || [];
+  const uniqueReviews = new Map();
+  [...(provider.reviews || []), ...communityReviews, ...storedReviews].map(review => ({
+    id: review.id || '',
+    author: review.author || review.user || 'Patient',
+    rating: Math.min(5, Math.max(1, Number(review.rating) || 5)),
+    date: review.date || 'Recently',
+    text: review.text || review.comment || review.body || review.title || ''
+  })).filter(review => review.text).forEach(review => {
+    const key = review.id || `${review.author}|${review.rating}|${review.text}`;
+    if (!uniqueReviews.has(key)) uniqueReviews.set(key, review);
+  });
+  return Array.from(uniqueReviews.values());
+}
+
+window.renderProviderReviewsPage = function() {
+  const provider = AppState.activeProvider;
+  if (!provider) {
+    return '<section class="max-w-4xl mx-auto px-4 py-10"><p class="text-slate-600">Provider reviews are unavailable.</p></section>';
+  }
+
+  const reviews = getProviderReviewEntries(provider);
+  const averageRating = reviews.length
+    ? (reviews.reduce((total, review) => total + review.rating, 0) / reviews.length).toFixed(1)
+    : null;
+
+  return `
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 py-6 mb-12">
+      <button type="button" onclick="returnToProviderSource()" class="mb-5 text-sm font-semibold text-slate-600 hover:text-red-700">
+        &larr; Back to previous page
+      </button>
+      <header class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm mb-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-4 min-w-0">
+            <img src="${escapeReviewHtml(provider.logo)}" alt="" class="w-14 h-14 rounded-xl object-cover bg-slate-100 shrink-0">
+            <div class="min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Patient reviews</p>
+              <h1 class="text-lg sm:text-xl font-bold text-slate-900">${escapeReviewHtml(provider.name)}</h1>
+              <p class="text-xs text-slate-500 mt-1">${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} shared</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            ${averageRating ? `<span class="text-sm font-bold text-amber-600">★ ${averageRating} / 5</span>` : ''}
+            <button type="button" onclick="openWriteReviewModal('${escapeReviewHtml(provider.id)}')" class="px-4 py-2 rounded-xl bg-saino-red hover:bg-saino-red-dark text-white text-xs font-bold transition">
+              Write a Review
+            </button>
+          </div>
+        </div>
+      </header>
+      <div class="space-y-3">
+        ${reviews.length ? reviews.map(review => `
+          <article class="bg-white border border-slate-200 rounded-2xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+              ${window.renderUserProfileIcon("w-10 h-10", "w-5 h-5")}
+              <div class="min-w-0 flex-1">
+                <h2 class="font-bold text-slate-800 text-sm">${escapeReviewHtml(review.author)}</h2>
+                <span class="text-xs text-slate-400">${escapeReviewHtml(review.date)}</span>
+              </div>
+            </div>
+            <p class="text-amber-500 text-sm mb-2" aria-label="${review.rating} out of 5 stars">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</p>
+            <p class="text-sm text-slate-600 leading-relaxed">${escapeReviewHtml(review.text)}</p>
+          </article>
+        `).join('') : `
+          <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center">
+            <h2 class="font-bold text-slate-800">No reviews yet</h2>
+            <p class="text-sm text-slate-500 mt-1">Be the first to share your experience with ${escapeReviewHtml(provider.name)}.</p>
+          </div>
+        `}
+      </div>
+    </section>
+  `;
+};
+
+window.openProviderReviews = function(providerId) {
+  const provider = AppState.providers.find(item =>
+    String(item.id) === String(providerId) || String(item.name) === String(providerId)
+  );
+  if (!provider) {
+    showToast("We couldn't find this provider's reviews.");
+    return;
+  }
+
+  window.captureProviderReturnView();
+  AppState.activeProvider = provider;
+  navigateTo('provider-reviews', { providerId: provider.id });
+};
 
 // Provider Profile Detail Modal (Pages 10 & 11)
 function openProviderModal(providerId) {
@@ -4923,7 +5400,7 @@ function renderProviderAboutTab(p) {
       <div>
         <h4 class="text-sm font-bold text-slate-900 mb-2">Speciality Departments</h4>
         <div class="flex flex-wrap gap-1.5">
-          ${p.departments.map(d => `<span class="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 text-xs font-semibold">${d}</span>`).join('')}
+          ${p.departments.map(d => `<span class="px-2.5 py-1 rounded-lg bg-sky-50 text-slate-900 text-xs font-semibold">${d}</span>`).join('')}
         </div>
       </div>
     </div>
@@ -5149,34 +5626,36 @@ function openWriteReviewModal(providerId) {
           <p class="text-xs text-slate-400 mt-0.5">${p.name}</p>
         </div>
 
-        <form onsubmit="handleReviewSubmit(event, '${p.id}')" class="p-6 space-y-4 text-xs">
+        <form onsubmit="handleReviewSubmit(event, '${escapeReviewHtml(p.id)}')" class="p-6 space-y-4 text-xs">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Your Full Name</label>
-            <input type="text" id="revName" required placeholder="e.g. Pooja Sharma" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <label for="revName" class="block font-bold text-slate-700 mb-1.5">Your name</label>
+            <input type="text" id="revName" required placeholder="Enter your name" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500">
           </div>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Rating (1 - 5 Stars)</label>
-            <select id="revRating" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800">
-              <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Outstanding Experience)</option>
-              <option value="4">⭐⭐⭐⭐ 4 Stars (Very Good)</option>
-              <option value="3">⭐⭐⭐ 3 Stars (Satisfactory)</option>
-              <option value="2">⭐⭐ 2 Stars (Needs Improvement)</option>
-              <option value="1">⭐ 1 Star (Poor)</option>
-            </select>
+            <span class="block font-bold text-slate-700 mb-1.5">Your rating</span>
+            <input type="hidden" id="revRating" value="0">
+            <div class="flex items-center gap-1" role="group" aria-label="Choose a rating from 1 to 5 stars">
+              ${[1, 2, 3, 4, 5].map(star => `
+                <button type="button" data-review-star="${star}" aria-label="${star} ${star === 1 ? 'star' : 'stars'}" aria-pressed="false" onclick="selectReviewRating(${star})" class="text-3xl leading-none text-slate-300 hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-rose-500 rounded-md transition" style="touch-action:manipulation">
+                  ★
+                </button>
+              `).join('')}
+              <span id="reviewRatingLabel" class="ml-2 text-xs text-slate-500">Select stars</span>
+            </div>
           </div>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Your Review & Feedback</label>
-            <textarea id="revComment" rows="3" required placeholder="Share your experience with the doctors, staff, facility hygiene, and waiting time..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+            <label for="revComment" class="block font-bold text-slate-700 mb-1.5">Your feedback</label>
+            <textarea id="revComment" rows="3" required placeholder="Share your experience..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500"></textarea>
           </div>
 
-          <div class="pt-2 flex items-center justify-end space-x-3">
+          <div class="pt-1 flex items-center justify-end space-x-3">
             <button type="button" onclick="closeModal()" class="px-4 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition">
               Cancel
             </button>
-            <button type="submit" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl transition shadow-md">
-              Submit Review
+            <button type="submit" class="px-5 py-2 bg-saino-red hover:bg-saino-red-dark text-white font-bold rounded-xl transition shadow-md">
+              Add Review
             </button>
           </div>
         </form>
@@ -5188,23 +5667,49 @@ function openWriteReviewModal(providerId) {
   if (window.lucide) window.lucide.createIcons();
 }
 
+window.selectReviewRating = function(rating) {
+  const ratingInput = document.getElementById('revRating');
+  if (ratingInput) ratingInput.value = String(rating);
+  document.querySelectorAll('[data-review-star]').forEach(button => {
+    const selected = Number(button.getAttribute('data-review-star')) <= rating;
+    button.classList.toggle('text-amber-400', selected);
+    button.classList.toggle('text-slate-300', !selected);
+    button.setAttribute('aria-pressed', String(Number(button.getAttribute('data-review-star')) === rating));
+  });
+  const ratingLabel = document.getElementById('reviewRatingLabel');
+  if (ratingLabel) ratingLabel.textContent = `${rating} out of 5`;
+};
+
 function handleReviewSubmit(e, providerId) {
   e.preventDefault();
   const p = AppState.providers.find(x => x.id === providerId);
   if (!p) return;
 
-  const name = document.getElementById('revName').value;
-  const rating = parseFloat(document.getElementById('revRating').value);
-  const comment = document.getElementById('revComment').value;
+  const name = document.getElementById('revName').value.trim();
+  const rating = parseInt(document.getElementById('revRating').value, 10);
+  const comment = document.getElementById('revComment').value.trim();
+  if (!name || !comment) return;
+  if (rating < 1 || rating > 5) {
+    showToast('Please select a star rating.');
+    return;
+  }
 
-  if (!p.reviews) p.reviews = [];
-  p.reviews.unshift({
+  const review = {
+    id: `provider-review-${Date.now()}`,
     user: name,
     rating: rating,
     date: 'Just now',
+    timestamp: Date.now(),
     comment: comment
-  });
-  p.reviewsCount += 1;
+  };
+
+  if (!p.reviews) p.reviews = [];
+  p.reviews.unshift(review);
+  const savedReviews = getSavedProviderReviews();
+  if (!savedReviews[p.id]) savedReviews[p.id] = [];
+  savedReviews[p.id].unshift(review);
+  localStorage.setItem('SAINO_PROVIDER_REVIEWS', JSON.stringify(savedReviews));
+  p.reviewsCount = (Number(p.reviewsCount) || 0) + 1;
 
   closeModal();
   renderApp();
@@ -5405,7 +5910,240 @@ function bindMarketplaceEvents() {
   if (nextBtn) nextBtn.addEventListener('click', nextAd);
 }
 
-function bindProvidersShowcaseEvents() {}
+function bindProvidersShowcaseEvents() {
+  const nearbyList = document.getElementById('nearbyProvidersList');
+  if (nearbyList) {
+    nearbyList.querySelectorAll('[data-location][data-category]').forEach(card => {
+      const name = card.querySelector('h4')?.textContent?.trim();
+      if (!name) return;
+      card.dataset.providerName = name;
+      card.setAttribute('role', 'link');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Open ${name} profile`);
+      card.classList.add('cursor-pointer', 'lg:flex-1');
+    });
+    nearbyList.addEventListener('click', event => {
+      if (event.target.closest('button, a, input, select')) return;
+      const card = event.target.closest('[data-provider-name]');
+      if (!card || !nearbyList.contains(card)) return;
+      window.openDiscoveryProviderProfile(card.dataset.providerName, card.dataset.category);
+    });
+    nearbyList.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      if (event.target.closest('button, a, input, select')) return;
+      const card = event.target.closest('[data-provider-name]');
+      if (!card || !nearbyList.contains(card)) return;
+      event.preventDefault();
+      window.openDiscoveryProviderProfile(card.dataset.providerName, card.dataset.category);
+    });
+  }
+
+  const ratedResults = document.getElementById('sainoRatedResults');
+  if (ratedResults) {
+    const categoryByTitle = {
+      'Hospitals': 'hospital',
+      'Clinics': 'clinic',
+      'Diagnostic Centers': 'diagnostic',
+      'Wellness Centers': 'wellness',
+      'Ambulance': 'ambulance',
+      'Blood Bank': 'bloodbank'
+    };
+    const panels = Array.from(ratedResults.querySelectorAll('div')).filter(panel =>
+      panel.querySelector(':scope > h4') && panel.querySelector(':scope > div.flex.flex-col')
+    );
+    panels.forEach(panel => {
+      const title = panel.querySelector(':scope > h4')?.textContent?.trim();
+      const category = categoryByTitle[title];
+      const list = panel.querySelector(':scope > div.flex.flex-col');
+      const rows = list?.children || [];
+      Array.from(rows).forEach(row => {
+        const name = row.querySelector('.truncate')?.textContent?.trim();
+        if (!name || !category) return;
+        row.dataset.providerName = name;
+        row.dataset.providerCategory = category;
+        row.setAttribute('role', 'link');
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('aria-label', `Open ${name} profile`);
+        row.classList.add('cursor-pointer', 'hover:bg-rose-50', 'rounded-lg', 'transition-colors');
+      });
+    });
+    const openRatedProfile = event => {
+      const row = event.target.closest('[data-provider-name][data-provider-category]');
+      if (!row || !ratedResults.contains(row)) return;
+      window.openDiscoveryProviderProfile(row.dataset.providerName, row.dataset.providerCategory);
+    };
+    ratedResults.addEventListener('click', openRatedProfile);
+    ratedResults.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const row = event.target.closest('[data-provider-name][data-provider-category]');
+      if (!row || !ratedResults.contains(row)) return;
+      event.preventDefault();
+      window.openDiscoveryProviderProfile(row.dataset.providerName, row.dataset.providerCategory);
+    });
+  }
+
+  window.applyProviderFilters();
+}
+
+window.openDiscoveryProviderProfile = function(providerName, category) {
+  const providers = (window.AppState && window.AppState.providers) || (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
+  const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const query = normalize(providerName);
+  const words = query.split(/\s+/).filter(word => word.length > 2 && !['hospital', 'clinic', 'centre', 'center', 'service'].includes(word));
+  const exact = providers.find(provider => normalize(provider.name) === query);
+  if (exact) {
+    window.openProviderProfile(exact.id || exact.name);
+    return;
+  }
+  const categoryProviders = providers.filter(provider =>
+    String(provider.category || '').toLowerCase() === String(category || '').toLowerCase()
+  );
+  const candidates = categoryProviders.length ? categoryProviders : providers;
+  const match = candidates
+    .map(provider => ({
+      provider,
+      score: words.reduce((score, word) => score + (normalize(provider.name).includes(word) ? 1 : 0), 0)
+    }))
+    .filter(result => result.score > 0)
+    .sort((a, b) => b.score - a.score)[0];
+  if (match) {
+    window.openProviderProfile(match.provider.id || match.provider.name);
+  } else if (category) {
+    filterCategory(category);
+  } else {
+    showToast("We couldn't find this provider's profile.");
+  }
+};
+
+function getDiscoveryProviderCatalog() {
+  const providers = (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
+  const catalog = providers.map(provider => ({
+    ...provider,
+    discoveryCategory: provider.category === 'physiotherapy' ? 'wellness' : provider.category,
+    discoveryLocation: provider.location || provider.area || provider.city || 'Kathmandu'
+  }));
+  const extraGroups = [
+    ['ambulances', 'ambulance'],
+    ['bloodBanks', 'bloodbank'],
+    ['diagnostics', 'diagnostic'],
+    ['labs', 'diagnostic']
+  ];
+  const seen = new Set(catalog.map(provider => String(provider.name || '').toLowerCase()));
+  extraGroups.forEach(([key, category]) => {
+    const entries = window.SAINO_DATA?.sainoRated?.[key] || [];
+    entries.forEach(entry => {
+      const name = String(entry.name || '').trim();
+      if (!name || seen.has(name.toLowerCase())) return;
+      seen.add(name.toLowerCase());
+      catalog.push({
+        ...entry,
+        category,
+        discoveryCategory: category,
+        discoveryLocation: entry.area || entry.location || 'Kathmandu'
+      });
+    });
+  });
+  return catalog;
+}
+
+function renderDiscoveryProviderCard(provider) {
+  const name = escapeCommunityText(provider.name);
+  const category = escapeCommunityText(provider.discoveryCategory || provider.category);
+  const location = escapeCommunityText(provider.discoveryLocation || provider.location || 'Kathmandu');
+  const categoryLabel = escapeCommunityText(String(provider.category || 'Healthcare Provider').replace(/([a-z])([A-Z])/g, '$1 $2'));
+  const rating = Number(provider.rating);
+  const reviewCount = Number(provider.reviewsCount || provider.reviews);
+  const departments = Array.isArray(provider.departments)
+    ? provider.departments.slice(0, 3)
+    : String(provider.special || '').split(',').map(item => item.trim()).filter(Boolean).slice(0, 3);
+  const serviceDescription = provider.leadDoctorRole || provider.about || 'Healthcare services and consultations';
+  const image = provider.image || provider.logo;
+  return `
+    <article data-location="${escapeCommunityText(location.toLowerCase())}" data-category="${category.toLowerCase()}" data-provider-name="${name}"
+      role="link" tabindex="0" aria-label="Open ${name} profile"
+      class="flex min-w-0 cursor-pointer flex-col items-start gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md sm:flex-row">
+      <div class="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 sm:h-28 sm:w-28">
+        ${image ? `<img src="${escapeCommunityText(image)}" alt="${name}" class="h-full w-full object-cover" loading="lazy">` : ''}
+      </div>
+      <div class="w-full min-w-0 flex-1">
+        <div class="flex min-w-0 flex-wrap items-start justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <span class="text-[10px] font-bold uppercase tracking-wide text-rose-700">${categoryLabel}</span>
+            <h4 class="mt-1 break-words text-base font-bold leading-snug text-slate-900 [overflow-wrap:anywhere]">${name}</h4>
+          </div>
+          <span class="shrink-0 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">${escapeCommunityText(provider.badgeLabel || 'Saino Verified')}</span>
+        </div>
+        <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          ${Number.isFinite(rating) ? `<span class="font-bold text-amber-600">★ ${rating.toFixed(1)}</span>` : ''}
+          ${Number.isFinite(reviewCount) ? `<span class="text-slate-500">(${reviewCount} reviews)</span>` : ''}
+        </div>
+        <p class="mt-2 line-clamp-2 break-words text-xs font-semibold text-slate-700">${escapeCommunityText(serviceDescription)}</p>
+        ${departments.length ? `<div class="mt-2.5 flex flex-wrap gap-1.5">${departments.map(item => `<span class="max-w-full break-words rounded-md border border-slate-200/80 bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-800">${escapeCommunityText(item)}</span>`).join('')}</div>` : ''}
+        <div class="mt-3 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
+          <span class="min-w-0 break-words [overflow-wrap:anywhere]">${location}</span>
+          ${provider.phone ? `<span class="max-w-full break-all">${escapeCommunityText(provider.phone)}</span>` : ''}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+window.applyProviderFilters = function() {
+  const list = document.getElementById('nearbyProvidersList');
+  if (!list) return;
+  const search = (document.getElementById('providerSearchInput')?.value || '').trim().toLowerCase();
+  const location = (document.getElementById('nearbyLocationSelect')?.value || 'all').toLowerCase();
+  const category = (document.getElementById('nearbyCategorySelect')?.value || 'all').toLowerCase();
+  if (!list.dataset.defaultMarkup) list.dataset.defaultMarkup = list.innerHTML;
+  const useDirectory = !!search || location !== 'all' || category !== 'all';
+  if (useDirectory) {
+    const aliases = {
+      kathmandu: ['kathmandu', 'baneshwor', 'thapathali', 'maharajgunj', 'putalisadak', 'lazimpat']
+    };
+    const providers = getDiscoveryProviderCatalog().filter(provider => {
+      const providerCategory = String(provider.discoveryCategory || provider.category || '').toLowerCase();
+      const providerLocation = String(provider.discoveryLocation || provider.location || '').toLowerCase();
+      const searchable = `${provider.name || ''} ${provider.category || ''} ${providerLocation} ${provider.about || ''} ${Array.isArray(provider.departments) ? provider.departments.join(' ') : ''}`.toLowerCase();
+      const locationMatch = location === 'all' ||
+        (aliases[location] || [location]).some(value => providerLocation.includes(value));
+      const categoryMatch = category === 'all' || providerCategory === category;
+      return locationMatch && categoryMatch && (!search || searchable.includes(search));
+    }).slice(0, 10);
+    list.innerHTML = providers.map(renderDiscoveryProviderCard).join('');
+  } else {
+    list.innerHTML = list.dataset.defaultMarkup;
+  }
+
+  list.querySelectorAll('[data-location][data-category]').forEach(card => {
+    const name = card.querySelector('h4')?.textContent?.trim() || card.dataset.providerName;
+    if (name) {
+      card.dataset.providerName = name;
+      card.setAttribute('role', 'link');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Open ${name} profile`);
+      card.classList.add('cursor-pointer');
+    }
+  });
+  const cards = Array.from(list.querySelectorAll('[data-location][data-category]'));
+  let visibleCount = 0;
+  cards.forEach(card => {
+    card.style.display = '';
+    visibleCount += 1;
+  });
+
+  const count = document.getElementById('nearbyResultsCount');
+  if (count) count.textContent = `${visibleCount} result${visibleCount === 1 ? '' : 's'} found`;
+  let emptyState = document.getElementById('nearbyNoResults');
+  if (!emptyState) {
+    emptyState = document.createElement('div');
+    emptyState.id = 'nearbyNoResults';
+    emptyState.className = 'hidden rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500';
+    emptyState.textContent = 'No providers match these filters.';
+    list.appendChild(emptyState);
+  }
+  emptyState.style.display = visibleCount > 0 ? 'none' : 'block';
+};
+
 function bindBoostEvents() {}
 function bindAboutEvents() {}
 function bindContactEvents() {}
@@ -5576,7 +6314,8 @@ async function loadNearbyProviders() {
           <button 
             type="button" 
             id="card-${index}-btn"
-            onclick="toggleSpecialties('card-${index}')" 
+            data-label="+ ${extraCount} more specialties"
+            onclick="toggleSpecialties('card-${index}')"
             class="text-[11px] font-medium bg-transparent text-slate-400 hover:text-slate-600 px-2.5 py-1 rounded-md border border-dashed border-slate-200 hover:border-slate-300 transition-all duration-200 cursor-pointer">
             + ${extraCount} more specialties
           </button>
@@ -5632,7 +6371,7 @@ window.toggleSpecialties = function(cardId) {
     } else {
       moreSpan.classList.add('hidden');
       moreSpan.classList.remove('flex');
-      btn.textContent = '+ 10 more specialties';
+      btn.textContent = btn.getAttribute('data-label') || '+ more specialties';
     }
   }
 };
@@ -5946,9 +6685,7 @@ window.renderFBCommentModal = function() {
         <div id="commentsStream" class="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
           ${comments.map(c => `
             <div class="flex items-start space-x-2.5">
-              <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-[11px] flex-shrink-0 mt-0.5">
-                ${(c.author || 'User').slice(0, 2).toUpperCase()}
-              </div>
+              ${window.renderUserProfileIcon("w-8 h-8", "w-4 h-4", "mt-0.5")}
               <div class="flex-1 min-w-0">
                 <div class="bg-slate-100 rounded-2xl px-4 py-2.5 inline-block max-w-full">
                   <span class="font-bold text-slate-900 block leading-tight">${c.author}</span>
@@ -5969,9 +6706,7 @@ window.renderFBCommentModal = function() {
                   <div class="ml-3 pl-3 border-l-2 border-slate-200 mt-2.5 space-y-2">
                     ${c.replies.map(r => `
                       <div class="flex items-start space-x-2">
-                        <div class="w-6 h-6 rounded-full bg-slate-700 text-white flex items-center justify-center font-bold text-[9px] flex-shrink-0 mt-0.5">
-                          ${(r.author || 'U').slice(0, 2).toUpperCase()}
-                        </div>
+                        ${window.renderUserProfileIcon("w-6 h-6", "w-3 h-3", "mt-0.5")}
                         <div class="bg-slate-100 rounded-xl px-3 py-1.5 inline-block max-w-full">
                           <span class="font-bold text-slate-900 block text-[11px]">${r.author}</span>
                           <p class="text-slate-700 text-[11px] mt-0.5">${r.text}</p>
@@ -6065,17 +6800,131 @@ window.closeDiscussionModal = function() {
 };
 
 // View All Discussions Page
+function loadSavedCommunityQuestions() {
+  const raw = localStorage.getItem('SAINO_COMMUNITY_QUESTIONS');
+  if (!raw) return [];
+  try {
+    const questions = JSON.parse(raw);
+    if (!Array.isArray(questions)) throw new Error('Saved community questions must be an array.');
+    return questions.filter(item => item && typeof item.id === 'string' && typeof item.question === 'string');
+  } catch (error) {
+    console.error('Unable to read saved community questions.', error);
+    return [];
+  }
+}
+
+function escapeCommunityText(value) {
+  return String(value || '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
+
+function countDiscussionMessages(messages) {
+  return (Array.isArray(messages) ? messages : []).reduce(
+    (total, message) => total + 1 + countDiscussionMessages(message.replies),
+    0
+  );
+}
+
+function findDiscussionMessage(messages, messageId) {
+  for (const message of Array.isArray(messages) ? messages : []) {
+    if (String(message.id) === String(messageId)) return message;
+    const nested = findDiscussionMessage(message.replies, messageId);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+window.openDiscussionPage = function(discussionId) {
+  navigateTo('discussions');
+  window.setTimeout(() => {
+    const target = Array.from(document.querySelectorAll('[data-thread-id]'))
+      .find(card => card.dataset.threadId === String(discussionId));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 0);
+};
+
+function renderInlineDiscussionMessage(message, discussionId, depth = 0) {
+  const authorText = message.author || 'Community member';
+  const author = escapeCommunityText(authorText);
+  const text = escapeCommunityText(message.text || '');
+  const messageId = escapeCommunityText(message.id);
+  if (!text) return '';
+  const replies = Array.isArray(message.replies) ? message.replies : [];
+  const isLiked = Boolean(message.isLiked);
+  const likes = Math.max(0, Number(message.likes) || 0);
+  return `
+    <div class="min-w-0 ${depth ? 'ml-6 sm:ml-9' : ''}" data-discussion-message="${messageId}">
+      <div class="flex items-start gap-2.5">
+        ${window.renderUserProfileIcon(depth ? 'w-7 h-7' : 'w-8 h-8', 'text-[10px]', 'mt-0.5', authorText)}
+        <div class="min-w-0 max-w-[92%] rounded-2xl ${depth ? 'border border-slate-100 bg-white' : 'bg-slate-100'} px-3.5 py-2.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <strong class="text-[11px] text-slate-800">${author}</strong>
+            <span class="text-[10px] text-slate-400">${escapeCommunityText(message.time || 'Recently')}</span>
+          </div>
+          <p class="mt-1 whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-700">${text}</p>
+        </div>
+      </div>
+      <div class="ml-10 mt-1 flex items-center gap-4 text-[11px]">
+        <button type="button" aria-pressed="${isLiked}" onclick="window.toggleInlineMessageLike('${escapeCommunityText(discussionId)}','${messageId}',this)"
+          class="inline-flex items-center gap-1 font-semibold ${isLiked ? 'text-rose-600' : 'text-slate-500 hover:text-rose-600'}">
+          <span aria-hidden="true">♥</span><span>${isLiked ? 'Liked' : 'Like'}${likes ? ` · ${likes}` : ''}</span>
+        </button>
+        <button type="button" onclick="window.toggleInlineReplyBox(this)" class="font-semibold text-slate-500 hover:text-rose-600">Reply</button>
+      </div>
+      <div class="discussion-message-reply-slot"></div>
+      ${replies.length ? `<div class="mt-2 space-y-3">${replies.map(reply => renderInlineDiscussionMessage(reply, discussionId, depth + 1)).join('')}</div>` : ''}
+    </div>
+  `;
+}
+
 window.renderAllDiscussionsView = function() {
-  const list = [
-    { id: 'disc-grande', hospital: 'Grande International Hospital', logo: 'GI', time: '2 hours ago', question: 'Has anyone recently visited their emergency department?', replies: 14, helpful: 9 },
-    { id: 'disc-norvic', hospital: 'Norvic International Hospital', logo: 'NI', time: '5 hours ago', question: 'How was your experience with the cardiology department?', replies: 22, helpful: 17 },
-    { id: 'disc-hams', hospital: 'HAMS Hospital', logo: 'HA', time: 'Yesterday', question: 'Anyone know about their dermatology OPD timing and wait time?', replies: 8, helpful: 5 },
-    { id: 'disc-bnb', hospital: 'B&B Hospital', logo: 'BB', time: '2 days ago', question: 'Is the diabetes specialist available on weekends at B&B?', replies: 11, helpful: 8 },
-    { id: 'disc-mediciti', hospital: 'Nepal Mediciti Hospital', logo: 'NE', time: '3 days ago', question: 'How are the room charges and insurance claim process at Mediciti?', replies: 19, helpful: 12 },
-    { id: 'disc-patan', hospital: 'Patan Hospital', logo: 'PA', time: '4 days ago', question: 'Is prior appointment mandatory for general surgery OPD?', replies: 15, helpful: 10 },
-    { id: 'disc-kmc', hospital: 'Kathmandu Medical College (KMC)', logo: 'KA', time: '5 days ago', question: 'Best pediatrician for newborn vaccination schedule here?', replies: 7, helpful: 6 },
-    { id: 'disc-om', hospital: 'Om Hospital & Research Centre', logo: 'OM', time: '1 week ago', question: 'ENT department consultation fees and doctor availability?', replies: 13, helpful: 9 }
-  ];
+  const savedQuestions = loadSavedCommunityQuestions();
+  savedQuestions.forEach(item => {
+    if (!window.DISCUSSIONS_STORE[item.id]) window.DISCUSSIONS_STORE[item.id] = item;
+  });
+  const list = Object.values(window.DISCUSSIONS_STORE || {})
+    .filter(item => item && item.id && item.question)
+    .map(item => ({
+      ...item,
+      hospital: item.hospital || 'Saino Community',
+      logo: item.logo || String(item.hospital || 'SC').split(/\s+/).slice(0, 2).map(word => word[0]).join('').toUpperCase(),
+      time: item.time || 'Recently',
+      replies: Number(item.replies) || (item.comments || []).reduce((total, comment) => total + 1 + (comment.replies || []).length, 0),
+      helpful: Number(item.helpful) || Number(item.likes) || 0
+    }))
+    .reverse();
+
+  const renderThread = item => {
+    const comments = Array.isArray(item.comments) ? item.comments : [];
+    const messageCount = countDiscussionMessages(comments);
+    const conversation = comments.map(comment => renderInlineDiscussionMessage(comment, item.id)).join('');
+    return `
+      <article data-thread-id="${escapeCommunityText(item.id)}" class="scroll-mt-6 flex h-[560px] flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm text-left">
+        <div class="flex shrink-0 items-start gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-xs font-extrabold text-[#B91C1C]">${escapeCommunityText(item.logo)}</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h2 class="text-sm font-bold text-slate-900">${escapeCommunityText(item.hospital)}</h2>
+              <span class="text-[11px] text-slate-400">${escapeCommunityText(item.time)}</span>
+            </div>
+            <p class="mt-1 line-clamp-3 break-words text-sm font-semibold leading-relaxed text-slate-800">${escapeCommunityText(item.question)}</p>
+            <div class="mt-2 flex items-center gap-3 text-[11px] text-slate-500">
+              <span>${messageCount} messages</span>
+              <span>${item.helpful} helpful</span>
+            </div>
+          </div>
+        </div>
+        <div class="discussion-conversation-scroll mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-2xl bg-slate-50 p-3 sm:p-4">
+          ${conversation || '<p class="px-2 py-1 text-xs text-slate-500">No replies yet. Start the conversation.</p>'}
+        </div>
+      </article>
+    `;
+  };
 
   return `
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 mb-16">
@@ -6087,36 +6936,132 @@ window.renderAllDiscussionsView = function() {
         <p class="text-xs sm:text-sm text-slate-500 mt-1">Ask questions, read patient experiences, and discuss care across hospitals in Nepal.</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
-        ${list.map(item => `
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between">
-            <div>
-              <div class="flex items-center space-x-3 mb-3">
-                <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
-                  ${item.logo}
-                </div>
-                <div>
-                  <h4 class="font-bold text-slate-900 text-xs leading-tight">${item.hospital}</h4>
-                  <span class="text-[11px] text-slate-400">${item.time}</span>
-                </div>
-              </div>
-              <p class="text-xs text-slate-700 font-medium mb-4 leading-relaxed">
-                "${item.question}"
-              </p>
-            </div>
-            <div>
-              <div class="text-[11px] text-slate-500 mb-3">
-                ${item.replies} replies • ${item.helpful} helpful
-              </div>
-              <button onclick="window.openDiscussionModal('${item.id}')" class="w-full py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer">
-                View Discussion
-              </button>
-            </div>
-          </div>
-        `).join('')}
+      <div class="space-y-5">
+        ${list.map(renderThread).join('')}
       </div>
+
+      <form id="discussionReplyComposer" hidden style="display:none" class="mt-2 flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pl-4 shadow-xs focus-within:border-rose-300 focus-within:ring-2 focus-within:ring-rose-100"
+        onsubmit="window.submitInlineDiscussionReply(event)">
+        <label class="sr-only" for="discussionReplyInput">Write a reply</label>
+        <input id="discussionReplyInput" name="reply" required maxlength="1000" autocomplete="off" placeholder="Write a reply..."
+          class="min-w-0 flex-1 bg-transparent py-2 text-xs text-slate-800 outline-none placeholder:text-slate-400">
+        <button type="submit" aria-label="Send reply" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#B91C1C] text-white transition hover:bg-[#991B1B]">
+          <i data-lucide="send" class="h-4 w-4"></i>
+        </button>
+      </form>
+
+      <section class="mt-8 rounded-2xl border border-slate-200 bg-white/80 p-4 sm:p-6 shadow-sm">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900">Ask the Community</h2>
+        <p class="mt-1 text-xs sm:text-sm text-slate-500">Share a question and hear from people with real healthcare experiences.</p>
+        <form class="mt-4 flex flex-col sm:flex-row items-stretch gap-3" onsubmit="submitCommunityQuestion(event)">
+          <label class="sr-only" for="communityQuestionInput">Your question</label>
+          <textarea id="communityQuestionInput" rows="2" maxlength="1000" required
+            placeholder="Write your question here..."
+            class="min-h-[72px] flex-1 resize-y rounded-xl border border-slate-200 bg-transparent px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-100"></textarea>
+          <button type="submit" class="inline-flex items-center justify-center gap-2 self-end rounded-xl bg-[#B91C1C] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#991B1B] sm:self-stretch">
+            <i data-lucide="send" class="h-4 w-4"></i>
+            Send
+          </button>
+        </form>
+      </section>
     </div>
   `;
+};
+
+window.submitInlineDiscussionReply = function(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const discussionId = form.dataset.discussionId;
+  const input = form.elements.reply;
+  const text = input.value.trim();
+  const discussion = window.DISCUSSIONS_STORE[discussionId];
+  const parentMessage = findDiscussionMessage(discussion?.comments, form.dataset.parentId);
+  if (!text || !discussion || !parentMessage) return;
+
+  if (!Array.isArray(parentMessage.replies)) parentMessage.replies = [];
+  parentMessage.replies.push({
+    id: `r_${Date.now()}`,
+    author: 'You (Patient)',
+    time: 'Just now',
+    text,
+    likes: 0,
+    isLiked: false,
+    replies: []
+  });
+  renderApp();
+  const updatedThread = Array.from(document.querySelectorAll('[data-thread-id]'))
+    .find(card => card.dataset.threadId === discussionId);
+  const conversation = updatedThread?.querySelector('.discussion-conversation-scroll');
+  if (conversation) conversation.scrollTop = conversation.scrollHeight;
+};
+
+window.toggleInlineReplyBox = function(button) {
+  const message = button.closest('[data-discussion-message]');
+  const discussion = message?.closest('[data-thread-id]');
+  const slot = message?.querySelector(':scope > .discussion-message-reply-slot');
+  const composer = document.getElementById('discussionReplyComposer');
+  if (!message || !discussion || !slot || !composer) return;
+
+  const isSameTarget = composer.dataset.discussionId === discussion.dataset.threadId &&
+    composer.dataset.parentId === message.dataset.discussionMessage;
+  if (composer.style.display !== 'none' && isSameTarget) {
+    composer.hidden = true;
+    composer.style.display = 'none';
+    return;
+  }
+
+  composer.dataset.discussionId = discussion.dataset.threadId;
+  composer.dataset.parentId = message.dataset.discussionMessage;
+  slot.appendChild(composer);
+  composer.hidden = false;
+  composer.style.display = 'flex';
+  composer.querySelector('input')?.focus();
+};
+
+window.toggleInlineMessageLike = function(discussionId, messageId, button) {
+  const message = findDiscussionMessage(window.DISCUSSIONS_STORE[discussionId]?.comments, messageId);
+  if (!message) return;
+  message.isLiked = !message.isLiked;
+  message.likes = Math.max(0, (Number(message.likes) || 0) + (message.isLiked ? 1 : -1));
+  button.setAttribute('aria-pressed', String(message.isLiked));
+  button.classList.toggle('text-rose-600', message.isLiked);
+  button.classList.toggle('text-slate-500', !message.isLiked);
+  button.innerHTML = `<span aria-hidden="true">♥</span><span>${message.isLiked ? 'Liked' : 'Like'}${message.likes ? ` · ${message.likes}` : ''}</span>`;
+};
+
+window.submitCommunityQuestion = function(event) {
+  event.preventDefault();
+  const input = document.getElementById('communityQuestionInput');
+  const question = input?.value.trim();
+  if (!question) {
+    showToast('Write a question before sending.');
+    input?.focus();
+    return;
+  }
+
+  const item = {
+    id: `community-${Date.now()}`,
+    hospital: 'Saino Community',
+    logo: 'SC',
+    time: 'Just now',
+    question,
+    likes: 0,
+    comments: [],
+    createdAt: Date.now()
+  };
+  const savedQuestions = loadSavedCommunityQuestions();
+  savedQuestions.unshift(item);
+  try {
+    localStorage.setItem('SAINO_COMMUNITY_QUESTIONS', JSON.stringify(savedQuestions));
+  } catch (error) {
+    console.error('Unable to save community question.', error);
+    showToast('Your question could not be saved. Please try again.');
+    return;
+  }
+  window.DISCUSSIONS_STORE[item.id] = item;
+  renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Your question was sent to the community.');
 };
 // 1. LocalStorage Store & Filter States
 window.REVIEWS_STORE = JSON.parse(localStorage.getItem('NEPAL_HEALTH_REVIEWS')) || {
@@ -6191,10 +7136,48 @@ window.renderAllReviewsView = function() {
     ]
   };
 
+  const normalizeReviewText = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const reviewKeys = new Set();
+  const addReview = review => {
+    if (!review || typeof review !== 'object') return;
+    const usableValue = value => {
+      const text = String(value || '').trim();
+      return text && !['undefined', 'null'].includes(text.toLowerCase()) ? text : '';
+    };
+    const text = usableValue(review.text) || usableValue(review.comment) || usableValue(review.body) || usableValue(review.title);
+    const key = normalizeReviewText(text);
+    if (!key || reviewKeys.has(key)) return;
+    reviewKeys.add(key);
+    allReviews.push({
+      ...review,
+      text,
+      hospitalName: usableValue(review.hospitalName) || usableValue(review.provider) || 'Healthcare provider',
+      author: usableValue(review.author) || usableValue(review.user) || 'Patient'
+    });
+  };
+
   // Flatten reviews
   Object.keys(store).forEach(hId => {
     const list = store[hId] || [];
-    list.forEach(r => allReviews.push({ ...r, hospitalId: hId }));
+    list.forEach(r => addReview({
+      ...r,
+      hospitalId: hId
+    }));
+  });
+
+  (window.SAINO_DATA?.patientReviews || []).forEach(review => addReview(review));
+
+  const providerReviews = (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
+  providerReviews.forEach(provider => {
+    (provider.reviews || []).forEach(review => {
+      addReview({
+        ...review,
+        id: review.id || `${provider.id || provider.name}-review`,
+        rating: Number(review.rating) || 5,
+        hospitalName: provider.name,
+        hospitalId: provider.id || provider.name
+      });
+    });
   });
 
   // Filters
@@ -6222,8 +7205,8 @@ window.renderAllReviewsView = function() {
       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 mb-16 text-left">
       <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <button onclick="navigateTo('discovery')" class="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center space-x-1 mb-3 cursor-pointer">
-            <span>← Back to Discovery</span>
+          <button onclick="returnFromAllReviews()" class="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center space-x-1 mb-3 cursor-pointer">
+            <span>← Back to previous page</span>
           </button>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">All Patient Reviews & Experiences</h1>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">Browse verified patient feedback across healthcare providers or share your own experience.</p>
@@ -6239,7 +7222,7 @@ window.renderAllReviewsView = function() {
       <!-- Reviews List Feed -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         ${allReviews.length === 0 ? '<p class="text-slate-400 text-center py-8 text-xs">No matching reviews found.</p>' : ''}
-        ${allReviews.slice(0, 9).map(r => renderTalkReviewItem(r)).join('')}
+        ${allReviews.map(r => renderTalkReviewItem(r)).join('')}
       </div>
     </div>
 
@@ -6252,6 +7235,7 @@ window.setReviewFilter = function(filter) {
   const mainContainer = document.getElementById('mainContent');
   if (mainContainer) {
     mainContainer.innerHTML = window.renderAllReviewsView();
+    if (window.lucide) window.lucide.createIcons();
   }
 
 

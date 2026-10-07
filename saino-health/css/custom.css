@@ -342,6 +342,34 @@ button.bg-white.btn-clicked-active {
     padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
+  #hospital-profile-container > .max-w-6xl {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  #hospital-profile-container .hospital-more-section {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 1rem;
+  }
+
+  #hospital-profile-container .hospital-more-cards {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.25rem;
+  }
+
+  #hospital-profile-container .hospital-more-card {
+    flex: 0 0 min(82%, 17rem);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
   #mobileBottomNav {
     display: flex !important;
     visibility: visible !important;
@@ -379,8 +407,8 @@ button.bg-white.btn-clicked-active {
     color: #B91C1C !important;
   }
 
-/* Keep the mobile bar available on touch phones whose CSS viewport is wider than 768px. */
-@media (hover: none) and (pointer: coarse) {
+  /* Keep the mobile bar available on touch phones whose CSS viewport is wider than 768px. */
+  @media (hover: none) and (pointer: coarse) {
   body {
     padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
@@ -394,5 +422,38 @@ button.bg-white.btn-clicked-active {
     height: calc(60px + env(safe-area-inset-bottom)) !important;
     padding-bottom: env(safe-area-inset-bottom) !important;
     z-index: 9999999 !important;
+  }
+}
+@media print {
+  #mobileBottomNav,
+  [data-bottom-btn],
+  button,
+  header,
+  footer,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 8mm !important;
+  }
+
+  html, body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  #mainContent, 
+  #booking-confirmation-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
 }

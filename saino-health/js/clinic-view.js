@@ -1,412 +1,3 @@
-/* ============================================================
-   HOSPITAL DIRECTORY & PROFILE VIEW (CLEAN & ERROR-FREE)
-   ============================================================ */
-
-/* 1. Directory View (List Page): hospital / clinic / diagnostic / wellness / insurance
-   Sab categories ke liye ek hi function. Left side filters category ke hisaab se badalte hain. */
-
-/* ---------- Icons (inline SVG, kabhi change nahi hote) ---------- */
-const DIRECTORY_ICON = (d, cls = "w-4 h-4") =>
-  `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">${d}</svg>`;
-
-const DIRECTORY_ICONS = {
-  location: '<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
-  distance: '<polygon points="3 11 22 2 13 21 11 13 3 11"/>',
-  speciality: '<path d="M6 3v6a4 4 0 0 0 8 0V3"/><path d="M10 13v2a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/>',
-  services: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
-  availability: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
-  saino: '<path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/>',
-  rating: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L8 14.2 3 9.3l6.9-1L12 2Z"/>',
-  facilities: '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>',
-  tests: '<path d="M10 2v7.5L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9.5V2"/><path d="M8.5 2h7"/>',
-  fee: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>',
-  plan: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
-  chevron: '<path d="m6 9 6 6 6-6"/>',
-  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
-  chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
-  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/>',
-  calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
-  filter: '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
-  rotate: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
-};
-
-/* ---------- Category info ---------- */
-const DIRECTORY_META = {
-  hospital:   { title: "Hospitals",          plural: "Hospitals",          desc: "Find hospitals and healthcare facilities based on your needs.", fee: ["Consultation Fee", "Rs. 4,000"] },
-  clinic:     { title: "Clinics",            plural: "Clinics",            desc: "Find verified clinics and specialist OPD consultations.",       fee: ["Consultation Fee", "Rs. 1,000"] },
-  diagnostic: { title: "Diagnostic Centers", plural: "Diagnostic Centers", desc: "Find certified pathology labs, blood tests, and scans.",       fee: ["Tests starting from", "Rs. 500"] },
-  wellness:   { title: "Wellness Centers",   plural: "Wellness Centers",   desc: "Find yoga, physiotherapy, and wellness retreats.",             fee: ["Sessions starting from", "Rs. 1,500"] },
-  insurance:  { title: "Health Insurance",   plural: "Insurance Providers", desc: "Explore medical coverage and health insurance policies.",      fee: ["Premium starting from", "Rs. 5,000 / yr"] },
-};
-
-/* ---------- Filters: option = [value, label, keywords?, "pass"?] ---------- */
-const DIRECTORY_COMMON = {
-  location: { id: "location", title: "Location", icon: "location", kind: "location",
-    options: [["Kathmandu", "Kathmandu"], ["Lalitpur", "Lalitpur"], ["Bhaktapur", "Bhaktapur"], ["Pokhara", "Pokhara"]] },
-  distance: { id: "distance", title: "Distance", icon: "distance", kind: "distance",
-    options: [["2", "Within 2 km"], ["5", "Within 5 km"], ["8", "Within 8 km"], ["10", "Within 10 km"], ["15", "Within 15 km"]] },
-  saino: { id: "saino", title: "SAINO Status", icon: "saino", kind: "saino",
-    options: [["verified", "Verified Partner"], ["featured", "Featured"]] },
-  rating: { id: "rating", title: "Rating", icon: "rating", kind: "rating",
-    options: [["4", "4 Stars & Above"], ["3", "3 Stars & Above"]] },
-};
-const dirText = (id, title, icon, options) => ({ id, title, icon, kind: "text", options });
-const C = DIRECTORY_COMMON;
-
-const DIRECTORY_FILTERS = {
-  hospital: [
-    C.location, C.distance,
-    dirText("speciality", "Speciality / Treatment", "speciality", [
-      ["Cardiology", "Cardiology"], ["Neurology", "Neurology"], ["Orthopedics", "Orthopedics", ["orthopedic", "ortho"]],
-      ["Pediatrics", "Pediatrics", ["pediatric", "paediatric"]], ["General Surgery", "General Surgery", ["surgery"]]]),
-    dirText("services", "Services", "services", [
-      ["Emergency", "Emergency Care", ["emergency"]], ["ICU", "ICU / NICU", ["icu", "nicu"]],
-      ["Pharmacy", "24/7 Pharmacy", ["pharmacy"]], ["Laboratory", "Laboratory & Diagnostics", ["laborator", "diagnostic", "pathology"]]]),
-    dirText("availability", "Availability", "availability", [
-      ["24_7", "Open 24/7", ["24/7", "24x7", "24 hours"]], ["today", "Available Today", [], "pass"]]),
-    C.saino, C.rating,
-    dirText("insurance", "Insurance", "plan", [
-      ["government", "Government Insurance / Health Scheme", ["government", "health scheme"]],
-      ["private", "Private Insurance Accepted", ["private insurance", "insurance"]]]),
-    dirText("facilities", "Facilities", "facilities", [
-      ["parking", "Parking Available", ["parking"]], ["cafeteria", "Cafeteria", ["cafeteria", "canteen"]], ["atm", "ATM", ["atm"]]]),
-    dirText("type", "Hospital Type", "facilities", [
-      ["government", "Government / Public", ["government", "public"]], ["private", "Private", ["private"]],
-      ["community", "Community / Trust", ["community", "trust"]]]),
-  ],
-  clinic: [
-    C.location, C.distance,
-    dirText("speciality", "Speciality", "speciality", [
-      ["General Physician", "General Physician", ["general", "physician"]], ["Dental", "Dental", ["dental", "dentist"]],
-      ["Dermatology", "Dermatology", ["dermat", "skin"]], ["Pediatrics", "Pediatrics", ["pediatric", "paediatric"]],
-      ["Gynecology", "Gynecology", ["gynec", "gynaec"]], ["ENT", "ENT", ["ent", "ear nose"]], ["Eye", "Eye Care", ["eye", "ophthal"]]]),
-    dirText("availability", "Availability", "availability", [
-      ["open_now", "Open Now", [], "pass"], ["evening", "Evening OPD", ["evening", "pm"]], ["weekend", "Open on Weekends", ["sat", "sun", "weekend"]]]),
-    dirText("fee", "Consultation Fee", "fee", [
-      ["fee_low", "Under Rs. 500", ["under 500"]], ["fee_mid", "Rs. 500 – 1,000", ["500"]], ["fee_high", "Above Rs. 1,000", ["above 1000"]]]),
-    C.saino, C.rating,
-    dirText("insurance", "Insurance", "plan", [
-      ["government", "Government Insurance / Health Scheme", ["government", "health scheme"]],
-      ["private", "Private Insurance Accepted", ["private insurance", "insurance"]]]),
-  ],
-  diagnostic: [
-    C.location, C.distance,
-    dirText("tests", "Tests & Scans", "tests", [
-      ["Blood", "Blood Tests / Pathology", ["blood", "pathology"]], ["X-Ray", "X-Ray", ["x-ray", "xray", "x ray"]],
-      ["MRI", "MRI", ["mri"]], ["CT", "CT Scan", ["ct scan", "ct"]], ["Ultrasound", "Ultrasound", ["ultrasound", "usg"]], ["ECG", "ECG", ["ecg", "ekg"]]]),
-    dirText("services", "Services", "services", [
-      ["home_sample", "Home Sample Collection", ["home sample", "home collection"]], ["online_report", "Online Reports", ["online report", "report"]],
-      ["packages", "Health Packages", ["package"]], ["24_7", "Open 24/7", ["24/7", "24x7", "24 hours"]]]),
-    dirText("accreditation", "Accreditation", "saino", [
-      ["nabl", "NABL Accredited", ["nabl"]], ["iso", "ISO Certified", ["iso"]]]),
-    C.saino, C.rating,
-  ],
-  wellness: [
-    C.location, C.distance,
-    dirText("services", "Services", "services", [
-      ["Yoga", "Yoga", ["yoga"]], ["Physio", "Physiotherapy", ["physio"]], ["Ayurveda", "Ayurveda", ["ayurved"]],
-      ["Spa", "Spa & Massage", ["spa", "massage"]], ["Meditation", "Meditation", ["meditat"]], ["Nutrition", "Nutrition & Diet", ["nutrition", "diet"]]]),
-    dirText("facilities", "Facilities", "facilities", [
-      ["steam", "Steam / Sauna", ["steam", "sauna"]], ["parking", "Parking Available", ["parking"]], ["female", "Female-only Sessions", ["female", "women"]]]),
-    dirText("availability", "Availability", "availability", [
-      ["open_now", "Open Now", [], "pass"], ["weekend", "Open on Weekends", ["sat", "sun", "weekend"]]]),
-    C.saino, C.rating,
-  ],
-  insurance: [
-    C.location,
-    dirText("plan", "Plan Type", "plan", [
-      ["individual", "Individual", ["individual"]], ["family", "Family Floater", ["family"]],
-      ["senior", "Senior Citizen", ["senior"]], ["critical", "Critical Illness", ["critical"]]]),
-    dirText("coverage", "Coverage", "fee", [
-      ["cov_5", "Up to Rs. 5 lakh", ["5 lakh", "500000"]], ["cov_10", "Rs. 5 – 10 lakh", ["10 lakh", "1000000"]], ["cov_high", "Above Rs. 10 lakh", ["above 10 lakh", "20 lakh", "25 lakh"]]]),
-    dirText("features", "Features", "services", [
-      ["cashless", "Cashless Hospitals", ["cashless"]], ["claim", "Claim Support", ["claim"]],
-      ["maternity", "Maternity Cover", ["maternity"]], ["preexisting", "Pre-existing Disease Cover", ["pre-existing", "preexisting"]]]),
-    C.saino, C.rating,
-  ],
-};
-
-/* ---------- Helpers ---------- */
-function directoryAllProviders() {
-  return (window.AppState && window.AppState.providers) || (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
-}
-function directoryFindProvider(id) {
-  const key = String(id).toLowerCase();
-  return directoryAllProviders().find(p => p && ((p.id && String(p.id).toLowerCase() === key) || (p.name && p.name.toLowerCase() === key)));
-}
-function directoryNorm(s) { return String(s || "").toLowerCase(); }
-
-const DIRECTORY_BLOBS = new WeakMap();
-function directoryBlob(p) {
-  if (!DIRECTORY_BLOBS.has(p)) {
-    let t = ""; try { t = JSON.stringify(p).toLowerCase(); } catch (e) {}
-    DIRECTORY_BLOBS.set(p, t);
-  }
-  return DIRECTORY_BLOBS.get(p);
-}
-function directoryIsVerified(p) {
-  const v = directoryNorm(p.verification);
-  return !!(p.isVerified || p.is_verified || ["verified", "pro", "prime", "vip", "vvip"].includes(v));
-}
-function directoryIsFeatured(p) {
-  const v = directoryNorm(p.verification);
-  return !!(p.featured || v === "vip" || v === "vvip");
-}
-function directoryHaversine(lat1, lng1, lat2, lng2) {
-  const R = 6371, rad = d => d * Math.PI / 180;
-  const dLat = rad(lat2 - lat1), dLng = rad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-// Asli distance (location + lat/lng se). Data na ho to null (fake 5km nahi dikhayenge)
-function directoryDistanceKm(p) {
-  const lat = parseFloat(p.lat ?? p.latitude), lng = parseFloat(p.lng ?? p.longitude);
-  const o = window.USER_LOCATION;
-  if (o && !isNaN(lat) && !isNaN(lng)) return directoryHaversine(o.lat, o.lng, lat, lng);
-  const direct = parseFloat(String(p.distance ?? "").replace(/[^\d.]/g, ""));
-  return isNaN(direct) ? null : direct;
-}
-
-function directoryMatchGroup(p, group, values) {
-  if (!values.length) return true;                                 // is group mein kuch tick nahi = koi rok nahi
-  switch (group.kind) {
-    case "location": {
-      const loc = directoryNorm([p.location, p.address, p.city].filter(Boolean).join(" "));
-      return values.some(v => loc.includes(v.toLowerCase()));
-    }
-    case "distance": {
-      const d = directoryDistanceKm(p);
-      return d === null ? true : d <= Math.max(...values.map(Number));
-    }
-    case "rating": {
-      const r = parseFloat(p.rating);
-      return (isNaN(r) ? 0 : r) >= Math.min(...values.map(Number));
-    }
-    case "saino":
-      return values.some(v => (v === "verified" ? directoryIsVerified(p) : directoryIsFeatured(p)));
-    default: {
-      const blob = directoryBlob(p);
-      return values.some(v => {
-        const opt = group.options.find(o => o[0] === v);
-        if (opt && opt[3] === "pass") return true;                 // data nahi hai to rok nahi lagate
-        const kws = (opt && opt[2] && opt[2].length) ? opt[2] : [(opt ? opt[1] : v).toLowerCase()];
-        return kws.some(k => blob.includes(k.toLowerCase()));
-      });
-    }
-  }
-}
-
-/* ---------- Sidebar + Card HTML ---------- */
-function directorySidebarHTML(groups) {
-  return groups.map(g => `
-    <div class="border-b border-slate-200 pb-3 last:border-b-0 last:pb-0">
-      <button type="button" onclick="toggleDirectoryFilter('${g.id}')"
-        class="w-full flex items-center justify-between gap-2 py-1 text-sm font-semibold text-slate-900">
-        <span class="flex items-center gap-2">
-          <span class="text-slate-700 shrink-0">${DIRECTORY_ICON(DIRECTORY_ICONS[g.icon] || DIRECTORY_ICONS.services)}</span>
-          <span>${g.title}</span>
-        </span>
-        <span id="directory-arrow-${g.id}" class="text-slate-500 transition-transform duration-200 shrink-0">${DIRECTORY_ICON(DIRECTORY_ICONS.chevron)}</span>
-      </button>
-      <div id="directory-options-${g.id}" class="hidden mt-3 space-y-2.5">
-        ${g.options.map(o => `
-          <label class="flex items-center gap-2.5 text-sm font-medium text-slate-700 cursor-pointer">
-            <input type="checkbox" data-filter-group="${g.id}" value="${o[0]}" class="w-4 h-4 accent-red-700 rounded shrink-0">
-            <span>${o[1]}</span>
-          </label>`).join("")}
-      </div>
-    </div>`).join("");
-}
-
-const DIRECTORY_PILL = "bg-slate-100 text-slate-900 px-3.5 py-1.5 rounded-xl text-xs font-bold";
-
-function directoryCardHTML(p, index, categoryType) {
-  const meta = DIRECTORY_META[categoryType] || DIRECTORY_META.hospital;
-  const id = p.id || p.name || "provider";
-  const name = p.name || meta.title.slice(0, -1);
-  const imgSrc = p.image || "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=500&q=80";
-  const rating = p.rating || "4.7";
-  const location = p.location || p.address || "Kathmandu";
-  const opd = p.opd || p.openingHours || "Mon–Sat, 9:30 AM – 6:00 PM";
-  const phone = p.phone || "+977-9876543329";
-  const deps = Array.isArray(p.departments) ? p.departments : [];
-  const fee = p.consultationFee || p.fee || meta.fee[1];
-  const heart = (typeof savedHeartButton === "function")
-    ? savedHeartButton(id)
-    : "";
-  const safeId = String(id).replace(/'/g, "\\'");
-
-  return `
-    <div data-directory-card data-provider-id="${id}" class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-sm">
-      <div class="grid grid-cols-1 md:grid-cols-[13rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)_13rem] gap-4">
-
-        <!-- Image -->
-        <button type="button" onclick="openProviderProfile('${safeId}')" aria-label="Open ${name}"
-          class="block w-full h-48 md:h-56 lg:h-60 self-start rounded-xl overflow-hidden bg-slate-100">
-          <img src="${imgSrc}" alt="${name}" class="w-full h-full object-cover">
-        </button>
-
-        <!-- Info -->
-        <div class="min-w-0 border border-slate-200 rounded-2xl p-4 flex flex-col">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-            <h2 class="text-xl lg:text-2xl font-bold text-slate-900 min-w-0">
-              <button type="button" onclick="openProviderProfile('${safeId}')" class="text-left hover:text-red-700 transition">${name}</button>
-            </h2>
-            ${typeof window.renderSainoTierBadge === "function"
-              ? window.renderSainoTierBadge(p, true)
-              : `<span class="flex items-center gap-1 text-emerald-700 text-xs font-medium whitespace-nowrap shrink-0">Saino Verified</span>`}
-          </div>
-
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 mb-2">
-            <span class="flex items-center gap-1 text-amber-500 font-bold">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L8 14.2 3 9.3l6.9-1L12 2Z"/></svg>
-              ${rating}
-            </span>
-            <button type="button" onclick="openProviderReviews('${safeId}')" class="font-medium hover:text-red-700 hover:underline">Reviews</button>
-            <button type="button" onclick="goToHospitalDiscussions('${safeId}')" class="flex items-center gap-1 font-medium hover:text-red-700 hover:underline">
-              ${DIRECTORY_ICON(DIRECTORY_ICONS.chat, "w-4 h-4 text-slate-500")}
-              Discussions
-            </button>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-3 text-sm mb-2 font-semibold">
-            <span class="text-emerald-700 flex items-center gap-1">
-              ${DIRECTORY_ICON(DIRECTORY_ICONS.clock, "w-4 h-4 text-emerald-600")} Open Now
-            </span>
-            ${categoryType === "hospital" ? `
-            <span class="flex items-center gap-1 text-red-700 font-bold">
-              <svg class="w-5 h-5 text-red-600 -scale-x-100" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 8a2 2 0 0 1 2-2h8a1 1 0 0 1 1 1v1h2.4a2 2 0 0 1 1.7.95l2.1 3.4a2 2 0 0 1 .3 1.05V16a1 1 0 0 1-1 1h-.6a2.5 2.5 0 0 1-4.8 0H9.4a2.5 2.5 0 0 1-4.8 0H4a1 1 0 0 1-1-1V8Z"/>
-                <circle cx="7" cy="17.5" r="1.5" fill="#fff"/><circle cx="17" cy="17.5" r="1.5" fill="#fff"/>
-              </svg>
-              24/7 Emergency
-            </span>` : ""}
-          </div>
-
-          <div class="text-slate-600 text-sm mb-1 font-medium">
-            ${location}<span data-distance-for="${id}" class="text-slate-500"></span>
-          </div>
-          <div class="text-slate-700 text-sm font-semibold mb-1">OPD: ${opd}</div>
-          <div class="text-slate-800 text-sm font-bold mb-3">${phone}</div>
-
-          <!-- Departments (pehle 3 aur baaki ke pills ek jaise) -->
-          <div class="flex flex-wrap items-center gap-2 mt-auto">
-            ${deps.slice(0, 3).map(d => `<span class="${DIRECTORY_PILL}">${d}</span>`).join("")}
-            <div id="extra-deps-${index}" class="hidden flex-wrap gap-2">
-              ${deps.slice(3).map(d => `<span class="${DIRECTORY_PILL}">${d}</span>`).join("")}
-            </div>
-            ${deps.length > 3 ? `
-              <button type="button" onclick="toggleDepartments(${index})" id="more-btn-${index}"
-                class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-slate-300 transition">
-                +${deps.length - 3}
-              </button>` : ""}
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="md:col-span-2 lg:col-span-1 flex flex-col sm:flex-row lg:flex-col gap-3 sm:items-center lg:items-stretch justify-between">
-          <div class="flex lg:flex-col items-center lg:items-stretch justify-between gap-3">
-            <div class="flex items-center gap-3 text-slate-700 lg:justify-end lg:mb-4 order-2 lg:order-1">
-              <button type="button" class="hover:text-red-700 transition" aria-label="Share">${DIRECTORY_ICON(DIRECTORY_ICONS.share, "w-5 h-5")}</button>
-              ${heart}
-            </div>
-            <div class="order-1 lg:order-2">
-              <div class="text-xs text-slate-500">${meta.fee[0]}</div>
-              <div class="text-sm font-bold">${fee}</div>
-            </div>
-          </div>
-          <div class="flex flex-col gap-3 sm:w-56 lg:w-full">
-            <button type="button" onclick="openAppointmentBooking('${safeId}')"
-              class="w-full flex items-center justify-center gap-2 bg-red-700 hover:bg-red-800 text-white text-sm font-bold px-4 py-3 rounded-xl transition shadow-sm">
-              ${DIRECTORY_ICON(DIRECTORY_ICONS.calendar, "w-5 h-5")} Book appointment
-            </button>
-            <button type="button" onclick="openProviderProfile('${safeId}')"
-              class="w-full border border-red-700 text-red-700 hover:bg-red-50 py-3 rounded-xl font-semibold text-sm transition">
-              View Profile
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>`;
-}
-
-/* ---------- Page ---------- */
-function renderHospitalDirectoryView(categoryType = "hospital") {
-  categoryType = String(categoryType || "hospital").toLowerCase();
-  if (!DIRECTORY_META[categoryType]) categoryType = "hospital";
-  window.__directoryCategory = categoryType;
-
-  const meta = DIRECTORY_META[categoryType];
-  const groups = DIRECTORY_FILTERS[categoryType];
-  const list = directoryAllProviders().filter(p => p && directoryNorm(p.category) === categoryType);
-
-  setTimeout(() => {                                   // HTML page par lagne ke baad
-    if (typeof directoryRefreshDistances === "function") directoryRefreshDistances();
-    if (typeof directoryEnsureUserLocation === "function") directoryEnsureUserLocation();
-  }, 0);
-
-  return `
-    <div class="max-w-7xl mx-auto px-4 py-4" style="zoom: 0.85;">
-
-      <!-- Header -->
-      <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
-        <div>
-          <button type="button" onclick="navigateTo('marketplace')"
-            class="flex items-center gap-1 text-xs font-semibold text-red-700 hover:underline mb-2">
-            ← Back to Marketplace
-          </button>
-          <h1 class="text-2xl sm:text-3xl font-black">${meta.title}</h1>
-          <p class="text-slate-500 text-sm">${meta.desc}</p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button type="button" onclick="clearAllFilters()" class="text-red-600 text-sm font-semibold hover:underline">Clear Filters</button>
-          <select class="border rounded-lg px-3 py-2 text-sm">
-            <option>Recommended</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Mobile: filters button -->
-      <button type="button" onclick="toggleDirectoryFilterPanel()"
-        class="md:hidden w-full flex items-center justify-center gap-2 mb-4 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-800">
-        ${DIRECTORY_ICON(DIRECTORY_ICONS.filter)} Filters
-      </button>
-
-      <!-- Layout -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 items-start">
-
-        <!-- Left Filter Sidebar -->
-        <div class="col-span-1 md:col-span-4 lg:col-span-3">
-          <div id="directory-filter-panel" data-category="${categoryType}" class="hidden md:block bg-white border rounded-xl p-4">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="font-bold">Filters</h3>
-              <button type="button" onclick="clearAllFilters()" class="text-red-600 text-sm font-semibold hover:underline">Clear All</button>
-            </div>
-            <div class="space-y-4">
-              ${directorySidebarHTML(groups)}
-            </div>
-            <div class="mt-5 pt-2">
-              <button type="button" onclick="clearAllFilters()"
-                class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-red-50 text-red-600 font-semibold rounded-xl hover:bg-red-100 transition text-sm">
-                ${DIRECTORY_ICON(DIRECTORY_ICONS.rotate)} Clear all filters
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Content List -->
-        <div id="directory-results" class="col-span-1 md:col-span-8 lg:col-span-9 space-y-4 min-w-0">
-          <div id="directory-count" class="text-sm font-semibold text-slate-700">${list.length} ${meta.plural} found</div>
-          ${list.map((p, index) => directoryCardHTML(p, index, categoryType)).join("")}
-          <div id="directory-empty" class="${list.length === 0 ? "" : "hidden "}bg-white border rounded-xl p-10 text-center text-slate-500 font-medium">
-            No ${meta.plural.toLowerCase()} found.
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
 
 /* 2. Hospital Profile View (Single Profile Page) */
 function renderHospitalProfileView(providerId) {
@@ -432,23 +23,9 @@ function renderHospitalProfileView(providerId) {
   };
 
   const name = provider.name || "Provider";
+  const initials = name.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "HC";
   const category = (provider.category || "healthcare").toLowerCase();
-
-const initials = name
-  .split(" ")
-  .filter(Boolean)
-  .map(w => w[0])
-  .join("")
-  .slice(0, 2)
-  .toUpperCase() || "HC";
-  const providerImage =
-  provider.image ||
-  provider.logo ||
-  provider.imageUrl ||
-  provider.photo ||
-  provider.profileImage ||
-  '';
-    const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1) + "s";
+  const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1) + "s";
   const location = provider.location || provider.address || "Kathmandu";
   const rating = provider.rating || "4.8";
   const reviews = provider.reviewsCount || "240";
@@ -468,14 +45,12 @@ const initials = name
       
       <!-- Breadcrumb -->
       <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
-        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <button type="button" onclick="returnToProviderSource()" class="font-semibold text-red-700 hover:underline">← Back to previous page</button>
-          <span>·</span>
+        <div class="flex items-center gap-2 text-xs text-slate-500">
           <button type="button" onclick="navigateTo('marketplace')" class="hover:underline">Home</button>
           <span>›</span>
           <button type="button" onclick="backToHospitalList()" class="hover:underline">${categoryTitle}</button>
           <span>›</span>
-          <<span class="text-slate-800 font-semibold">${name}</span>>
+          <span class="text-slate-800 font-semibold">Norvic Hospital</span>
         </div>
       </div>
 
@@ -485,23 +60,16 @@ const initials = name
         <div class="relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-900 text-white p-6 sm:p-8 flex flex-col justify-between shadow-sm" style="min-height: 190px;">
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-             <div class="w-20 h-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-                ${
-                  providerImage
-                    ? `<img src="${providerImage}" alt="${name}"
-                        class="w-full h-full object-cover">`
-                    : `<div class="w-full h-full flex items-center justify-center
-                        bg-slate-100 text-slate-500 font-bold text-xl">
-                        ${initials}
-                      </div>`
-                }
+              <div class="w-16 h-16 rounded-xl overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white font-bold text-xl shrink-0">
+                ${(provider.image || provider.imageUrl || provider.logo) ? `<img src="${provider.image || provider.imageUrl || provider.logo}" alt="${name}" class="w-full h-full object-cover">` : initials}
               </div>
               <div>
                 <div class="flex items-center gap-2">
                   <h1 class="text-2xl font-bold">${name}</h1>
-                  ${typeof window.renderSainoTierBadge === "function"
-                    ? window.renderSainoTierBadge(provider, true)
-                    : `<span class="text-[11px] font-semibold bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 px-2 py-0.5 rounded-full">Saino Verified</span>`}
+                 <span class="inline-flex items-center gap-1 text-emerald-300 text-xs font-semibold bg-emerald-500/20 border border-emerald-400/30 px-2.5 py-0.5 rounded-full backdrop-blur-xs">
+                    <svg class="w-4 h-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="#064e3b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Saino Verified
+                  </span>
                 </div>
                 <div class="flex items-center gap-3 text-xs text-emerald-100/80 mt-1">
                   <span>Multispecialty Hospital</span>
@@ -511,7 +79,7 @@ const initials = name
                 <div class="flex items-center gap-1.5 text-xs text-amber-300 mt-2">
                   <span>★</span>
                   <span class="font-bold text-white">${rating}</span>
-                  <span class="text-emerald-100/70">(${reviews} reviews)</span>
+                  <button type="button" onclick="openDedicatedReviewsView('${provider.id || name}')" class="text-emerald-100/80 hover:text-white underline underline-offset-2 transition cursor-pointer">(${reviews} reviews)</button>
                 </div>
               </div>
             </div>
@@ -563,7 +131,7 @@ const initials = name
             <span class="text-xs text-slate-400 font-medium">3 Doctors Active</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="border border-slate-200 rounded-xl p-4 text-center">
               <img src="assets/doctor3.jpg" class="w-14 h-14 mx-auto rounded-full object-cover mb-2" alt="Dr. Anup Karki">
               <h3 class="text-xs font-bold text-slate-900">Dr. Anup Karki</h3>
@@ -574,7 +142,7 @@ const initials = name
             </div>
 
             <div class="border border-slate-200 rounded-xl p-4 text-center">
-              <img src="assets/doctor2.jpg" class="w-14 h-14 mx-auto rounded-full object-cover mb-2" alt="Dr. Sabina Shrestha">
+              <img src="assets/doctor2.jpg" class="w-14 h-14 mx-auto rounded-full object-cover mb-2">
               <h3 class="text-xs font-bold text-slate-900">Dr. Sabina Shrestha</h3>
               <p class="text-[11px] text-slate-500 mb-3">General physician</p>
               <button type="button" onclick="openAppointmentBooking('${provider.id || name}', 'Dr. Sabina Shrestha', 'General physician')" class="w-full bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold py-2 rounded-lg transition">
@@ -656,17 +224,17 @@ const initials = name
         <div class="bg-white rounded-2xl border border-slate-200 p-6">
           <h2 class="text-base font-bold text-slate-900 mb-4">Gallery</h2>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <img src="assets/hos1.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 1">
-            <img src="assets/hos2.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 2">
-            <img src="assets/hos3.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 3">
-            <img src="assets/hos4.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 4">
-            <img src="assets/hos5.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 5">
-            <img src="assets/hos6.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 6">
-          </div>
+  <img src="assets/hos1.jpg" class="w-full h-44 rounded-xl object-cover" alt="Gallery 1">
+  <img src="assets/hos2.jpg" class="w-full h-44 rounded-xl object-cover" alt="Gallery 2">
+  <img src="assets/hos3.jpg" class="w-full h-44 rounded-xl object-cover" alt="Gallery 3">
+  <img src="assets/hos4.jpg" class="w-full h-44 rounded-xl object-cover" alt="Gallery 4">
+  <img src="assets/hos5.jpg" class="w-full h-44 rounded-xl object-cover" alt="Gallery 5">
+  <img src="assets/hos6.jpg" class="w-full h-44 rounded-xl object-cover" alt="Gallery 6">
+</div>
         </div>
 
-        <!-- Reviews Section -->
-        <div id="profile-reviews" class="bg-white rounded-2xl border border-slate-200 p-6 w-full">
+        <!-- Reviews -->
+        <div id="profile-reviews" class="bg-white rounded-2xl border border-slate-200 p-6 scroll-mt-4">
           <h2 class="text-base font-bold text-slate-900 mb-4">Reviews</h2>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="border border-slate-200 rounded-xl p-5 text-center flex flex-col justify-center">
@@ -681,7 +249,6 @@ const initials = name
                 <div class="flex items-center gap-2"><span>1</span><div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-amber-400 h-full w-[1%]"></div></div></div>
               </div>
             </div>
-
             <div class="lg:col-span-2 space-y-4">
               <!-- Sujata R. -->
               <div class="border-b border-slate-100 pb-3">
@@ -728,73 +295,56 @@ const initials = name
                 <p class="text-xs text-slate-600 pl-10.5">Very professional gynaecology department. Felt well cared for.</p>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- More Hospitals Section (Full Width) -->
-        <div class="hospital-more-section bg-white rounded-2xl border border-slate-200 p-6 w-full mt-6">
+        <!-- More Hospitals -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-bold text-slate-900">More hospitals</h2>
-            <button type="button" onclick="backToHospitalList()" class="text-xs text-red-700 font-semibold hover:underline cursor-pointer">View all</button>
+            <button type="button" onclick="backToHospitalList()" class="text-xs text-red-700 font-semibold hover:underline">View all</button>
           </div>
 
-          <div class="hospital-more-cards grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <!-- Norvic Hospital -->
-            <div class="hospital-more-card border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between bg-white">
-              <div class="h-40 w-full bg-slate-100 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=500&q=80" alt="Norvic Hospital" class="w-full h-full object-cover">
-              </div>
-              <div class="p-4 flex flex-col flex-1 justify-between gap-3">
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Norvic Hospital</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Thapathali • 3km</p>
-                </div>
-                <button type="button" onclick="openHospitalProfile('norvic')" class="w-full bg-red-700 hover:bg-red-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition whitespace-nowrap">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+              <img src="assets/hos1.jpg" alt="Norvic Hospital" class="h-28 w-full object-cover">
+              <div class="p-3.5">
+                <h3 class="text-xs font-bold text-slate-900">Norvic Hospital</h3>
+                <p class="text-[10px] text-slate-500 mt-0.5">Thapathali • 3km</p>
+                <button type="button" onclick="openHospitalProfile('norvic')" class="w-full mt-3 bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold py-2 rounded-lg transition">
                   Book Appointment →
                 </button>
               </div>
             </div>
 
-            <!-- Madhyapur Hospital -->
-            <div class="hospital-more-card border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between bg-white">
-              <div class="h-40 w-full bg-slate-100 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=500&q=80" alt="Madhyapur Hospital" class="w-full h-full object-cover">
-              </div>
-              <div class="p-4 flex flex-col flex-1 justify-between gap-3">
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Madhyapur Hospital</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Thimi • 6km</p>
-                </div>
-                <button type="button" onclick="openHospitalProfile('madhyapur')" class="w-full bg-red-700 hover:bg-red-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition whitespace-nowrap">
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+              <img src="assets/hos2.jpg" alt="Madhyapur Hospital" class="h-28 w-full object-cover">
+              <div class="p-3.5">
+                <h3 class="text-xs font-bold text-slate-900">Madhyapur Hospital</h3>
+                <p class="text-[10px] text-slate-500 mt-0.5">Thimi • 6km</p>
+                <button type="button" onclick="openHospitalProfile('madhyapur')" class="w-full mt-3 bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold py-2 rounded-lg transition">
                   Book Appointment →
                 </button>
               </div>
             </div>
 
-            <!-- Everest Hospital -->
-            <div class="hospital-more-card border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between bg-white">
-              <div class="h-40 w-full bg-slate-100 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=500&q=80" alt="Everest Hospital" class="w-full h-full object-cover">
-              </div>
-              <div class="p-4 flex flex-col flex-1 justify-between gap-3">
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Everest Hospital</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">New Baneshwor • 4km</p>
-                </div>
-                <button type="button" onclick="openHospitalProfile('everest')" class="w-full bg-red-700 hover:bg-red-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition whitespace-nowrap">
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+              <img src="assets/hos3.jpg" alt="Everest Hospital" class="h-28 w-full object-cover">
+              <div class="p-3.5">
+                <h3 class="text-xs font-bold text-slate-900">Everest Hospital</h3>
+                <p class="text-[10px] text-slate-500 mt-0.5">New Baneshwor • 4km</p>
+                <button type="button" onclick="openHospitalProfile('everest')" class="w-full mt-3 bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold py-2 rounded-lg transition">
                   Book Appointment →
                 </button>
               </div>
             </div>
           </div>
         </div>
+
+      </div>
     </div>
-  </div>
-`;
+  `;
 }
 
 /* 3. Global Click Handlers */
-window.renderHospitalDirectoryView = renderHospitalDirectoryView;
 window.renderHospitalProfileView = renderHospitalProfileView;
 
 /* Profile router: sirf ek function. Clinic ho to clinic ka profile, baaki sabka hospital wala profile page.
@@ -802,13 +352,10 @@ window.renderHospitalProfileView = renderHospitalProfileView;
 window.openProviderProfile = function(providerId) {
   const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
   if (!main) return;
-  if (typeof window.captureProviderReturnView === "function") window.captureProviderReturnView();
   const p = directoryFindProvider(providerId);
   const cat = directoryNorm(p && p.category);
   const useClinic = cat === "clinic" && typeof window.renderClinicProfileView === "function";
   main.innerHTML = useClinic ? window.renderClinicProfileView(providerId) : renderHospitalProfileView(providerId);
-  const hero = document.getElementById("heroHomeSection");
-  if (hero) hero.style.display = "none";
   window.scrollTo({ top: 0, behavior: "instant" });
   if (window.lucide && typeof window.lucide.createIcons === "function") {
     window.lucide.createIcons();
@@ -818,25 +365,13 @@ window.openHospitalProfile = window.openProviderProfile;
 window.openClinicProfile = window.openProviderProfile;
 window.openDiagnosticProfile = window.openProviderProfile;
 window.openWellnessProfile = window.openProviderProfile;
-window.openInsuranceProfile = window.openHospitalProfile;
 
 // Reviews par click: profile khulta hai aur seedha Reviews section par scroll hota hai
 window.openProviderReviews = function(providerId) {
-  const hasReturnView = typeof window.captureProviderReturnView === "function" && window.captureProviderReturnView();
   window.openProviderProfile(providerId);
   setTimeout(function() {
     const el = document.getElementById("profile-reviews");
-    if (!el) return;
-    if (hasReturnView && typeof window.returnToProviderSource === "function" && !el.querySelector("[data-review-return]")) {
-      const backButton = document.createElement("button");
-      backButton.type = "button";
-      backButton.setAttribute("data-review-return", "true");
-      backButton.className = "mb-4 text-sm font-semibold text-slate-600 hover:text-red-700";
-      backButton.textContent = "← Back to previous page";
-      backButton.addEventListener("click", window.returnToProviderSource);
-      el.insertBefore(backButton, el.firstChild);
-    }
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 60);
 };
 
@@ -856,16 +391,8 @@ window.openCategoryPage = function(categoryName) {
     }
   }
 };
-
-window.backToHospitalList = function() {
-  const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
-  if (main) {
-    main.innerHTML = renderHospitalDirectoryView(window.__directoryCategory || "hospital");
-    window.scrollTo({ top: 0, behavior: "instant" });
-    if (window.lucide && typeof window.lucide.createIcons === 'function') {
-      window.lucide.createIcons();
-    }
-  }
+window.backToHospitalList = function () {
+  navigateTo(window.__directoryCategory || "hospital");
 };
 
 window.toggleDepartments = function(index) {
@@ -883,7 +410,6 @@ window.toggleDepartments = function(index) {
    ============================================================ */
 
 window.BOOKING_STATE = {
-  bookingType: "appointment",
   hospitalName: "Norvic Hospital",
   doctorName: "Dr. Aayush Shrestha",
   doctorRole: "Senior Cardiologist",
@@ -900,38 +426,6 @@ window.renderAppointmentBookingView = function() {
   const currentDoc = window.BOOKING_STATE.doctorName;
   const currentDay = window.BOOKING_STATE.selectedDay;
   const currentSlot = window.BOOKING_STATE.timeSlot;
-  const isDiagnosticPackage = window.BOOKING_STATE.bookingType === "diagnostic-package";
-  const providers = (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
-  const provider = providers.find(item =>
-    String(item.id) === String(window.BOOKING_STATE.providerId) ||
-    String(item.name) === String(window.BOOKING_STATE.hospitalName)
-  );
-  const doctorOptions = (provider && Array.isArray(provider.doctors) ? provider.doctors : [])
-    .map(doctor => typeof doctor === "string" ? { name: doctor, role: "" } : doctor)
-    .filter(doctor => doctor && doctor.name);
-  if (provider && Array.isArray(provider.availability)) {
-    provider.availability.forEach(availability => {
-      const availabilityDoctor = String(availability.doctor || "");
-      const doctorName = availabilityDoctor.split(" (")[0].trim();
-      const matchedRole = availabilityDoctor.match(/\(([^)]+)\)/);
-      if (doctorName && !doctorOptions.some(doctor => doctor.name === doctorName)) {
-        doctorOptions.push({
-          name: doctorName,
-          role: availability.role || availability.specialty || (matchedRole && matchedRole[1]) || ""
-        });
-      }
-    });
-  }
-  if (provider && provider.leadDoctor && !doctorOptions.some(doctor => doctor.name === provider.leadDoctor)) {
-    doctorOptions.unshift({ name: provider.leadDoctor, role: provider.leadDoctorRole || "" });
-  }
-  if (currentDoc && !doctorOptions.some(doctor => doctor.name === currentDoc)) {
-    doctorOptions.unshift({ name: currentDoc, role: window.BOOKING_STATE.doctorRole || "" });
-  }
-  if (!doctorOptions.length) {
-    doctorOptions.push({ name: currentDoc || "Available Doctor", role: window.BOOKING_STATE.doctorRole || "" });
-  }
-  const safeBookingValue = value => String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/[\r\n]/g, " ");
 
   return `
     <div id="appointment-booking-container" class="bg-[#f8fafc] min-h-screen text-slate-800 font-sans pb-24">
@@ -942,7 +436,7 @@ window.renderAppointmentBookingView = function() {
           <nav class="flex items-center gap-2 text-[11px] text-slate-400 mb-3">
             <button type="button" onclick="navigateTo('marketplace')" class="hover:text-slate-600">Home</button>
             <span>›</span>
-            <span class="text-red-700 font-semibold">${isDiagnosticPackage ? "Book Diagnostic Package" : "Book Appointment"}</span>
+            <span class="text-red-700 font-semibold">Book Appointment</span>
           </nav>
 
           <div class="flex items-center justify-between">
@@ -961,8 +455,8 @@ window.renderAppointmentBookingView = function() {
               </div>
             </div>
 
-            <button type="button" onclick="returnToProviderSource()" class="text-xs font-semibold text-slate-600 hover:text-red-700 flex items-center gap-1">
-              ← Back
+            <button type="button" onclick="openHospitalProfile('${window.BOOKING_STATE.providerId || currentProviderName}')" class="text-xs font-semibold text-slate-600 hover:text-red-700 flex items-center gap-1">
+              ← Back to Profile
             </button>
           </div>
         </div>
@@ -977,44 +471,54 @@ window.renderAppointmentBookingView = function() {
 
             <!-- 1. Choose an Available Doctor -->
             <div class="bg-white border border-slate-200 rounded-2xl p-6">
-              <h2 class="text-sm font-bold text-slate-900 mb-4">${isDiagnosticPackage ? "1. Selected Diagnostic Package" : "1. Choose an Available Doctor"}</h2>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" style="display:${isDiagnosticPackage ? "none" : "grid"}">
-                ${doctorOptions.map(doctor => {
-                  const selected = doctor.name === currentDoc;
-                  const safeName = safeBookingValue(doctor.name);
-                  const safeRole = safeBookingValue(doctor.role || "Consultant");
-                  return `
-                    <button type="button"
-                            data-booking-doctor
-                            data-doctor="${safeBookingValue(doctor.name)}"
-                            aria-pressed="${selected}"
-                            onclick="selectBookingDoctor('${safeName}', '${safeRole}')"
-                            class="w-full text-left cursor-pointer rounded-2xl p-4 relative transition ${selected ? 'border-2 border-red-600 bg-red-50/20' : 'border border-slate-200 bg-white hover:border-slate-300'}">
-                      <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-3">
-                          ${window.renderUserProfileIcon("w-12 h-12", "w-6 h-6")}
-                          <div>
-                            <h3 class="text-xs font-bold text-slate-900">${doctor.name}</h3>
-                            <p class="text-[11px] text-slate-500">${doctor.role || "Consultant"}</p>
-                          </div>
-                        </div>
-                        <span data-doctor-radio class="w-4 h-4 rounded-full border-2 ${selected ? 'border-red-700' : 'border-slate-300'} flex items-center justify-center">
-                          <span class="w-2 h-2 rounded-full bg-red-700 ${selected ? '' : 'hidden'}"></span>
-                        </span>
+              <h2 class="text-sm font-bold text-slate-900 mb-4">1. Choose an Available Doctor</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <!-- Doctor 1: Dr. Aayush Shrestha -->
+                <div id="doc-card-aayush" 
+                     onclick="selectBookingDoctor('Dr. Aayush Shrestha', 'Senior Cardiologist')" 
+                     class="cursor-pointer rounded-2xl p-4 relative transition ${currentDoc === 'Dr. Aayush Shrestha' ? 'border-2 border-red-600 bg-red-50/20' : 'border border-slate-200 bg-white hover:border-slate-300'}">
+                  <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                      ${window.renderUserProfileIcon("w-12 h-12", "w-6 h-6")}
+                      <div>
+                        <h3 class="text-xs font-bold text-slate-900">Dr. Aayush Shrestha</h3>
+                        <p class="text-[11px] text-slate-500">Senior Cardiologist</p>
                       </div>
-                      ${doctor.experience ? `<p class="mt-3 text-[11px] text-slate-500">Experience: <strong class="text-slate-700">${doctor.experience}</strong></p>` : ""}
-                    </button>
-                  `;
-                }).join("")}
-              </div>
-              ${isDiagnosticPackage ? `
-                <div class="rounded-xl border border-red-100 bg-red-50/60 p-4">
-                  <h3 class="text-sm font-bold text-slate-900">${window.BOOKING_STATE.packageTitle}</h3>
-                  <p class="text-xs text-slate-600 mt-1">${window.BOOKING_STATE.packageTests}</p>
-                  <p class="text-xs font-bold text-red-700 mt-2">${window.BOOKING_STATE.fee}</p>
-                  <p class="text-[11px] text-slate-500 mt-1">Partner: ${currentProviderName}</p>
+                    </div>
+                    <span id="doc-radio-aayush" class="w-4 h-4 rounded-full flex items-center justify-center ${currentDoc === 'Dr. Aayush Shrestha' ? 'border-2 border-red-700' : 'border-2 border-slate-300'}">
+                      <span class="w-2 h-2 rounded-full bg-red-700 ${currentDoc === 'Dr. Aayush Shrestha' ? '' : 'hidden'}"></span>
+                    </span>
+                  </div>
+                  <div class="mt-3 text-[11px] text-slate-500">
+                    <div class="text-amber-500 font-medium">★ ★ ★ ★ ★ <span class="text-slate-700 font-bold">4.8</span> <span class="text-slate-400">(240 reviews)</span></div>
+                    <div class="mt-1">Experience: <strong class="text-slate-700 font-semibold">12 Years</strong></div>
+                  </div>
                 </div>
-              ` : ""}
+
+                <!-- Doctor 2: Dr. Rekha Shrestha -->
+                <div id="doc-card-rekha" 
+                     onclick="selectBookingDoctor('Dr. Rekha Shrestha', 'General Physician')" 
+                     class="cursor-pointer rounded-2xl p-4 relative transition ${currentDoc === 'Dr. Rekha Shrestha' ? 'border-2 border-red-600 bg-red-50/20' : 'border border-slate-200 bg-white hover:border-slate-300'}">
+                  <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                      ${window.renderUserProfileIcon("w-12 h-12", "w-6 h-6")}
+                      <div>
+                        <h3 class="text-xs font-bold text-slate-900">Dr. Rekha Shrestha</h3>
+                        <p class="text-[11px] text-slate-500">General Physician</p>
+                      </div>
+                    </div>
+                    <span id="doc-radio-rekha" class="w-4 h-4 rounded-full flex items-center justify-center ${currentDoc === 'Dr. Rekha Shrestha' ? 'border-2 border-red-700' : 'border-2 border-slate-300'}">
+                      <span class="w-2 h-2 rounded-full bg-red-700 ${currentDoc === 'Dr. Rekha Shrestha' ? '' : 'hidden'}"></span>
+                    </span>
+                  </div>
+                  <div class="mt-3 text-[11px] text-slate-500">
+                    <div class="text-amber-500 font-medium">★ ★ ★ ★ ★ <span class="text-slate-700 font-bold">5.0</span> <span class="text-slate-400">(180 reviews)</span></div>
+                    <div class="mt-1">Experience: <strong class="text-slate-700 font-semibold">8 Years</strong></div>
+                  </div>
+                </div>
+
+              </div>
             </div>
 
             <!-- 2. Select Date (September 2026) -->
@@ -1115,14 +619,14 @@ window.renderAppointmentBookingView = function() {
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1.5">${isDiagnosticPackage ? "Package notes (optional)" : "Reason for Appointment / Symptoms"}</label>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Reason for Appointment / Symptoms</label>
                 <textarea id="patientSymptoms" rows="3" placeholder="Explain symptoms briefly here..." class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-red-600 transition"></textarea>
               </div>
 
               <div class="flex items-center gap-2 pt-2">
                 <input type="checkbox" id="consentBox" checked class="w-4 h-4 accent-red-700 rounded cursor-pointer">
                 <label for="consentBox" class="text-[11px] text-slate-600 cursor-pointer">
-                  I consent to sharing these details with ${currentProviderName} for ${isDiagnosticPackage ? "package booking" : "clinical review"}.
+                  I consent to sharing this basic healthcare details with Narnia Clinic for clinical review.
                 </label>
               </div>
             </div>
@@ -1132,16 +636,16 @@ window.renderAppointmentBookingView = function() {
           <!-- RIGHT COLUMN: Sticky Booking Summary -->
           <div class="lg:col-span-4 sticky top-6">
             <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
-              <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100">${isDiagnosticPackage ? "Package Booking Summary" : "Booking Summary"}</h3>
+              <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100">Booking Summary</h3>
               
               <dl class="text-xs space-y-3 py-4 border-b border-slate-100">
                 <div class="flex justify-between items-center">
-                  <dt class="text-slate-400">${isDiagnosticPackage ? "Partner" : "Hospital"}</dt>
+                  <dt class="text-slate-400">Hospital</dt>
                   <dd id="summaryHospital" class="font-bold text-slate-800 text-right">${window.BOOKING_STATE.hospitalName}</dd>
                 </div>
                 <div class="flex justify-between items-center">
-                  <dt class="text-slate-400">${isDiagnosticPackage ? "Package" : "Doctor"}</dt>
-                  <dd id="summaryDoctor" class="font-bold text-slate-800 text-right">${isDiagnosticPackage ? window.BOOKING_STATE.packageTitle : window.BOOKING_STATE.doctorName}</dd>
+                  <dt class="text-slate-400">Doctor</dt>
+                  <dd id="summaryDoctor" class="font-bold text-slate-800 text-right">${window.BOOKING_STATE.doctorName}</dd>
                 </div>
                 <div class="flex justify-between items-center">
                   <dt class="text-slate-400">Date</dt>
@@ -1154,16 +658,16 @@ window.renderAppointmentBookingView = function() {
               </dl>
 
               <div class="flex justify-between items-center py-4">
-                <span class="text-xs font-semibold text-slate-600">${isDiagnosticPackage ? "Package Price" : "Consultation Fee"}</span>
+                <span class="text-xs font-semibold text-slate-600">Consultation Fee</span>
                 <span class="text-base font-black text-red-700">${window.BOOKING_STATE.fee}</span>
               </div>
 
               <button type="button" onclick="confirmAppointment()" class="w-full bg-[#991b1b] hover:bg-red-800 text-white text-xs font-bold py-3.5 rounded-xl transition shadow-xs">
-                ${isDiagnosticPackage ? "Confirm & Book Package" : "Confirm & Book Appointment"}
+                Confirm & Book Appointment
               </button>
 
               <p class="text-[10px] text-slate-400 text-center mt-3">
-                ${isDiagnosticPackage ? "No booking charges. Payment is handled by the diagnostic partner." : "No booking charges. Pay at the clinic."}
+                No booking charges. Pay at the clinic.
               </p>
             </div>
           </div>
@@ -1184,20 +688,41 @@ window.selectBookingDoctor = function(doctorName, doctorRole) {
   window.BOOKING_STATE.doctorName = doctorName;
   window.BOOKING_STATE.doctorRole = doctorRole;
 
+  // Update Summary Card
   const summaryDoc = document.getElementById("summaryDoctor");
   if (summaryDoc) summaryDoc.textContent = doctorName;
 
-  document.querySelectorAll("[data-booking-doctor]").forEach(card => {
-    const selected = card.getAttribute("data-doctor") === doctorName;
-    card.setAttribute("aria-pressed", String(selected));
-    card.className = `w-full text-left cursor-pointer rounded-2xl p-4 relative transition ${selected ? "border-2 border-red-600 bg-red-50/20" : "border border-slate-200 bg-white hover:border-slate-300"}`;
-    const radio = card.querySelector("[data-doctor-radio]");
-    if (radio) {
-      radio.className = `w-4 h-4 rounded-full border-2 ${selected ? "border-red-700" : "border-slate-300"} flex items-center justify-center`;
-      const dot = radio.querySelector("span");
-      if (dot) dot.classList.toggle("hidden", !selected);
+  // Update Visual Card Borders & Radio Dots
+  const cardAayush = document.getElementById("doc-card-aayush");
+  const cardRekha = document.getElementById("doc-card-rekha");
+  const radioAayush = document.querySelector("#doc-radio-aayush span");
+  const radioRekha = document.querySelector("#doc-radio-rekha span");
+  const radioAayushCircle = document.getElementById("doc-radio-aayush");
+  const radioRekhaCircle = document.getElementById("doc-radio-rekha");
+
+  if (doctorName === "Dr. Aayush Shrestha") {
+    if (cardAayush) {
+      cardAayush.className = "cursor-pointer rounded-2xl p-4 relative transition border-2 border-red-600 bg-red-50/20";
     }
-  });
+    if (cardRekha) {
+      cardRekha.className = "cursor-pointer rounded-2xl p-4 relative transition border border-slate-200 bg-white hover:border-slate-300";
+    }
+    if (radioAayushCircle) radioAayushCircle.className = "w-4 h-4 rounded-full border-2 border-red-700 flex items-center justify-center";
+    if (radioRekhaCircle) radioRekhaCircle.className = "w-4 h-4 rounded-full border-2 border-slate-300 flex items-center justify-center";
+    if (radioAayush) radioAayush.classList.remove("hidden");
+    if (radioRekha) radioRekha.classList.add("hidden");
+  } else {
+    if (cardRekha) {
+      cardRekha.className = "cursor-pointer rounded-2xl p-4 relative transition border-2 border-red-600 bg-red-50/20";
+    }
+    if (cardAayush) {
+      cardAayush.className = "cursor-pointer rounded-2xl p-4 relative transition border border-slate-200 bg-white hover:border-slate-300";
+    }
+    if (radioRekhaCircle) radioRekhaCircle.className = "w-4 h-4 rounded-full border-2 border-red-700 flex items-center justify-center";
+    if (radioAayushCircle) radioAayushCircle.className = "w-4 h-4 rounded-full border-2 border-slate-300 flex items-center justify-center";
+    if (radioRekha) radioRekha.classList.remove("hidden");
+    if (radioAayush) radioAayush.classList.add("hidden");
+  }
 };
 
 // 2. Date Selection Logic
@@ -1241,44 +766,25 @@ window.selectBookingSlot = function(timeString) {
   });
 };
 
-window.openAppointmentBooking = function(providerId, doctorName, doctorRole, doctorFee) {
-  const isDiagnosticPackage = window.BOOKING_STATE.bookingType === "diagnostic-package" && doctorRole === "Diagnostic Package";
-  if (!isDiagnosticPackage) {
-    window.BOOKING_STATE.bookingType = "appointment";
-    delete window.BOOKING_STATE.packageTitle;
-    delete window.BOOKING_STATE.packageTests;
-    window.BOOKING_STATE.doctorName = "Dr. Aayush Shrestha";
-    window.BOOKING_STATE.doctorRole = "Senior Cardiologist";
-    window.BOOKING_STATE.fee = "Rs. 1,000";
-  }
-  if (typeof window.captureProviderReturnView === "function") window.captureProviderReturnView();
+window.openAppointmentBooking = function(providerId, doctorName, doctorRole) {
   const allProviders = (window.AppState && window.AppState.providers) || (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
   
   // Clicked facility find karein (Clinic, Hospital, Diagnostic)
-  const p = providerId ? allProviders.find(item =>
+  const p = allProviders.find(item => 
     item && (
       (item.id && String(item.id).toLowerCase() === String(providerId).toLowerCase()) ||
       (item.name && item.name.toLowerCase() === String(providerId).toLowerCase()) ||
       (item.name && item.name.toLowerCase().includes(String(providerId).toLowerCase()))
     )
-  ) : null;
+  );
 
   if (p) {
     window.BOOKING_STATE.providerId = p.id;
     window.BOOKING_STATE.hospitalName = p.name;
     window.BOOKING_STATE.location = p.location || p.address || "Kathmandu";
     if (p.doctors && p.doctors.length > 0) {
-      const firstDoctor = typeof p.doctors[0] === "string"
-        ? { name: p.doctors[0], role: "" }
-        : p.doctors[0];
-      window.BOOKING_STATE.doctorName = firstDoctor.name;
-      window.BOOKING_STATE.doctorRole = firstDoctor.role || "Consultant";
-    } else if (p.leadDoctor) {
-      window.BOOKING_STATE.doctorName = p.leadDoctor;
-      window.BOOKING_STATE.doctorRole = p.leadDoctorRole || "Consultant";
-    } else if (p.availability && p.availability.length) {
-      window.BOOKING_STATE.doctorName = String(p.availability[0].doctor || "Available Doctor").split(" (")[0].trim();
-      window.BOOKING_STATE.doctorRole = p.availability[0].role || p.availability[0].specialty || "Consultant";
+      window.BOOKING_STATE.doctorName = p.doctors[0].name;
+      window.BOOKING_STATE.doctorRole = p.doctors[0].role;
     }
   } else if (providerId) {
     window.BOOKING_STATE.providerId = providerId;
@@ -1288,17 +794,20 @@ window.openAppointmentBooking = function(providerId, doctorName, doctorRole, doc
   if (doctorName) {                       // profile par kisi doctor ke "Book" se aaye ho
     window.BOOKING_STATE.doctorName = doctorName;
     if (doctorRole) window.BOOKING_STATE.doctorRole = doctorRole;
-    if (doctorFee) window.BOOKING_STATE.fee = doctorFee;
   }
 
   // Modal ko band karein agar khula ho
   if (typeof closeModal === 'function') closeModal();
+  window.closeModal = function() {
+  const modal = document.getElementById("modal") || document.getElementById("appointment-modal") || document.querySelector(".modal");
+  if (modal) modal.remove();
+  openProviderProfile(window.BOOKING_STATE?.providerId || 'norvic');
+};
 
-  if (typeof navigateTo === "function") {
-    navigateTo("appointment-booking", {
-      providerId: window.BOOKING_STATE.providerId,
-      doctorName: window.BOOKING_STATE.doctorName
-    });
+  const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
+  if (main && typeof window.renderAppointmentBookingView === 'function') {
+    main.innerHTML = window.renderAppointmentBookingView();
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 };
 
@@ -1313,8 +822,7 @@ window.renderAppointmentSuccessView = function(patientData) {
   const patientName = patientData.name || "John Doe";
   const patientPhone = patientData.phone || "+977 98510XXXXX";
   const patientEmail = patientData.email || "johndoe@gmail.com";
-  const isDiagnosticPackage = window.BOOKING_STATE.bookingType === "diagnostic-package";
-  const patientReason = patientData.symptoms || (isDiagnosticPackage ? `Booking for ${window.BOOKING_STATE.packageTitle}.` : "Routine cardiovascular check-up. Experiencing minor shortness of breath during light workouts over the past week.");
+  const patientReason = patientData.symptoms || "Routine cardiovascular check-up. Experiencing minor shortness of breath during light workouts over the past week.";
   const bookingRef = "SAINO-2026-" + Math.floor(1000 + Math.random() * 9000);
 
   return `
@@ -1324,6 +832,10 @@ window.renderAppointmentSuccessView = function(patientData) {
       <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-4">
         <nav class="flex items-center gap-2 text-[11px] text-slate-400">
           <button type="button" onclick="navigateTo('marketplace')" class="hover:text-slate-600">Home</button>
+          <span>›</span>
+          <button type="button" onclick="backToHospitalList()" class="hover:text-slate-600">Hospitals</button>
+          <span>›</span>
+          <button type="button" onclick="openHospitalProfile('norvic')" class="hover:text-slate-600">Norvic Hospital</button>
           <span>›</span>
           <span class="text-red-700 font-medium">Booking Confirmed</span>
         </nav>
@@ -1341,9 +853,9 @@ window.renderAppointmentSuccessView = function(patientData) {
             </svg>
           </div>
 
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">${isDiagnosticPackage ? "Diagnostic Package Booked Successfully!" : "Appointment Booked Successfully!"}</h1>
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Appointment Booked Successfully!</h1>
           <p class="text-xs text-slate-500 mt-1.5 max-w-md mx-auto">
-            ${isDiagnosticPackage ? `Your ${window.BOOKING_STATE.packageTitle} booking is confirmed with ${window.BOOKING_STATE.hospitalName}.` : `Your booking is confirmed. ${window.BOOKING_STATE.hospitalName} has been notified of your appointment.`}
+            Your booking is confirmed. Norvic Hospital has been notified of your appointment.
           </p>
 
           <!-- Booking Reference Pill -->
@@ -1361,27 +873,19 @@ window.renderAppointmentSuccessView = function(patientData) {
             <h2 class="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100">Appointment Summary</h2>
             
             <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">${isDiagnosticPackage ? "Diagnostic Partner" : "Clinic"}</span>
+              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Clinic</span>
               <div class="flex items-center gap-1 text-xs font-bold text-slate-900 mt-0.5">
                 <svg class="w-3.5 h-3.5 text-red-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
                 <span>${window.BOOKING_STATE.hospitalName}</span>
               </div>
-              <p class="text-[11px] text-slate-500 ml-4.5">${window.BOOKING_STATE.location || "Kathmandu"}</p>
+              <p class="text-[11px] text-slate-500 ml-4.5">Thapathali, Kathmandu · Multi-specialty</p>
             </div>
 
-            ${isDiagnosticPackage ? `
-              <div>
-                <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Diagnostic Package</span>
-                <div class="text-xs font-bold text-slate-900 mt-0.5">${window.BOOKING_STATE.packageTitle}</div>
-                <p class="text-[11px] text-slate-500">${window.BOOKING_STATE.packageTests}</p>
-              </div>
-            ` : `
-              <div>
-                <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Doctor</span>
-                <div class="text-xs font-bold text-slate-900 mt-0.5">${window.BOOKING_STATE.doctorName}</div>
-                <p class="text-[11px] text-slate-500">${window.BOOKING_STATE.doctorRole} (12 Yrs Experience)</p>
-              </div>
-            `}
+            <div>
+              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Doctor</span>
+              <div class="text-xs font-bold text-slate-900 mt-0.5">${window.BOOKING_STATE.doctorName}</div>
+              <p class="text-[11px] text-slate-500">${window.BOOKING_STATE.doctorRole} (12 Yrs Experience)</p>
+            </div>
 
             <div>
               <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Date & Time</span>
@@ -1390,9 +894,9 @@ window.renderAppointmentSuccessView = function(patientData) {
             </div>
 
             <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">${isDiagnosticPackage ? "Package Price" : "Consultation Fee"}</span>
+              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Consultation Fee</span>
               <div class="text-sm font-black text-red-700 mt-0.5">${window.BOOKING_STATE.fee}</div>
-              <p class="text-[10px] text-slate-400">${isDiagnosticPackage ? "Payment is handled by the diagnostic partner." : "Pay at the clinic counter during checkout"}</p>
+              <p class="text-[10px] text-slate-400">Pay at the clinic counter during checkout</p>
             </div>
           </div>
 
@@ -1416,7 +920,7 @@ window.renderAppointmentSuccessView = function(patientData) {
             </div>
 
             <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">${window.BOOKING_STATE.bookingType === "diagnostic-package" ? "Package Booking Note" : "Reason for Visit"}</span>
+              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Reason for Visit</span>
               <p class="text-xs text-slate-600 mt-0.5 leading-relaxed font-normal">${patientReason}</p>
             </div>
           </div>
@@ -1424,72 +928,39 @@ window.renderAppointmentSuccessView = function(patientData) {
         </div>
 
         <!-- 3. Important Guidelines & Instructions -->
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-3">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-3 print:hidden">
           <h2 class="text-xs font-bold text-slate-900 tracking-tight">Important Guidelines & Instructions</h2>
           <ul class="space-y-2 text-xs text-slate-600 list-disc list-inside">
             <li class="leading-relaxed">
-              ${isDiagnosticPackage ? `Please follow the sample collection or lab-visit instructions shared by ${window.BOOKING_STATE.hospitalName}.` : `Please arrive at ${window.BOOKING_STATE.hospitalName} at least <strong class="text-red-700 font-semibold">15 minutes early</strong> to complete physical check-in and registry procedures.`}
+              Please arrive at Norvic Hospital at least <strong class="text-red-700 font-semibold">15 minutes early</strong> to complete physical check-in and registry procedures.
             </li>
             <li class="leading-relaxed">
-              ${isDiagnosticPackage ? `Bring a valid <strong class="text-red-700 font-semibold">Government-issued Photo ID</strong> and any relevant previous test reports.` : `Bring a valid <strong class="text-red-700 font-semibold">Government-issued Photo ID</strong> (Citizenship Card, Passport, or License) along with any previous medical/cardiology reports.`}
+              Bring a valid <strong class="text-red-700 font-semibold">Government-issued Photo ID</strong> (Citizenship Card, Passport, or License) along with any previous medical/cardiology reports.
             </li>
             <li class="leading-relaxed">
-              ${isDiagnosticPackage ? `For changes to this package booking, please contact the diagnostic partner.` : `If you need to reschedule or cancel your slot, please notify the platform or clinic at least 4 hours before the scheduled time slot.`}
+              If you need to reschedule or cancel your slot, please notify the platform or clinic at least 4 hours before the scheduled time slot.
             </li>
           </ul>
         </div>
-    
+
         <!-- 4. Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-2 print:hidden">
-          <button type="button" onclick="printBookingConfirmation()"
-              class="flex-1 py-3 px-4 border border-red-700 text-red-700 hover:bg-red-50 text-xs font-bold rounded-xl transition text-center shadow-2xs">
+        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+          <button type="button" 
+                  onclick="window.print()" 
+                  class="flex-1 py-3 px-4 border border-red-700 text-red-700 hover:bg-red-50 text-xs font-bold rounded-xl transition text-center shadow-2xs">
             Download Confirmation PDF
           </button>
           
-          <button type="button" onclick="returnToProviderSource()"
+          <button type="button" 
+                  onclick="navigateTo('marketplace')" 
                   class="flex-1 py-3 px-4 bg-[#991b1b] hover:bg-red-800 text-white text-xs font-bold rounded-xl transition text-center shadow-xs">
-            Back to previous page
+            Go Back to Homepage
           </button>
         </div>
 
       </div>
     </div>
   `;
-};
-
-window.printBookingConfirmation = function() {
-  const element = document.getElementById("booking-confirmation-container");
-  if (!element) return;
-
-  const printable = element.cloneNode(true);
-  printable.querySelectorAll("button").forEach(button => button.remove());
-  const title = window.BOOKING_STATE.bookingType === "diagnostic-package"
-    ? "Diagnostic Package Receipt"
-    : "Appointment Receipt";
-  const printWindow = window.open("", "", "width=750,height=800");
-  if (!printWindow) {
-    showToast("Allow pop-ups to print your confirmation.");
-    return;
-  }
-
-  printWindow.document.write(`<!DOCTYPE html>
-    <html>
-      <head>
-        <title>${title}</title>
-        <script src="https://cdn.tailwindcss.com"><\/script>
-        <style>
-          @page { size: A4 portrait; margin: 10mm; }
-          body { background: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        </style>
-      </head>
-      <body><main class="max-w-xl mx-auto">${printable.outerHTML}</main></body>
-    </html>`);
-  printWindow.document.close();
-  setTimeout(() => {
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-  }, 350);
 };
 
 // Confirm Button Handler with Form Data Extraction
@@ -1536,9 +1007,7 @@ window.confirmAppointment = function() {
     name: name,
     phone: phone,
     email: email || "johndoe@gmail.com",
-    symptoms: symptoms || (window.BOOKING_STATE.bookingType === "diagnostic-package"
-      ? `Booking for ${window.BOOKING_STATE.packageTitle}.`
-      : "Routine cardiovascular check-up. Experiencing minor shortness of breath during light workouts over the past week.")
+    symptoms: symptoms || "Routine cardiovascular check-up. Experiencing minor shortness of breath during light workouts over the past week."
   };
 
   const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
@@ -1548,7 +1017,7 @@ window.confirmAppointment = function() {
   }
 };
 /* ============================================================
-   AUTO-SCALE FOR DESKTOP VIEW
+   AUTO-SCALE FOR LAPTOP VIEW (COMPACT 85% ZOOM)
    ============================================================ */
 function applyLaptopScale() {
   const container = document.getElementById("mainContent") || 
@@ -1560,7 +1029,7 @@ function applyLaptopScale() {
 
   
   if (window.innerWidth >= 1024) {
-    container.style.zoom = typeof AppState !== "undefined" && AppState.activeView === "marketplace" ? "0.8" : "0.85";
+    container.style.zoom = "0.85";
   } else {
     container.style.zoom = "1"; 
   }
@@ -1568,16 +1037,6 @@ function applyLaptopScale() {
 
 window.addEventListener("resize", applyLaptopScale);
 window.addEventListener("DOMContentLoaded", applyLaptopScale);
-
-
-const originalRenderHospital = window.renderHospitalDirectoryView;
-if (typeof originalRenderHospital === "function") {
-  window.renderHospitalDirectoryView = function(...args) {
-    const html = originalRenderHospital.apply(this, args);
-    setTimeout(applyLaptopScale, 50);
-    return html;
-  };
-}
 
 // Run immediately once
 applyLaptopScale();
@@ -1675,12 +1134,6 @@ window.goToHospitalDiscussions = function(providerId) {
   const disc = (p.discussionId && store[p.discussionId]) ||
     Object.values(store).find(function(d) { const n = clean(d.hospital); return n && (n === key || n.includes(key) || key.includes(n)); });
 
-  navigateTo("discussions");
-  if (disc) {
-    setTimeout(function() { if (typeof window.openDiscussionModal === "function") window.openDiscussionModal(disc.id); }, 60);
-  } else if (typeof showToast === "function") {
-    showToast("No discussion for " + p.name + " yet");
-  }
 };
 
 /* ---------- Home page card: "+N more" click par baaki departments ---------- */

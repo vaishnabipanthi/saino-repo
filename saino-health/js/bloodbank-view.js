@@ -141,7 +141,7 @@ function renderBloodBankDirectoryView() {
                 <div class="flex flex-wrap items-start justify-between gap-4 mb-3">
                   <div>
                     <div class="flex items-center gap-2">
-                      <h3 class="text-base font-bold text-slate-900">${bank.name}</h3>
+                      <button type="button" onclick="openProviderByName('${bank.name.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}', 'bloodbank')" class="text-left text-base font-bold text-slate-900 hover:text-red-700">${bank.name}</button>
                       <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
                         ✓ Saino Verified
                       </span>
@@ -229,9 +229,7 @@ function renderBloodDeliveryTrackingView(bankName, bloodGroup) {
       <!-- Courier Card -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div class="flex items-center gap-3.5">
-          <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700">
-            SM
-          </div>
+          ${window.renderUserProfileIcon("w-12 h-12", "w-6 h-6")}
           <div>
             <div class="text-sm font-bold text-slate-900">Sunita Maharjan</div>
             <div class="text-xs text-slate-500">Cold-chain courier · Bike</div>

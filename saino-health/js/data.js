@@ -1825,7 +1825,7 @@ window.SAINO_DATA = {
       role: 'Consultant Cardiologist',
       experience: '12+ Years Experience',
       hospital: 'Norvic Heart Institute',
-      image: 'https://images.unsplash.com/photo-1594824813628-4a2368543d07?w=300&auto=format&fit=crop&q=80',
+      image: 'assets/doctor2.jpg',
       fee: 'Rs. 800',
       status: 'OPD Available'
     },

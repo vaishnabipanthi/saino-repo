@@ -21,7 +21,6 @@ const AMBULANCE_TIERS = {
 
 let AMBULANCE_STATE = { filter: "All", from: null, to: null, active: null };
 
-const ambulanceInitials = (name) => name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 const ambulanceMoney = (n) => `NPR ${n.toLocaleString("en-US")}`;
 
 function ambulanceVisible() {
@@ -169,9 +168,7 @@ function ambulanceDriverCard(b) {
   return `
     <div class="bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
-          ${ambulanceInitials(d.name)}
-        </div>
+        ${window.renderUserProfileIcon("w-11 h-11", "w-5 h-5")}
         <div>
           <div class="text-sm font-bold text-slate-900">${d.name}</div>
           <div class="text-[11px] text-slate-500">${d.role}</div>
