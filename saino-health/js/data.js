@@ -1318,89 +1318,60 @@ window.SAINO_DATA = {
 
   subscriptionTiers: [
     {
-      id: 'listed',
-      name: 'SAINO LISTED',
-      badge: 'Saino Listed (Free)',
-      price: 'NPR 0 / Free Forever',
+      id: 'saino_listed',
+      name: 'FREE LISTING',
+      badge: 'SAINO Free Listing',
+      price: 'NPR 0 / Free',
       annualPrice: 'NPR 0 / year',
-      period: 'Standard Discovery Entry',
+      period: 'Basic marketplace presence',
       highlight: false,
       features: [
-        '1 Organisation logo upload for Discovery',
-        '1 picture of your organisation or service',
-        '2 services / doctor / package query + Bookings',
-        'Can see reviews (cannot reply - no review control)',
-        'No public rating stars or like counters',
-        'Service Explanation & Opening/Closing times',
-        'Social links display',
-        'No direct phone number (Routed via SAINO manual triage number)'
+        'Provider profile, logo and facility photos',
+        'Address, contact number and opening hours',
+        'Up to 2 basic services',
+        'Limited booking and comment features',
+        'Standard marketplace visibility'
       ],
       cta: 'Start Free Listing',
       type: 'free'
     },
     {
-      id: 'pro',
-      name: 'SAINO PRO',
-      badge: '✓ SAINO Verified Pro (PAID)',
-      price: 'NPR 3,600 / month',
-      annualPrice: 'NPR 43,200 / year',
-      period: 'Billed monthly or annually',
-      highlight: false,
-      popularTag: 'POPULAR FOR CLINICS & SPECIALISTS',
-      features: [
-        'Organisation logo with Pro Verified Batch',
-        'Ratings, Likes & Full Review Management (reply to patients)',
-        'Profile Optimised for search discovery',
-        '5 Consultants / services / packages Book Options in Marketplace',
-        '5 picture uploads of your medical facility',
-        'Service explanation & Opening/Closing time details',
-        'Direct Phone number & Social Links display',
-        'Appointment Management system integration'
-      ],
-      cta: 'Upgrade to Pro',
-      type: 'paid'
-    },
-    {
-      id: 'vip',
-      name: 'SAINO VIP',
-      badge: '👑 SAINO Verified VIP (PAID)',
-      price: 'NPR 5,900 / month',
-      annualPrice: 'NPR 70,800 / year',
-      period: 'Billed monthly or annually',
+      id: 'saino_pro',
+      name: 'SAINO VERIFIED (VIP)',
+      badge: 'SAINO Verified Trust Badge',
+      price: 'Contact SAINO',
+      annualPrice: 'Contact SAINO',
+      period: 'Plan and pricing confirmed by SAINO',
       highlight: true,
-      popularTag: 'MOST POPULAR FOR HOSPITALS & POLYCLINICS',
+      popularTag: 'TRUSTED PROVIDER',
       features: [
-        'Organisation logo with VIP Batch Verification',
-        'Ratings, Likes, Reviews & Reputation Management',
-        'Profile Optimised for top search results',
-        '15 Consultants / services / packages Book Options in Marketplace',
-        '10 picture uploads of an organisation',
-        'Direct Phone number & Social Links show',
-        'Appointment Management with Intelligence Experience',
-        '1 Free Big Screen Healthcare Campaign every month'
+        'Everything in Free Listing',
+        'Up to 5 services',
+        'View patient reviews and comments',
+        'Reply to patient reviews',
+        'SAINO Verified Trust Badge after verification'
       ],
-      cta: 'Upgrade to VIP',
+      cta: 'Request VIP plan',
       type: 'paid'
     },
     {
-      id: 'vvip',
-      name: 'SAINO HEALTH VVIP',
-      badge: '🏆 SAINO VVIP Advantage (PREMIUM)',
-      price: 'NPR 9,999 / month',
-      annualPrice: 'NPR 1,19,988 / year',
-      period: 'Billed monthly or annually',
+      id: 'saino_prime',
+      name: 'SAINO VVIP',
+      badge: 'SAINO VVIP Trust Badge',
+      price: 'Contact SAINO',
+      annualPrice: 'Contact SAINO',
+      period: 'Plan and pricing confirmed by SAINO',
       highlight: false,
-      popularTag: 'FLAGSHIP GROWTH PACKAGE FOR ENTERPRISES',
+      popularTag: 'ADVANCED GROWTH',
       features: [
-        'Premium Organization Profile with VIP Verified Badge',
-        'Up to 15 Consultants / Services / Packages & 10 Photos',
-        'Intelligent Appointment Management (Walk-in/Walk-out, Scheduling, Notifications)',
-        'Healthcare SEO Support & Local SEO Optimization',
-        'Patient Interest Tracking & Engagement Insights',
-        'Profile Performance Insights & ROI reports',
-        '2 Free Big Screen Healthcare Campaigns every month'
+        'Everything in SAINO Verified (VIP)',
+        'Up to 15 services',
+        'Advanced marketplace analytics',
+        'Search campaigns',
+        'Higher marketplace visibility',
+        'SAINO VVIP Trust Badge after verification'
       ],
-      cta: 'Upgrade to VVIP',
+      cta: 'Request VVIP plan',
       type: 'paid'
     }
   ],
@@ -1450,7 +1421,7 @@ window.SAINO_DATA = {
     },
     {
       q: 'How are WhatsApp bookings tracked in the analytics dashboard?',
-      a: 'Saino Pro users receive real-time metrics showing total card impressions, clicks on "Book via WhatsApp", profile view durations, and user location breakdowns.'
+      a: 'SAINO VVIP providers receive marketplace metrics for profile views, searches, bookings, and service interest.'
     },
     {
       q: 'What is required for the SAINO Verified Badge?',

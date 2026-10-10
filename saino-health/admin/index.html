@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SAINO Admin</title>
+
+    <link rel="stylesheet" href="css/admin.css">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-mark">S</div>
+
+            <div>
+                <h2>SAINO</h2>
+                <span>SUPER ADMIN</span>
+            </div>
+        </div>
+
+        <div class="sidebar-scroll">
+
+            <div class="nav-section">
+                <p class="nav-title">OVERVIEW</p>
+
+                <a class="nav-item active" href="#" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+                <p class="nav-title">MARKETPLACE</p>
+
+                <a class="nav-item" href="#" data-page="providers">
+                    <i data-lucide="building-2"></i>
+                    <span>Providers</span>
+                    <b class="nav-count">486</b>
+                </a>
+
+                <a class="nav-item" href="#" data-page="doctors">
+                    <i data-lucide="stethoscope"></i>
+                    <span>Doctors</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="categories">
+                    <i data-lucide="layers"></i>
+                    <span>Categories</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="services">
+                    <i data-lucide="list"></i>
+                    <span>Services</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="featured">
+                    <i data-lucide="star"></i>
+                    <span>Featured Listings</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+                <p class="nav-title">VERIFICATION</p>
+
+                <a class="nav-item" href="#" data-page="verification">
+                    <i data-lucide="badge-check"></i>
+                    <span>Verification Queue</span>
+                    <b class="nav-count warning">24</b>
+                </a>
+
+                <a class="nav-item" href="#" data-page="verification-rules">
+                    <i data-lucide="shield-check"></i>
+                    <span>Verification Rules</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+
+                <p class="nav-title">OPERATIONS</p>
+
+                <a class="nav-item" href="#" data-page="appointments">
+                    <i data-lucide="calendar-days"></i>
+                    <span>Appointments</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="reviews">
+                    <i data-lucide="message-square"></i>
+                    <span>Reviews & Moderation</span>
+                    <b class="nav-count danger">18</b>
+                </a>
+
+                <a class="nav-item" href="#" data-page="users">
+                    <i data-lucide="users"></i>
+                    <span>Users</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="reports">
+                    <i data-lucide="flag"></i>
+                    <span>Reports & Complaints</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+
+                <p class="nav-title">ADVERTISING</p>
+
+                <a class="nav-item" href="#" data-page="ads">
+                    <i data-lucide="megaphone"></i>
+                    <span>Advertisements</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="campaigns">
+                    <i data-lucide="badge-percent"></i>
+                    <span>Campaigns</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="boosts">
+                    <i data-lucide="zap"></i>
+                    <span>Boosts</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="ad-inventory">
+                    <i data-lucide="layout-template"></i>
+                    <span>Ad Inventory</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+
+                <p class="nav-title">CONTENT</p>
+
+                <a class="nav-item" href="#" data-page="homepage">
+                    <i data-lucide="home"></i>
+                    <span>Homepage</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="banners">
+                    <i data-lucide="image"></i>
+                    <span>Banners</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="articles">
+                    <i data-lucide="newspaper"></i>
+                    <span>Articles & FAQs</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="pages">
+                    <i data-lucide="file-text"></i>
+                    <span>Static Pages</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="seo">
+                    <i data-lucide="search"></i>
+                    <span>SEO</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+
+                <p class="nav-title">INTELLIGENCE</p>
+
+                <a class="nav-item" href="#" data-page="analytics">
+                    <i data-lucide="chart-no-axes-combined"></i>
+                    <span>Analytics</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="search">
+                    <i data-lucide="search-check"></i>
+                    <span>Search & Discovery</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="recommendations">
+                    <i data-lucide="sparkles"></i>
+                    <span>Recommendations</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+
+                <p class="nav-title">SYSTEM</p>
+
+                <a class="nav-item" href="#" data-page="notifications">
+                    <i data-lucide="bell"></i>
+                    <span>Notifications</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="features">
+                    <i data-lucide="toggle-right"></i>
+                    <span>Feature Controls</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="roles">
+                    <i data-lucide="user-cog"></i>
+                    <span>Roles & Permissions</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="audit">
+                    <i data-lucide="history"></i>
+                    <span>Audit Logs</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="settings">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>System Operational</strong>
+                    <small>All services running</small>
+                </div>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button class="icon-button mobile-menu" id="menuBtn">
+                    <i data-lucide="menu"></i>
+                </button>
+
+                <div>
+                    <p class="breadcrumb">SAINO / <span id="breadcrumbPage">Dashboard</span></p>
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button class="icon-button" title="Emergency Control">
+                    <i data-lucide="siren"></i>
+                </button>
+
+                <button class="icon-button notification-button">
+                    <i data-lucide="bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">SA</div>
+
+                    <div class="admin-info">
+                        <strong>Super Admin</strong>
+                        <span>Administrator</span>
+                    </div>
+
+                    <i data-lucide="chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <section class="page-content" id="pageContent">
+
+            <!-- DASHBOARD -->
+
+            <div id="dashboardPage" class="page active-page">
+
+                <div class="page-intro">
+
+                    <div>
+                        <p class="eyebrow">MARKETPLACE OVERVIEW</p>
+                        <h2>Good evening, Admin.</h2>
+                        <p class="muted">
+                            Here's what's happening across SAINO today.
+                        </p>
+                    </div>
+
+                    <button class="primary-button">
+                        <i data-lucide="plus"></i>
+                        Quick Action
+                    </button>
+
+                </div>
+
+
+                <!-- KPI CARDS -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="users"></i>
+                        </div>
+
+                        <div class="stat-content">
+                            <span>Total Users</span>
+                            <strong id="totalUsers">12,480</strong>
+                            <small class="positive">↑ 8.4% this month</small>
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="building-2"></i>
+                        </div>
+
+                        <div class="stat-content">
+                            <span>Total Providers</span>
+                            <strong id="totalProviders">486</strong>
+                            <small class="positive">↑ 12 new this week</small>
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="badge-check"></i>
+                        </div>
+
+                        <div class="stat-content">
+                            <span>Verified Providers</span>
+                            <strong id="verifiedProviders">352</strong>
+                            <small>72.4% of providers</small>
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="calendar-check"></i>
+                        </div>
+
+                        <div class="stat-content">
+                            <span>Appointments</span>
+                            <strong id="totalAppointments">1,284</strong>
+                            <small class="positive">↑ 14.2% this month</small>
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="star"></i>
+                        </div>
+
+                        <div class="stat-content">
+                            <span>Total Reviews</span>
+                            <strong id="totalReviews">3,921</strong>
+                            <small>18 awaiting moderation</small>
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="megaphone"></i>
+                        </div>
+
+                        <div class="stat-content">
+                            <span>Active Campaigns</span>
+                            <strong id="activeCampaigns">26</strong>
+                            <small>8 pending approval</small>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- QUICK ACTIONS -->
+
+                <div class="section-heading">
+
+                    <div>
+                        <h3>Quick Actions</h3>
+                        <p>Frequently used administration tools.</p>
+                    </div>
+
+                </div>
+
+                <div class="quick-actions">
+
+                    <button class="quick-action" data-page="providers">
+                        <span class="quick-icon red">
+                            <i data-lucide="building-2"></i>
+                        </span>
+                        <span>
+                            <strong>Add Provider</strong>
+                            <small>Create a marketplace listing</small>
+                        </span>
+                    </button>
+
+
+                    <button class="quick-action" data-page="verification">
+                        <span class="quick-icon amber">
+                            <i data-lucide="shield-check"></i>
+                        </span>
+                        <span>
+                            <strong>Review Verification</strong>
+                            <small>24 providers waiting</small>
+                        </span>
+                    </button>
+
+
+                    <button class="quick-action" data-page="reviews">
+                        <span class="quick-icon purple">
+                            <i data-lucide="message-square-warning"></i>
+                        </span>
+                        <span>
+                            <strong>Moderate Reviews</strong>
+                            <small>18 require attention</small>
+                        </span>
+                    </button>
+
+
+                    <button class="quick-action" data-page="ads">
+                        <span class="quick-icon blue">
+                            <i data-lucide="megaphone"></i>
+                        </span>
+                        <span>
+                            <strong>Create Advertisement</strong>
+                            <small>Manage marketplace ads</small>
+                        </span>
+                    </button>
+
+                </div>
+
+
+                <!-- LOWER GRID -->
+
+                <div class="dashboard-grid">
+
+                    <!-- ACTIVITY -->
+
+                    <div class="panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <h3>Recent Activity</h3>
+                                <p>Latest actions across the marketplace.</p>
+                            </div>
+
+                            <button class="text-button">View All</button>
+
+                        </div>
+
+
+                        <div class="activity-list" id="activityList">
+                        </div>
+
+                    </div>
+
+
+                    <!-- VERIFICATION -->
+
+                    <div class="panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <h3>Verification Queue</h3>
+                                <p>Providers awaiting review.</p>
+                            </div>
+
+                            <button class="text-button" data-page="verification">
+                                View Queue
+                            </button>
+
+                        </div>
+
+
+                        <div class="mini-list" id="verificationList">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MARKETPLACE HEALTH -->
+
+                <div class="panel marketplace-health">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h3>Marketplace Health</h3>
+                            <p>Current platform performance.</p>
+                        </div>
+
+                        <span class="live-badge">
+                            <span></span> Live
+                        </span>
+
+                    </div>
+
+
+                    <div class="health-grid">
+
+                        <div class="health-item">
+                            <span>Search → Profile</span>
+                            <strong>38.6%</strong>
+                            <div class="progress">
+                                <i style="width:38.6%"></i>
+                            </div>
+                        </div>
+
+                        <div class="health-item">
+                            <span>Profile → Booking</span>
+                            <strong>14.8%</strong>
+                            <div class="progress">
+                                <i style="width:14.8%"></i>
+                            </div>
+                        </div>
+
+                        <div class="health-item">
+                            <span>Provider Verification</span>
+                            <strong>72.4%</strong>
+                            <div class="progress">
+                                <i style="width:72.4%"></i>
+                            </div>
+                        </div>
+
+                        <div class="health-item">
+                            <span>Profile Completion</span>
+                            <strong>81.2%</strong>
+                            <div class="progress">
+                                <i style="width:81.2%"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/providers.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/admin.js"></script>
+
+</body>
+</html>

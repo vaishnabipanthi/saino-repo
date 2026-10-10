@@ -61,14 +61,32 @@ A modern, responsive, and connected healthcare marketplace web application for *
 
 ### 5. Marketplace Listings & 3-Tier Verification Badges (Pages 1, 2, 9 & 10)
 - 25 rich Nepalese provider listings across Kathmandu Valley and major cities.
-- **3 Verification Tiers**:
-  - `Saino Pro`: Paid verified profile, up to 15 users, verified badge, top ranking, advanced analytics tool.
-  - `Saino Prime`: Paid verified profile, 5 doctors/users listing fee, verified badge, priority ranking.
-  - `Saino Listed`: Free listing, 2 booking services, manual WhatsApp inquiry, basic ranking.
+- **3 Verification Tiers**: Free Listing, SAINO Verified (VIP), and SAINO VVIP.
 - Interactive engagement:
   - Live toggleable `♡ Like` and `👥 Interested` counters.
   - ⭐ Rating and review counters.
   - Service hours, opening/closing times, and department tags.
+
+### Provider subscription tiers
+
+The provider portal and Supabase enforce three plan levels:
+
+- **Free Listing** — profile, photos, contact details, opening hours and up to
+  **2 services**; basic marketplace visibility. The two-service limit is the
+  current default because the original listing specification described two
+  booking services.
+- **SAINO Verified (VIP)** — Free features, up to **5 services**, provider
+  access to published patient reviews and moderated replies, plus the SAINO
+  Verified Trust Badge when the provider is verified.
+- **SAINO VVIP** — VIP features, up to **15 services**, advanced analytics,
+  search campaigns, higher marketplace priority and the VVIP Trust Badge when
+  verified.
+
+Pending and approved services both count toward a provider's quota. The portal
+shows the quota and blocks new submissions at the limit; a database trigger
+also enforces it for direct API requests. VIP review access, VVIP analytics and
+campaign access are independently enforced by row-level security. Marketplace
+priority is stored on the provider record for use by the marketplace query.
 
 ### 6. Comprehensive Provider Profile Detail Modal (Pages 10 & 11)
 - Interactive tabbed view:
@@ -122,3 +140,46 @@ saino-health/
 │   └── app.js            # Reactive state controller, search/filter algorithms, modals, WhatsApp link builder
 └── README.md             # Project documentation & instructions
 ```
+
+## Provider management backend (Supabase)
+
+The Super Admin **Providers** screen and the provider dashboard connect to
+Supabase with the public anon key. To set them up:
+
+1. For a fresh project, run [`supabase/schema.sql`](./supabase/schema.sql) once
+   in the Supabase SQL Editor. For a project that already has the earlier
+   provider schema, run
+   [`supabase/migrations/20261009_provider_plan_entitlements.sql`](./supabase/migrations/20261009_provider_plan_entitlements.sql)
+   instead; do not rerun the full schema because its policy declarations are
+   intended for a fresh setup.
+2. Put the Supabase project URL and **public anon key** in
+   [`admin/js/supabase-config.js`](./admin/js/supabase-config.js). Never put a
+   `service_role` key in browser code.
+3. Create the admin account in Supabase Auth and assign
+   `app_metadata.role = "super_admin"` using a trusted server-side process.
+   The admin signs into the Providers or Verification Queue screen with that account.
+4. Create each provider's Supabase Auth user. In the Super Admin Providers
+   screen, add or edit the listing and enter the existing account email to link
+   the provider owner. The email-based membership helper is super-admin-only.
+5. Open [`provider/index.html`](./provider/index.html) using a local web server
+   (for example VS Code Live Server). Providers sign in with their linked Auth
+   account. The provider portal refuses access if the account has no provider
+   membership.
+
+Provider profile submissions are separate from approved listings; the
+`review_provider_change_request` database function applies submitted profile
+changes only after an admin approves them. The schema also includes provider
+memberships, doctors, appointment slots, private gallery storage, moderated
+services, reviews and bookings. Provider functionality includes profile-change
+approval, doctors and service submissions/edits, slot setup, appointment status
+management, atomic queue tokens, telemedicine settings, moderated photos,
+review replies/reports, plan requests, offers, daily analytics, notifications
+and account preferences. Use a trusted backend/edge function for importing
+analytics and publishing approved photos to any public marketplace media
+bucket. Provider coordinates are saved for distance calculation by marketplace
+clients. Row-level security and explicit table grants protect provider and
+patient data. Provider lists use server-side pagination, indexed status/city
+lookup and indexed name search; Supabase-managed pooling avoids opening one
+direct database connection per browser session. Plan prices are intentionally
+not fabricated; populate the plan catalogue with approved SAINO prices. Do not
+expose Supabase service credentials to the browser.

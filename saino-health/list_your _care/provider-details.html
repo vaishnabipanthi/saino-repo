@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAINO HEALTH - Search, Discover, Review & Book Healthcare in Nepal</title>
+  <meta name="description" content="Nepal's premier connected healthcare marketplace. Search, discover, review and book doctor consultations, hospital OPD, diagnostic scans, homecare nurses and emergency blood bank across Kathmandu, Lalitpur, Pokhara and nationwide.">
+
+  <!-- Google Fonts (Plus Jakarta Sans & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link href="css/custom.css" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            saino: {
+              red: '#ad0b0e',
+              'red-dark': '#B3121A',
+              'red-light': '#FDE8E9',
+              navy: '#1A2B4C',
+              'navy-light': '#2A4070',
+              gray: {
+                50: '#F8F9FA',
+                100: '#F1F3F5',
+                200: '#E9ECEF',
+                300: '#DEE2E6',
+                400: '#CED4DA',
+                500: '#ADB5BD',
+                600: '#6C757D',
+                700: '#495057',
+                800: '#343A40',
+                900: '#212529',
+              }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/custom.css">
+<link rel="stylesheet" href="onboarding/provider-onboarding.css">
+<script src="onboarding/provider-onboarding.js" defer></script>
+</head>
+
+
+   <!-- Top Header -->
+<header class="sticky top-0 z-40 bg-[#d6d6d6] backdrop-blur-md border-b border-saino-gray-200 shadow-sm">    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between min-h-[72px] py-2 gap-4">
+        
+        <!-- Brand Logo -->
+        <a href="#" data-nav="marketplace" class="flex items-center space-x-3 group py-1 flex-shrink-0 ml-0 md:-ml-8">
+  <img src="assets/logo.png" alt="SAINO HEALTH" class="h-12 sm:h-14 md:h-16 w-auto max-w-[200px] object-contain transition group-hover:scale-105 drop-shadow-xs">
+</a>
+
+            <!-- Header Search Bar - Desktop Only -->
+    <div class="hidden md:flex flex-1 max-w-xl items-center bg-saino-gray-50 rounded-lg border border-saino-gray-200 p-1 pl-4 shadow-sm focus-within:border-saino-red focus-within:ring-2 focus-within:ring-saino-red/20 transition">
+      <i data-lucide="search" class="w-4 h-4 text-saino-gray-400 mr-2 flex-shrink-0"></i>
+
+      <input 
+        type="text" 
+        id="headerSearchInput" 
+        placeholder="Search hospitals, clinics, services..." 
+        class="bg-transparent flex-1 text-xs text-saino-gray-800 font-medium focus:outline-none placeholder-saino-gray-400"
+      >
+
+      <div class="h-4 w-px bg-saino-gray-300 mx-2"></div>
+
+      <select 
+        id="headerLocationSelect" 
+        class="bg-transparent text-xs text-saino-gray-600 font-semibold focus:outline-none cursor-pointer pr-2"
+      >
+        <option value="all">All Locations</option>
+        <option value="Kathmandu">Kathmandu</option>
+        <option value="Lalitpur">Lalitpur</option>
+        <option value="Bhaktapur">Bhaktapur</option>
+        <option value="Pokhara">Pokhara</option>
+        <option value="Chitwan">Chitwan</option>
+      </select>
+
+      <button 
+        onclick="triggerHeaderSearch()" 
+        class="px-4 py-1.5 bg-[#ad0b0e] hover:bg-saino-red-dark text-white font-bold rounded-lg text-xs transition shadow-sm"
+      >
+        Search
+      </button>
+    </div>
+
+      
+<!-- Right Actions - Desktop -->
+<div class="hidden md:flex items-center gap-2 flex-shrink-0">
+
+  <button
+    onclick="openProviderSignInModal('patient')"
+    class="header-action-btn bg-saino-red hover:bg-saino-red-dark text-white"
+  >
+    Sign In
+  </button>
+
+  <a
+    href="#"
+    class="header-action-btn bg-saino-red hover:bg-saino-red-dark text-white"
+  >
+    <span>Get Started</span>
+  </a>
+
+</div>
+
+        <!-- Mobile + Tablet Actions (Sign In + Menu) - visible below 768px -->
+        <div class="md:hidden flex items-center space-x-2 ml-auto">
+            <button
+        onclick="openProviderSignInModal('patient')"
+        class="w-24 h-9 px-3 rounded-lg bg-saino-red hover:bg-saino-red-dark border border-saino-red text-white font-bold text-xs flex items-center justify-center transition shadow-xs"
+      >
+        Sign In
+      </button>
+          <button id="mobileMenuBtn" class="p-2 rounded-xl text-saino-gray-600 hover:bg-saino-gray-100 transition">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+  </div>
+
+    <!-- Sub-Navigation -->
+<div class="bg-[#d6d6d6] px-4 sm:px-6 lg:px-8 py-2">      
+  <div class="max-w-7xl mx-auto flex items-center justify-between text-xs font-bold text-saino-gray-600">
+        <nav class="flex items-center space-x-6">
+          <a href="#" data-nav="marketplace" class="text-saino-red font-black uppercase tracking-wider hover:text-saino-red-dark transition">HOME</a>
+          <a href="#" data-nav="about" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Discover</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Find Health care</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">My Appoinments</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Saved</a>
+
+        </nav>
+        <div class="hidden md:flex items-center space-x-5 text-saino-gray-700 font-semibold text-[11px]">
+    
+          <a href="list-your-care.html" class="text-saino-gray-700 hover:text-saino-red transition">List Your Care</a>
+          <a href="#" data-nav="contact" class="text-saino-gray-700 hover:text-saino-red transition">About Us</a>
+          <a href="#" data-nav="about" class="text-saino-gray-700 hover:text-saino-red transition">Contact Us</a>
+          <a href="#" data-nav="contact" class="text-saino-gray-700 hover:text-saino-red transition">FAQs</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-saino-gray-200 bg-white px-4 py-4 space-y-2 shadow-lg">
+      <a href="#" data-nav="marketplace" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Home</a>
+      <a href="#" data-nav="discovery" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition flex items-center justify-between">
+        <span>Discovery</span>
+        <span class="px-1.5 py-0.5 rounded text-[10px] bg-saino-red/10 text-saino-red font-bold">Explore</span>
+      </a>
+      <a href="#" data-nav="about" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">About us</a>
+      <a href="#" data-nav="contact" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Contact us</a>
+      <a href="#" data-nav="list-your-care" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-red hover:bg-saino-red/5 transition">List your care</a>
+      <div class="pt-3 border-t border-saino-gray-100 mb-2">
+        <button onclick="openProviderSignInModal('patient')" class="w-full py-2.5 text-xs font-bold text-saino-gray-800 border border-saino-gray-200 rounded-xl hover:border-saino-red hover:text-saino-red hover:bg-saino-red/5 transition flex items-center justify-center space-x-2">
+          <i data-lucide="user" class="w-4 h-4 text-saino-red"></i>
+          <span>Sign In / Register</span>
+        </button>
+      </div>
+      <a href="tel:+9779761427155" class="w-full py-2.5 text-xs font-bold bg-saino-red hover:bg-saino-red-dark text-white rounded-xl shadow flex items-center justify-center space-x-2 transition">
+        <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+        <span>Call Hotline: +977 9761427155</span>
+      </a>
+    </div>
+  </header>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #ffffff;
+            color: #172033;
+            font-size: 14px; /* font එක ලොකු කරලා */
+        }
+
+        
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        .navigation {
+            border-top: 1px dotted #8b35ff;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            background: #fafafa;
+        }
+
+        .navigation a {
+            text-decoration: none;
+            color: #252b35;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .navigation a:hover {
+            color: #b3121a;
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            max-width: 1120px;
+            margin: auto;
+            padding: 32px 25px 45px;
+        }
+
+        .page-title {
+            font-family: "Poppins", sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .page-description {
+            font-size: 12px;
+            color: #7b8490;
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================
+           STEPS
+        ========================= */
+
+        .steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #7b8490;
+    font-size: 10px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    padding: 7px 9px;
+    border-radius: 6px;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    white-space: nowrap;
+}
+
+.step:hover {
+    background: #fde8e9;
+    color: #b3121a;
+}
+
+.step:hover .circle {
+    background: #b3121a;
+    color: white;
+}
+
+.step.active {
+    background: #fde8e9;
+    color: #b3121a;
+    font-weight: 700;
+}
+
+.circle {
+    width: 19px;
+    height: 19px;
+
+    min-width: 19px;
+
+    border-radius: 50%;
+
+    background: #dce1e6;
+    color: #687382;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.step.active .circle {
+    background: #b3121a;
+    color: white;
+}
+
+
+        /* =========================
+           PLAN SECTION
+        ========================= */
+
+        .plan-title {
+            font-family: "Poppins", sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .plan-description {
+            font-size: 12px;
+            color: #78818d;
+            margin-bottom: 20px;
+        }
+
+        .plans {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .plan-card {
+            border: 1px solid #e0e3e7;
+            border-radius: 6px;
+            padding: 22px 18px 18px;
+            min-height: 390px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+        }
+
+        .plan-badge {
+            text-align: center;
+            color: #b3121a;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .free .plan-badge {
+            color: #178b61;
+        }
+
+        .plan-name {
+            text-align: center;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .price {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .month {
+            text-align: center;
+            color: #737c88;
+            font-size: 11px;
+            margin-bottom: 13px;
+        }
+
+        .plan-description-small {
+            font-size: 11px;
+            line-height: 1.55;
+            color: #6e7783;
+            min-height: 65px;
+            margin-bottom: 8px;
+        }
+
+        .features {
+            list-style: none;
+            margin-top: 5px;
+            flex: 1;
+        }
+
+        .features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            font-size: 11px;
+            line-height: 1.5;
+            margin-bottom: 9px;
+            color: #515b68;
+        }
+
+        .features li::before {
+            content: "●";
+            color: #596474;
+            font-size: 8px;
+            margin-top: 3px;
+        }
+
+        .choose-btn {
+            width: 100%;
+            border: none;
+            background: #b3121a;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .choose-btn:hover {
+            background: #8f0e15;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            background: #e5e9ed;
+            padding: 32px 40px 22px;
+            border-top: 1px solid #d7dce1;
+        }
+
+        .footer-container {
+            max-width: 1120px;
+            margin: auto;
+        }
+
+        .footer-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-column h4 {
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            display: block;
+            text-decoration: none;
+            color: #59616c;
+            font-size: 10px;
+            margin-bottom: 7px;
+        }
+
+        .footer-column a:hover {
+            color: #b3121a;
+        }
+
+        .footer-line {
+            height: 1px;
+            background: #bbc1c8;
+            margin: 25px 0 20px;
+        }
+
+        .footer-logo {
+            display: block;
+            width: 105px;
+            margin: 0 auto 15px;
+        }
+
+        .footer-description {
+            text-align: center;
+            max-width: 250px;
+            margin: auto;
+            color: #7a838e;
+            font-size: 8px;
+            line-height: 1.6;
+        }
+
+        .follow {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .social {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .social span {
+            width: 23px;
+            height: 23px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #b3121a;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .copyright {
+            text-align: center;
+            color: #7a838e;
+            font-size: 8px;
+            margin-top: 18px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .header-main {
+                padding: 0 20px;
+            }
+
+            .search-area {
+                max-width: 450px;
+            }
+
+            .plans {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .navigation {
+                gap: 15px;
+            }
+        }
+
+
+        @media (max-width: 650px) {
+
+            .header-main {
+                height: auto;
+                padding: 18px;
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                width: 90px;
+            }
+
+            .search-area {
+                order: 3;
+                width: 100%;
+                max-width: none;
+            }
+
+            .header-buttons {
+                margin-left: auto;
+            }
+
+            .navigation {
+                height: auto;
+                padding: 12px;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .steps {
+                overflow-x: auto;
+                justify-content: flex-start;
+                gap: 25px;
+                padding-bottom: 10px;
+            }
+
+            .step {
+                white-space: nowrap;
+            }
+
+            .plans {
+                grid-template-columns: 1fr;
+            }
+
+            .plan-card {
+                min-height: auto;
+            }
+
+            .footer-columns {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+
+        @media (max-width: 450px) {
+
+            body {
+                font-size: 13px;
+            }
+
+            .main {
+                padding: 25px 15px;
+            }
+
+            .header-buttons {
+                gap: 4px;
+            }
+
+            .sign-btn,
+            .started-btn {
+                padding: 8px 9px;
+                font-size: 9px;
+            }
+
+            .location {
+                display: none;
+            }
+
+            .search-btn {
+                padding: 0 10px;
+            }
+
+            .footer-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* =========================
+   BACK BUTTON
+========================= */
+
+.back-button-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 25px;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 15px;
+
+    background: #ffffff;
+    color: #596474;
+
+    border: 1px solid #dfe3e7;
+    border-radius: 7px;
+
+    text-decoration: none;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    transition: all 0.2s ease;
+}
+
+.back-button i {
+    width: 15px;
+    height: 15px;
+    stroke-width: 2.5;
+}
+
+.back-button:hover {
+    color: #b3121a;
+    border-color: #b3121a;
+    background: #fde8e9;
+    transform: translateX(-2px);
+}
+    </style>
+<link rel="stylesheet" href="onboarding/provider-onboarding.css">
+<script src="onboarding/provider-onboarding.js" defer></script>
+</head>
+
+<body>
+
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <h1 class="page-title">
+            Provider Registration
+        </h1>
+
+        <h2 class="page-subtitle">
+            Choose your plan
+        </h2>
+
+        <p class="page-description">
+            Choose the marketplace plan that matches your organization. Your selected plan will be shown throughout onboarding.
+        </p>
+
+
+        <!-- STEPS -->
+
+          <div class="steps">
+
+    <a href="organization-details.html" class="step">
+        <span class="circle">1</span>
+        <span>Organization Details</span>
+    </a>
+
+    <a href="provider-details.html"  class="step active">
+        <span class="circle">2</span>
+        <span>Choose Plan</span>
+    </a>
+
+    
+
+    <a href="legal-agreement.html" class="step">
+        <span class="circle">3</span>
+        <span>Legal Agreement  & Documents</span>
+    </a>
+<a href="bank-details.html" class="step">
+        <span class="circle">4</span>
+        <span>Bank Details</span>
+    </a>
+    <a href="check-submit.html" class="step">
+        <span class="circle">5</span>
+        <span>Check & Submit</span>
+    </a>
+
+</div>
+
+
+        <!-- PLAN -->
+
+        <h2 class="plan-title">
+            Choose Your Plan
+        </h2>
+
+        <p class="plan-description">
+            Select the plan that best fits your healthcare organization.
+        </p>
+
+
+        <div class="onboarding-note"><strong>How it works:</strong> Select a plan → complete verification details → add payment for paid plans → review your information → submit for SAINO approval.</div>
+
+        <div class="plans">
+
+            <!-- FREE -->
+
+            <div class="plan-card free">
+
+                <div class="plan-badge">
+                    🟢 Saino Free
+                </div>
+
+                <h3 class="plan-name">
+                    FREE LISTING
+                </h3>
+
+                <div class="price">
+                    NPR 0 / month
+                </div>
+
+                <div class="month">
+                    Free Forever
+                </div>
+
+                <p class="plan-description-small">
+                    Best for: Getting started
+                    <br>
+                    Create your healthcare presence on Saino and help patients discover your organization.
+                </p>
+
+                <ul class="features">
+                    <li>Basic provider profile</li>
+                    <li>Organization information</li>
+                    <li>Services listing</li>
+                    <li>Patient discovery</li>
+                </ul>
+
+               <button class="choose-btn" onclick="selectPlan('Saino Free', 'NPR 0 / month', 'Free Forever')">
+    Choose Free
+</button>
+
+            </div>
+
+
+            <!-- PRO -->
+
+            <div class="plan-card">
+
+                <div class="plan-badge">
+                    🔵 Saino Pro
+                </div>
+
+                <h3 class="plan-name">
+                    SAINO PRO
+                </h3>
+
+                <div class="price">
+                    NPR 3,600 /
+                </div>
+
+                <div class="month">
+                    Month
+                </div>
+
+                <p class="plan-description-small">
+                    Best for: Growing your presence
+                    <br>
+                    Build a stronger healthcare presence with enhanced profile visibility and useful provider features.
+                </p>
+
+                <ul class="features">
+                    <li>Everything in Free</li>
+                    <li>Enhanced profile</li>
+                    <li>More service information</li>
+                    <li>Improved visibility</li>
+                </ul>
+
+              <button class="choose-btn" onclick="selectPlan('Saino Pro', 'NPR 3,600 / month', 'Monthly')">
+    Choose Pro
+</button>
+
+            </div>
+
+
+            <!-- VIP -->
+
+            <div class="plan-card">
+
+                <div class="plan-badge">
+                    🟡 Saino VIP
+                </div>
+
+                <h3 class="plan-name">
+                    SAINO VIP
+                </h3>
+
+                <div class="price">
+                    NPR 5,900 /
+                </div>
+
+                <div class="month">
+                    Month
+                </div>
+
+                <p class="plan-description-small">
+                    Best for: Increasing visibility
+                    <br>
+                    Stand out from other providers with premium visibility and enhanced features.
+                </p>
+
+                <ul class="features">
+                    <li>Everything in Pro</li>
+                    <li>Featured placement</li>
+                    <li>Enhanced marketplace presence</li>
+                    <li>More engagement opportunities</li>
+                </ul>
+
+                <button class="choose-btn" onclick="selectPlan('Saino VIP', 'NPR 5,900 / month', 'Monthly')">
+    Choose VIP
+</button>
+
+            </div>
+
+
+            <!-- VVIP -->
+
+            <div class="plan-card">
+
+                <div class="plan-badge">
+                    🔴 Saino VVIP
+                </div>
+
+                <h3 class="plan-name">
+                    SAINO VVIP
+                </h3>
+
+                <div class="price">
+                    NPR 9,999 /
+                </div>
+
+                <div class="month">
+                    Month
+                </div>
+
+                <p class="plan-description-small">
+                    Best for: Maximum visibility
+                    <br>
+                    Get the highest level of visibility and priority support for your healthcare organization.
+                </p>
+
+                <ul class="features">
+                    <li>Everything in VIP</li>
+                    <li>Higher visibility</li>
+                    <li>Premium placement</li>
+                    <li>Advanced marketplace features</li>
+                    <li>Priority support</li>
+                </ul>
+
+                <button class="choose-btn" onclick="selectPlan('Saino VVIP', 'NPR 9,999 / month', 'Monthly')">
+    Choose VVIP
+</button>
+
+            </div>
+
+        </div>
+                </div>
+
+        <!-- Back Button -->
+        <div class="back-button-wrapper">
+            <a href="organization-details.html" class="back-button">
+                <i data-lucide="arrow-left"></i>
+                <span>Back to Organization Details page</span>
+            </a>
+        </div>
+
+    
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-container">
+
+            <div class="footer-columns">
+
+                <div class="footer-column">
+
+                    <h4>Patients</h4>
+
+                    <a href="#">Write Reviews</a>
+                    <a href="#">Hospital</a>
+                    <a href="#">Clinics</a>
+                    <a href="#">Diagnostic Centres</a>
+                    <a href="#">Wellness Centres</a>
+                    <a href="#">Ambulance</a>
+                    <a href="#">Blood Banks</a>
+                    <a href="#">Health Insurance</a>
+                    <a href="#">Search Healthcare and Medical Travel</a>
+                    <a href="#">SAINO Health App IOS and Android</a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>Healthcare Providers</h4>
+
+                    <a href="#">Login</a>
+                    <a href="#">Register</a>
+                    <a href="#">SAINO Boost</a>
+                    <a href="#">SAINO Campaigns</a>
+                    <a href="#">Upgrade your Badge</a>
+                    <a href="#">Quickly by SAINO (coming soon)</a>
+                    <a href="#">Manage and audit your verification process</a>
+
+                    <br>
+
+                    <h4>Sales & Distribution</h4>
+                    <a href="#">Contact Us</a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>For Advertisers</h4>
+
+                    <a href="#">Healthcare Campaigns</a>
+                    <a href="#">Boost and Marketplace Partners & Category</a>
+                    <a href="#">Terms & Conditions</a>
+
+                    <br>
+
+                    <a href="#">Help</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms & Conditions</a>
+                    <a href="#">Subscribers</a>
+                    <a href="#">Healthcare Directory</a>
+                    <a href="#">SAINO Health Web</a>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer-line"></div>
+
+
+            <img
+                src="assets/logo.png"
+                class="footer-logo"
+                alt="SAINO HEALTH"
+            >
+
+            <p class="footer-description">
+                SAINO HEALTH connects patients with trusted healthcare
+                providers and makes healthcare discovery simple,
+                transparent and accessible.
+            </p>
+
+
+            <div class="follow">
+                Follow Us
+            </div>
+
+            <div class="social">
+                <span>f</span>
+                <span>◎</span>
+                <span>in</span>
+                <span>▶</span>
+            </div>
+
+
+            <p class="copyright">
+                © 2026 Saino Health. All Rights Reserved.
+            </p>
+
+        </div>
+
+    </footer>
+    <script>
+function selectPlan(planName, planPrice, planPeriod) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    const btn = [...document.querySelectorAll('.choose-btn')].find(b => b.getAttribute('onclick')?.includes(planName));
+    if (btn) btn.closest('.plan-card')?.classList.add('selected');
+
+    // Save selected plan
+    localStorage.setItem("selectedPlanName", planName);
+    localStorage.setItem("selectedPlanPrice", planPrice);
+    localStorage.setItem("selectedPlanPeriod", planPeriod);
+
+    // Free plan
+    if (planName === "Saino Free") {
+
+        // Free plan skips Bank Details & Documents
+        // and Legal Agreement
+        window.location.href = "check-submit.html";
+
+    } else {
+
+        // Paid plans
+        // Go to Verification / Bank Details
+        window.location.href = "legal-agreement.html";
+    }
+}
+</script>
+
+</body>
+</html>

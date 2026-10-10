@@ -13,10 +13,10 @@ const AMBULANCE_FILTERS = ["All", "Basic", "ICU", "Oxygen equipped"];
 const AMBULANCE_STEPS = ["Requested", "Dispatched", "En Route", "Arrived"];
 
 const AMBULANCE_TIERS = {
-  verified: { label: "Saino Verified", cls: "text-emerald-700" },
-  pro:      { label: "Saino Pro",      cls: "text-blue-800" },
-  vip:      { label: "Saino VIP",      cls: "text-amber-600" },
-  vvip:     { label: "Saino VVIP",     cls: "text-red-600" },
+  verified: { label: "SAINO Verified", cls: "text-emerald-700" },
+  pro:      { label: "SAINO Verified (VIP)", cls: "text-blue-800" },
+  vip:      { label: "SAINO Verified (VIP)", cls: "text-amber-600" },
+  vvip:     { label: "SAINO VVIP",     cls: "text-red-600" },
 };
 
 let AMBULANCE_STATE = { filter: "All", from: null, to: null, active: null };

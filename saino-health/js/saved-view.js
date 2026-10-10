@@ -117,7 +117,7 @@ let SAVED_STATE = { category: "all" };
 
 function savedProviderCard(p) {
   const verification = String(p.verification || "").toLowerCase();
-  const tier = { vvip: "Saino VVIP", vip: "Saino VIP", pro: "Saino Pro", prime: "Saino Prime" }[verification];
+  const tier = { vvip: "SAINO VVIP", vip: "SAINO Verified (VIP)", pro: "SAINO Verified (VIP)", prime: "SAINO VVIP" }[verification];
   const place = p.location || p.address || p.city || "";
   const initials = String(p.name || "?").split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 

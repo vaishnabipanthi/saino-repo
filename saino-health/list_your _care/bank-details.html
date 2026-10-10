@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>SAINO HEALTH - Bank & Payment Details</title>
+
+  <meta name="description"
+    content="SAINO HEALTH provider registration - Bank account, card and digital payment details.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+            inter: ['Inter', 'sans-serif']
+          },
+          colors: {
+            saino: {
+              red: '#ad0b0e',
+              dark: '#B3121A',
+              light: '#FDE8E9',
+              navy: '#1A2B4C'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: #1f2937;
+      background: #ffffff;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .payment-option {
+      transition: all 0.2s ease;
+      border: 2px solid #e5e7eb;
+      background: #ffffff;
+    }
+
+    .payment-option:hover {
+      border-color: #ad0b0e;
+      background: #fffafa;
+    }
+
+    .payment-option:has(input:checked) {
+      border-color: #ad0b0e;
+      background: #fde8e9;
+      box-shadow: 0 0 0 1px #ad0b0e;
+    }
+
+    .payment-section {
+      display: none;
+      margin-top: 24px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      background: #ffffff;
+    }
+
+    .payment-section.active {
+      display: block;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      outline: none;
+      background: #ffffff;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: #ad0b0e;
+      box-shadow: 0 0 0 3px rgba(173, 11, 14, 0.10);
+    }
+
+    .digital-option {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .digital-option:hover {
+      border-color: #ad0b0e;
+    }
+
+    .digital-option:has(input:checked) {
+      border-color: #ad0b0e;
+      background: #fde8e9;
+    }
+
+
+
+/* ================= REGISTRATION STEPS ================= */
+
+.steps {
+  max-width: 1050px;
+  margin: 28px auto 20px;
+  padding: 0 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 6px;
+}
+
+/* Step button */
+.step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 9px 11px;
+
+  border-radius: 7px;
+
+  background: #f3f4f6;
+  color: #6b7280;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  border: 1px solid #e5e7eb;
+
+  transition: all 0.2s ease;
+
+  white-space: nowrap;
+}
+
+/* Hover */
+.step:hover {
+  background:  #fde8e9;
+  color: #b3121a;
+  
+}
+
+/* Current step */
+.step.active {
+  background: #fde8e9;
+  color: #b3121a;
+
+  border-color:none;
+
+  
+}
+
+/* Completed steps */
+.step.completed {
+  background: #0b0b0b;
+  color: #ad0b0e;
+
+  border-color: #f3c5c7;
+}
+
+/* Circle */
+.circle {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+
+  border-radius: 50%;
+
+  background: #dfe3e8;
+  color: #6b7280;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Active circle */
+.step.active .circle {
+  background: #b3121a;
+  color: white;
+}
+.step:hover .circle {
+  background: #b3121a;
+  color: #ffffff;
+}
+
+
+
+
+
+/* ================= TABLET ================= */
+
+@media (max-width: 1000px) {
+
+  .steps {
+    gap: 5px;
+    padding: 0 12px;
+  }
+
+  .step {
+    padding: 8px 9px;
+    font-size: 10px;
+  }
+
+  .circle {
+    width: 21px;
+    height: 21px;
+    min-width: 21px;
+  }
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 700px) {
+
+  .steps {
+    overflow-x: auto;
+    justify-content: flex-start;
+
+    gap: 6px;
+
+    padding: 0 12px 8px;
+
+    scrollbar-width: none;
+  }
+
+  .steps::-webkit-scrollbar {
+    display: none;
+  }
+
+  .step {
+    flex-shrink: 0;
+
+    padding: 9px 11px;
+
+    font-size: 10px;
+  }
+
+  .circle {
+    width: 21px;
+    height: 21px;
+    min-width: 21px;
+  }
+}
+
+
+/* ================= MOBILE PAYMENT LAYOUT ================= */
+
+@media (max-width: 768px) {
+
+  #paymentMethodsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .payment-option {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .payment-section {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 4px;
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .payment-section.active {
+    display: block;
+  }
+
+  .payment-section .grid {
+    grid-template-columns: 1fr ;
+  }
+
+  .payment-section .md\:col-span-2 {
+    grid-column: span 1 ;
+  }
+
+  .payment-section h3 {
+    font-size: 16px;
+  }
+
+  .payment-section p {
+    line-height: 1.5;
+  }
+
+  .form-input,
+  .form-select {
+    min-height: 46px;
+    font-size: 14px;
+  }
+
+}
+
+
+  </style>
+<link rel="stylesheet" href="onboarding/provider-onboarding.css">
+<script src="onboarding/provider-onboarding.js" defer></script>
+</head>
+
+<body class="bg-white">
+
+  <!-- HEADER -->
+  <header class="bg-[#d6d6d6] border-b border-gray-300 sticky top-0 z-50">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="h-20 flex items-center justify-between">
+
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center">
+          <img
+            src="assets/logo.png"
+            alt="SAINO HEALTH"
+            class="h-12 w-auto">
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-8">
+
+          <a href="index.html"
+            class="text-gray-700 hover:text-[#ad0b0e] font-medium">
+            Home
+          </a>
+
+          <a href="index.html#services"
+            class="text-gray-700 hover:text-[#ad0b0e] font-medium">
+            Services
+          </a>
+
+          <a href="index.html#about"
+            class="text-gray-700 hover:text-[#ad0b0e] font-medium">
+            About
+          </a>
+
+          <a href="index.html#contact"
+            class="text-gray-700 hover:text-[#ad0b0e] font-medium">
+            Contact
+          </a>
+
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <button
+          id="mobileMenuBtn"
+          class="md:hidden text-gray-800"
+          aria-label="Open menu">
+
+          <i data-lucide="menu" class="w-7 h-7"></i>
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- Mobile Menu -->
+    <div
+      id="mobileMenu"
+      class="hidden md:hidden bg-white border-t border-gray-200">
+
+      <div class="px-6 py-5 space-y-4">
+
+        <a href="index.html"
+          class="block text-gray-700 font-medium">
+          Home
+        </a>
+
+        <a href="index.html#services"
+          class="block text-gray-700 font-medium">
+          Services
+        </a>
+
+        <a href="index.html#about"
+          class="block text-gray-700 font-medium">
+          About
+        </a>
+
+        <a href="index.html#contact"
+          class="block text-gray-700 font-medium">
+          Contact
+        </a>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+<!-- PAGE HEADER -->
+<section class="bg-white border-b border-gray-200 py-10">
+
+  <div class="max-w-5xl mx-auto px-4 text-center">
+
+    <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-gray-100 mb-4">
+      <i
+        data-lucide="credit-card"
+        class="w-5 h-5 text-[#1A2B4C]">
+      </i>
+    </div>
+
+    <h1 class="text-2xl md:text-3xl font-bold text-[#1A2B4C] mb-2">
+      Bank & Payment Details
+    </h1>
+
+    <p class="text-sm md:text-base text-gray-500 max-w-2xl mx-auto">
+      Provide your preferred payment details to complete your SAINO HEALTH provider registration.
+    </p>
+
+  </div>
+
+</section>
+
+
+  <!-- STEPS -->
+
+  <div class="steps">
+
+  <a href="organization-details.html" class="step ">
+    <span class="circle">1</span>
+    <span>Organization Details</span>
+  </a>
+
+  <a href="provider-details.html" class="step">
+    <span class="circle">2</span>
+    <span>Choose Plan</span>
+  </a>
+
+  <a href="legal-agreement.html" class="step">
+    <span class="circle">3</span>
+    <span>Legal Agreement & Documents</span>
+  </a>
+
+  <a href="bank-details.html" class="step active">
+    <span class="circle">4</span>
+    <span>Bank Details </span>
+  </a>
+
+  <a href="check-submit.html" class="step">
+    <span class="circle">5</span>
+    <span>Check & Submit</span>
+  </a>
+
+</div>
+
+
+  <!-- MAIN FORM -->
+  <main class="py-12 bg-gray-50">
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-10">
+
+        <div class="mb-8">
+
+          <h2 class="text-2xl font-bold text-[#1A2B4C] mb-2">
+            Select Payment Method
+          </h2>
+
+          <p class="text-gray-600 text-sm">
+            Choose how you would like to provide your payment details.
+          </p>
+
+        </div>
+
+
+        <!-- PAYMENT METHODS -->
+         <div id="paymentMethodsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <!-- BANK ACCOUNT -->
+<label id="bankOption" class="payment-option rounded-xl p-5 cursor-pointer">
+            <div class="flex items-start gap-3">
+
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="bank"
+                onchange="showPaymentMethod('bank')"
+                class="mt-1 accent-[#ad0b0e]">
+
+              <div>
+
+                <div class="flex items-center gap-2 mb-1">
+
+                  <i
+                    data-lucide="landmark"
+                    class="w-5 h-5 text-[#ad0b0e]">
+                  </i>
+
+                  <h3 class="font-bold text-gray-800">
+                    Bank Account
+                  </h3>
+
+                </div>
+
+                <p class="text-xs text-gray-500">
+                  Provide your Nepal bank account details.
+                </p>
+
+              </div>
+
+            </div>
+
+          </label>
+
+
+          <!-- CARD PAYMENT -->
+         <label id="cardOption" class="payment-option rounded-xl p-5 cursor-pointer">
+
+            <div class="flex items-start gap-3">
+
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="card"
+                onchange="showPaymentMethod('card')"
+                class="mt-1 accent-[#ad0b0e]">
+
+              <div>
+
+                <div class="flex items-center gap-2 mb-1">
+
+                  <i
+                    data-lucide="credit-card"
+                    class="w-5 h-5 text-[#ad0b0e]">
+                  </i>
+
+                  <h3 class="font-bold text-gray-800">
+                    Card Payment
+                  </h3>
+
+                </div>
+
+                <p class="text-xs text-gray-500">
+                  Pay using Visa or Mastercard.
+                </p>
+
+              </div>
+
+            </div>
+
+          </label>
+
+
+          <!-- DIGITAL PAYMENT -->
+          <label id="digitalOption" class="payment-option rounded-xl p-5 cursor-pointer">
+            <div class="flex items-start gap-3">
+
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="digital"
+                onchange="showPaymentMethod('digital')"
+                class="mt-1 accent-[#ad0b0e]">
+
+              <div>
+
+                <div class="flex items-center gap-2 mb-1">
+
+                  <i
+                    data-lucide="smartphone"
+                    class="w-5 h-5 text-[#ad0b0e]">
+                  </i>
+
+                  <h3 class="font-bold text-gray-800">
+                    Digital Payment
+                  </h3>
+
+                </div>
+
+                <p class="text-xs text-gray-500">
+                  eSewa, Khalti, Fonepay or QR.
+                </p>
+
+              </div>
+
+            </div>
+
+          </label>
+
+        </div>
+
+
+        <!-- BANK PAYMENT -->
+        <div id="bankPayment" class="payment-section">
+
+          <div class="flex items-center gap-3 mb-6">
+
+            <div class="w-10 h-10 rounded-full bg-[#FDE8E9] flex items-center justify-center">
+
+              <i
+                data-lucide="landmark"
+                class="w-5 h-5 text-[#ad0b0e]">
+              </i>
+
+            </div>
+
+            <div>
+
+              <h3 class="text-lg font-bold text-[#1A2B4C]">
+                Bank Account Details
+              </h3>
+
+              <p class="text-sm text-gray-500">
+                Enter your Nepal bank account information.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <!-- Account Holder -->
+            <div>
+
+              <label class="form-label">
+                Account Holder Name
+              </label>
+
+              <input
+                type="text"
+                id="accountHolder"
+                class="form-input"
+                placeholder="Enter account holder name">
+
+            </div>
+
+
+            <!-- Account Number -->
+            <div>
+
+              <label class="form-label">
+                Bank Account Number
+              </label>
+
+              <input
+                type="text"
+                id="accountNumber"
+                class="form-input"
+                placeholder="Enter bank account number"
+                inputmode="numeric">
+
+            </div>
+
+
+            <!-- Bank Name -->
+            <div>
+
+              <label class="form-label">
+                Bank Name
+              </label>
+
+              <select
+                id="bankName"
+                class="form-select">
+
+                <option value="">
+                  Select bank
+                </option>
+
+                <option value="Nepal Bank Limited">
+                  Nepal Bank Limited
+                </option>
+
+                <option value="Rastriya Banijya Bank">
+                  Rastriya Banijya Bank
+                </option>
+
+                <option value="Nabil Bank">
+                  Nabil Bank
+                </option>
+
+                <option value="NIC Asia Bank">
+                  NIC Asia Bank
+                </option>
+
+                <option value="Global IME Bank">
+                  Global IME Bank
+                </option>
+
+                <option value="Himalayan Bank">
+                  Himalayan Bank
+                </option>
+
+                <option value="Prabhu Bank">
+                  Prabhu Bank
+                </option>
+
+                <option value="Everest Bank">
+                  Everest Bank
+                </option>
+
+                <option value="Kumari Bank">
+                  Kumari Bank
+                </option>
+
+                <option value="Sanima Bank">
+                  Sanima Bank
+                </option>
+
+                <option value="Siddhartha Bank">
+                  Siddhartha Bank
+                </option>
+
+                <option value="NMB Bank">
+                  NMB Bank
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <!-- Branch -->
+            <div>
+
+              <label class="form-label">
+                Branch Name
+              </label>
+
+              <input
+                type="text"
+                id="branchName"
+                class="form-input"
+                placeholder="Enter branch name">
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- CARD PAYMENT -->
+        <div id="cardPayment" class="payment-section">
+
+          <div class="flex items-center gap-3 mb-6">
+
+            <div class="w-10 h-10 rounded-full bg-[#FDE8E9] flex items-center justify-center">
+
+              <i
+                data-lucide="credit-card"
+                class="w-5 h-5 text-[#ad0b0e]">
+              </i>
+
+            </div>
+
+            <div>
+
+              <h3 class="text-lg font-bold text-[#1A2B4C]">
+                Card Payment Details
+              </h3>
+
+              <p class="text-sm text-gray-500">
+                Enter your card payment information.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <!-- Card Holder -->
+            <div class="md:col-span-2">
+
+              <label class="form-label">
+                Card Holder Name
+              </label>
+
+              <input
+                type="text"
+                id="cardHolder"
+                class="form-input"
+                placeholder="Enter name as shown on card">
+
+            </div>
+
+
+            <!-- Card Number -->
+            <div class="md:col-span-2">
+
+              <label class="form-label">
+                Card Number
+              </label>
+
+              <input
+                type="text"
+                id="cardNumber"
+                class="form-input"
+                placeholder="1234 5678 9012 3456"
+                maxlength="19"
+                inputmode="numeric">
+
+            </div>
+
+
+            <!-- Expiry -->
+            <div>
+
+              <label class="form-label">
+                Expiry Date
+              </label>
+
+              <input
+                type="text"
+                id="expiryDate"
+                class="form-input"
+                placeholder="MM/YY"
+                maxlength="5"
+                inputmode="numeric">
+
+            </div>
+
+
+            <!-- CVV -->
+            <div>
+
+              <label class="form-label">
+                CVV Number
+              </label>
+
+              <input
+                type="password"
+                id="cvvNumber"
+                class="form-input"
+                placeholder="123"
+                maxlength="4"
+                inputmode="numeric">
+
+            </div>
+
+          </div>
+
+
+          <div class="mt-5 p-4 rounded-lg bg-yellow-50 border border-yellow-200">
+
+            <div class="flex gap-3">
+
+              <i
+                data-lucide="shield-alert"
+                class="w-5 h-5 text-yellow-600 flex-shrink-0">
+              </i>
+
+              <p class="text-xs text-yellow-800">
+                For this project prototype, CVV is collected as requested.
+                In a real production payment system, CVV should not be stored
+                and card payments should be handled through a secure payment
+                gateway.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- DIGITAL PAYMENT -->
+        <div id="digitalPayment" class="payment-section">
+
+          <div class="flex items-center gap-3 mb-6">
+
+            <div class="w-10 h-10 rounded-full bg-[#FDE8E9] flex items-center justify-center">
+
+              <i
+                data-lucide="smartphone"
+                class="w-5 h-5 text-[#ad0b0e]">
+              </i>
+
+            </div>
+
+            <div>
+
+              <h3 class="text-lg font-bold text-[#1A2B4C]">
+                Digital Payment
+              </h3>
+
+              <p class="text-sm text-gray-500">
+                Select your preferred digital payment method.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- Digital Payment Options -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- eSewa -->
+            <label class="digital-option">
+
+              <div class="flex items-center gap-3">
+
+                <input
+                  type="radio"
+                  name="digitalMethod"
+                  value="esewa"
+                  class="accent-[#ad0b0e]">
+
+                <div>
+
+                  <h4 class="font-bold text-gray-800">
+                    eSewa
+                  </h4>
+
+                  <p class="text-xs text-gray-500">
+                    Pay using your eSewa account.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </label>
+
+
+            <!-- Khalti -->
+            <label class="digital-option">
+
+              <div class="flex items-center gap-3">
+
+                <input
+                  type="radio"
+                  name="digitalMethod"
+                  value="khalti"
+                  class="accent-[#ad0b0e]">
+
+                <div>
+
+                  <h4 class="font-bold text-gray-800">
+                    Khalti
+                  </h4>
+
+                  <p class="text-xs text-gray-500">
+                    Pay using your Khalti account.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </label>
+
+
+            <!-- Fonepay -->
+            <label class="digital-option">
+
+              <div class="flex items-center gap-3">
+
+                <input
+                  type="radio"
+                  name="digitalMethod"
+                  value="fonepay"
+                  class="accent-[#ad0b0e]">
+
+                <div>
+
+                  <h4 class="font-bold text-gray-800">
+                    Fonepay
+                  </h4>
+
+                  <p class="text-xs text-gray-500">
+                    Pay using Fonepay.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </label>
+
+
+            <!-- QR Payment -->
+            <label class="digital-option">
+
+              <div class="flex items-center gap-3">
+
+                <input
+                  type="radio"
+                  name="digitalMethod"
+                  value="qr"
+                  class="accent-[#ad0b0e]">
+
+                <div>
+
+                  <h4 class="font-bold text-gray-800">
+                    QR Payment
+                  </h4>
+
+                  <p class="text-xs text-gray-500">
+                    Scan and pay using a supported wallet.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </label>
+
+          </div>
+
+
+          <!-- Digital Account Number -->
+          <div class="mt-6">
+
+            <label class="form-label">
+              Digital Payment Account / Mobile Number
+            </label>
+
+            <input
+              type="text"
+              id="digitalAccount"
+              class="form-input"
+              placeholder="Enter wallet account or mobile number"
+              inputmode="numeric">
+
+          </div>
+
+        </div>
+
+
+        <!-- SECURITY INFO -->
+        <div class="mt-8 p-5 rounded-xl bg-gray-50 border border-gray-200">
+
+          <div class="flex gap-3">
+
+            <i
+              data-lucide="lock"
+              class="w-5 h-5 text-[#ad0b0e] flex-shrink-0">
+            </i>
+
+            <div>
+
+              <h4 class="font-bold text-gray-800 mb-1">
+                Secure Payment Information
+              </h4>
+
+              <p class="text-sm text-gray-600">
+                Your payment information is used for the SAINO HEALTH
+                provider registration process. Please make sure the
+                information you provide is accurate.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- BUTTONS -->
+        <div class="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row gap-4 justify-between">
+
+          <button
+            type="button"
+            onclick="goBack()"
+            class="w-full sm:w-auto px-7 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition">
+
+            <span class="flex items-center justify-center gap-2">
+
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+
+              Back
+
+            </span>
+
+          </button>
+
+
+          <button
+            type="button"
+            onclick="continueBankDetails()"
+            class="w-full sm:w-auto px-8 py-3 rounded-lg bg-[#ad0b0e] text-white font-semibold hover:bg-[#8f090c] transition">
+
+            <span class="flex items-center justify-center gap-2">
+
+              Continue
+
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+
+            </span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- FOOTER -->
+  <footer class="bg-[#1A2B4C] text-white py-8">
+
+    <div class="max-w-7xl mx-auto px-4 text-center">
+
+      <p class="text-sm text-gray-300">
+        © 2026 SAINO HEALTH. All rights reserved.
+      </p>
+
+    </div>
+
+  </footer>
+
+
+  <script>
+
+    /* ----------------------------------
+       PAYMENT METHOD
+    ---------------------------------- */
+
+ function showPaymentMethod(method) {
+
+  const bankPayment =
+    document.getElementById("bankPayment");
+
+  const cardPayment =
+    document.getElementById("cardPayment");
+
+  const digitalPayment =
+    document.getElementById("digitalPayment");
+
+  const bankOption =
+    document.getElementById("bankOption");
+
+  const cardOption =
+    document.getElementById("cardOption");
+
+  const digitalOption =
+    document.getElementById("digitalOption");
+
+
+  /* Hide all payment sections */
+
+  bankPayment.classList.remove("active");
+  cardPayment.classList.remove("active");
+  digitalPayment.classList.remove("active");
+
+
+  /* Desktop original position */
+
+  const paymentMethodsGrid =
+    document.getElementById("paymentMethodsGrid");
+
+
+  /* MOBILE VIEW */
+
+  if (window.innerWidth <= 768) {
+
+    if (method === "bank") {
+
+      bankOption.after(bankPayment);
+
+      bankPayment.classList.add("active");
+
+    }
+
+    else if (method === "card") {
+
+      cardOption.after(cardPayment);
+
+      cardPayment.classList.add("active");
+
+    }
+
+    else if (method === "digital") {
+
+      digitalOption.after(digitalPayment);
+
+      digitalPayment.classList.add("active");
+
+    }
+
+  }
+
+  /* DESKTOP VIEW */
+
+  else {
+
+    /* Put sections back after payment cards */
+
+    paymentMethodsGrid.after(
+      bankPayment,
+      cardPayment,
+      digitalPayment
+    );
+
+
+    if (method === "bank") {
+
+      bankPayment.classList.add("active");
+
+    }
+
+    else if (method === "card") {
+
+      cardPayment.classList.add("active");
+
+    }
+
+    else if (method === "digital") {
+
+      digitalPayment.classList.add("active");
+
+    }
+
+  }
+
+}
+
+
+    /* ----------------------------------
+       CARD NUMBER FORMAT
+    ---------------------------------- */
+
+    const cardNumber =
+      document.getElementById("cardNumber");
+
+    if (cardNumber) {
+
+      cardNumber.addEventListener("input", function () {
+
+        let value =
+          this.value.replace(/\D/g, "");
+
+        value =
+          value.substring(0, 16);
+
+        let formatted =
+          value.match(/.{1,4}/g);
+
+        this.value =
+          formatted ? formatted.join(" ") : "";
+
+      });
+
+    }
+
+
+    /* ----------------------------------
+       EXPIRY DATE FORMAT
+    ---------------------------------- */
+
+    const expiryDate =
+      document.getElementById("expiryDate");
+
+    if (expiryDate) {
+
+      expiryDate.addEventListener("input", function () {
+
+        let value =
+          this.value.replace(/\D/g, "");
+
+        value =
+          value.substring(0, 4);
+
+        if (value.length >= 3) {
+
+          this.value =
+            value.substring(0, 2) +
+            "/" +
+            value.substring(2);
+
+        } else {
+
+          this.value = value;
+
+        }
+
+      });
+
+    }
+
+
+    /* ----------------------------------
+       ONLY NUMBERS
+    ---------------------------------- */
+
+    const accountNumber =
+      document.getElementById("accountNumber");
+
+    if (accountNumber) {
+
+      accountNumber.addEventListener("input", function () {
+
+        this.value =
+          this.value.replace(/\D/g, "");
+
+      });
+
+    }
+
+
+    const cvvNumber =
+      document.getElementById("cvvNumber");
+
+    if (cvvNumber) {
+
+      cvvNumber.addEventListener("input", function () {
+
+        this.value =
+          this.value.replace(/\D/g, "");
+
+      });
+
+    }
+
+
+    /* ----------------------------------
+       CONTINUE ---------*/
+function continueBankDetails() {
+
+    const selectedMethod = document.querySelector(
+        'input[name="paymentMethod"]:checked'
+    );
+
+    if (!selectedMethod) {
+        alert("Please select a payment method.");
+        return;
+    }
+
+    const method = selectedMethod.value;
+
+    /* =====================================================
+       BANK ACCOUNT
+       ===================================================== */
+
+    if (method === "bank") {
+
+        const accountHolder =
+            document.getElementById("accountHolder").value.trim();
+
+        const accountNumber =
+            document.getElementById("accountNumber").value.trim();
+
+        const bankName =
+            document.getElementById("bankName").value.trim();
+
+        const branchName =
+            document.getElementById("branchName").value.trim();
+
+        if (
+            !accountHolder ||
+            !accountNumber ||
+            !bankName ||
+            !branchName
+        ) {
+            alert("Please fill in all bank details.");
+            return;
+        }
+
+        if (!/^\d+$/.test(accountNumber)) {
+            alert("Account number must contain numbers only.");
+            return;
+        }
+
+        /* SAVE BANK DATA */
+        localStorage.setItem("paymentMethod", "bank");
+        localStorage.setItem("accountHolder", accountHolder);
+        localStorage.setItem("accountNumber", accountNumber);
+        localStorage.setItem("bankName", bankName);
+        localStorage.setItem("branchName", branchName);
+
+        /* Remove old card/digital data */
+        localStorage.removeItem("cardHolder");
+        localStorage.removeItem("cardNumber");
+        localStorage.removeItem("expiryDate");
+        localStorage.removeItem("digitalMethod");
+        localStorage.removeItem("digitalAccount");
+
+        alert("Bank details saved successfully.");
+
+        window.location.href = "legal-agreement.html";
+
+        return;
+    }
+
+
+    /* =====================================================
+       CARD PAYMENT
+       ===================================================== */
+
+    if (method === "card") {
+
+        const cardHolder =
+            document.getElementById("cardHolder").value.trim();
+
+        const cardNumber =
+            document.getElementById("cardNumber").value.trim();
+
+        const expiryDate =
+            document.getElementById("expiryDate").value.trim();
+
+        const cvvNumber =
+            document.getElementById("cvvNumber").value.trim();
+
+        if (
+            !cardHolder ||
+            !cardNumber ||
+            !expiryDate ||
+            !cvvNumber
+        ) {
+            alert("Please fill in all card details.");
+            return;
+        }
+
+        const cleanCardNumber =
+            cardNumber.replace(/\s/g, "");
+
+        if (!/^\d{16}$/.test(cleanCardNumber)) {
+            alert("Card number must contain 16 digits.");
+            return;
+        }
+
+        if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+            alert("Please enter expiry date in MM/YY format.");
+            return;
+        }
+
+        if (!/^\d{3,4}$/.test(cvvNumber)) {
+            alert("Please enter a valid CVV.");
+            return;
+        }
+
+        /* SAVE CARD DATA */
+        localStorage.setItem("paymentMethod", "card");
+        localStorage.setItem("cardHolder", cardHolder);
+
+        /* Store masked card number only */
+        localStorage.setItem(
+            "cardNumber",
+            "•••• •••• •••• " + cleanCardNumber.slice(-4)
+        );
+
+        localStorage.setItem("expiryDate", expiryDate);
+
+        /*
+         * DO NOT store CVV in localStorage.
+         * CVV should never be persisted.
+         */
+
+        /* Remove old bank/digital data */
+        localStorage.removeItem("accountHolder");
+        localStorage.removeItem("accountNumber");
+        localStorage.removeItem("bankName");
+        localStorage.removeItem("branchName");
+        localStorage.removeItem("digitalMethod");
+        localStorage.removeItem("digitalAccount");
+
+        alert("Card details saved successfully.");
+
+        window.location.href = "legal-agreement.html";
+
+        return;
+    }
+
+
+    /* =====================================================
+       DIGITAL PAYMENT
+       ===================================================== */
+
+    if (method === "digital") {
+
+        const digitalMethod =
+            document.querySelector(
+                'input[name="digitalMethod"]:checked'
+            );
+
+        const digitalAccount =
+            document.getElementById("digitalAccount").value.trim();
+
+        if (!digitalMethod) {
+            alert("Please select a digital payment method.");
+            return;
+        }
+
+        if (!digitalAccount) {
+            alert("Please enter your digital payment account.");
+            return;
+        }
+
+        /* SAVE DIGITAL PAYMENT DATA */
+        localStorage.setItem(
+            "paymentMethod",
+            "digital"
+        );
+
+        localStorage.setItem(
+            "digitalMethod",
+            digitalMethod.value
+        );
+
+        localStorage.setItem(
+            "digitalAccount",
+            digitalAccount
+        );
+
+        /* Remove old bank/card data */
+        localStorage.removeItem("accountHolder");
+        localStorage.removeItem("accountNumber");
+        localStorage.removeItem("bankName");
+        localStorage.removeItem("branchName");
+        localStorage.removeItem("cardHolder");
+        localStorage.removeItem("cardNumber");
+        localStorage.removeItem("expiryDate");
+
+        alert("Digital payment details saved successfully.");
+
+        window.location.href = "check-submit.html";
+
+        return;
+    }
+}
+
+
+
+    /* ----------------------------------
+       BACK BUTTON
+    ---------------------------------- */
+
+    function goBack() {
+
+      window.location.href =
+        "legal-agreement.html";
+
+    }
+
+
+    /* ----------------------------------
+       MOBILE MENU
+    ---------------------------------- */
+
+    const mobileMenuBtn =
+      document.getElementById("mobileMenuBtn");
+
+    const mobileMenu =
+      document.getElementById("mobileMenu");
+
+
+    if (mobileMenuBtn && mobileMenu) {
+
+      mobileMenuBtn.addEventListener("click", function () {
+
+        mobileMenu.classList.toggle("hidden");
+
+      });
+
+    }
+
+
+    /* ----------------------------------
+       LUCIDE
+    ---------------------------------- */
+
+    if (typeof lucide !== "undefined") {
+
+      lucide.createIcons();
+
+    }
+
+  </script>
+
+</body>
+
+</html>

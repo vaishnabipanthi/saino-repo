@@ -1314,7 +1314,7 @@ function renderHorizontalClinicCard(c) {
       <button type="button" onclick="openProviderProfile('${clinicProfileId}')" aria-label="Open ${c.name} profile" class="w-full sm:w-36 h-32 sm:h-auto rounded-xl overflow-hidden bg-saino-gray-100 flex-shrink-0 relative">
         <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover">
         <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-black bg-saino-red text-white shadow-xs">
-          ${c.badge || 'SAINO PRO'}
+          ${c.badge || 'SAINO Verified (VIP)'}
         </span>
       </button>
       <div class="flex-1 flex flex-col justify-between text-xs">
@@ -1525,7 +1525,11 @@ window.returnToServiceSource = function() {
 };
 
 window.renderSainoTierBadge = function(provider, compact = false) {
-  const tier = String(provider && (provider.verification || provider.verificationTier || provider.badgeType) || "listed").toLowerCase();
+  const verificationStatus = provider && provider.verification_status;
+  if ((verificationStatus && verificationStatus !== "verified") || (provider && provider.verified === false)) {
+    return "";
+  }
+  const tier = String(provider && (provider.plan || provider.verification || provider.verificationTier || provider.badgeType) || "listed").toLowerCase();
   const size = compact
     ? "gap-1 px-2 py-0.5 text-[10px]"
     : "gap-1.5 px-3 py-1 text-xs";
@@ -1534,14 +1538,11 @@ window.renderSainoTierBadge = function(provider, compact = false) {
   if (tier === "vvip") {
     return `<span class="inline-flex items-center ${size} rounded-full font-black bg-gradient-to-r from-indigo-600 to-purple-700 text-white shadow-md"><i data-lucide="award" class="${iconSize} text-amber-300"></i><span>🏆 SAINO VVIP</span></span>`;
   }
-  if (tier === "vip") {
-    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-gradient-to-r from-amber-500 to-amber-600 text-saino-gray-950 shadow-md"><i data-lucide="crown" class="${iconSize}"></i><span>👑 SAINO VIP</span></span>`;
+  if (tier === "vip" || tier === "saino_pro" || tier === "pro") {
+    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-gradient-to-r from-amber-500 to-amber-600 text-saino-gray-950 shadow-md"><i data-lucide="crown" class="${iconSize}"></i><span>SAINO Verified (VIP)</span></span>`;
   }
-  if (tier === "pro") {
-    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-saino-red text-white shadow-md"><i data-lucide="check-circle-2" class="${iconSize}"></i><span>✓ SAINO Pro</span></span>`;
-  }
-  if (tier === "prime" || tier === "verified") {
-    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-emerald-600 text-white shadow-md"><i data-lucide="badge-check" class="${iconSize}"></i><span>SAINO Prime</span></span>`;
+  if (tier === "prime" || tier === "verified" || tier === "saino_prime" || tier === "vvip") {
+    return `<span class="inline-flex items-center ${size} rounded-full font-black bg-emerald-600 text-white shadow-md"><i data-lucide="badge-check" class="${iconSize}"></i><span>SAINO VVIP</span></span>`;
   }
   return `<span class="inline-flex items-center ${size} rounded-full font-black bg-saino-gray-800 text-white shadow-md"><i data-lucide="compass" class="${iconSize}"></i><span>SAINO Discovery</span></span>`;
 };
@@ -2012,7 +2013,7 @@ function renderCampaignsView() {
               <i data-lucide="send" class="w-4 h-4"></i>
               <span>Book Big Screen Campaign Slot</span>
             </button>
-            <button onclick="openUpgradeBadgeModal('pro')" class="px-4 py-3 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm transition border border-white/20">
+            <button onclick="openUpgradeBadgeModal('saino_prime')" class="px-4 py-3 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm transition border border-white/20">
               View Advertising Rates & Tiers
             </button>
           </div>
@@ -2478,7 +2479,7 @@ function bindCampaignsEvents() {}
                 <h4 class="break-words text-base sm:text-lg font-bold leading-snug text-slate-900 [overflow-wrap:anywhere]">City Hospital</h4>
                 <div class="flex items-center space-x-1.5 mt-1">
                   <svg class="w-3.5 h-3.5 text-amber-500 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                  <span class="text-xs font-semibold text-amber-700">Saino VIP</span>
+                  <span class="text-xs font-semibold text-amber-700">SAINO Verified (VIP)</span>
                 </div>
                 <div class="flex items-center space-x-2 mt-2 text-xs">
                   <span class="text-amber-500 font-bold">★ 4.5</span>
@@ -2568,7 +2569,7 @@ function bindCampaignsEvents() {}
                 <h4 class="break-words text-base sm:text-lg font-bold leading-snug text-slate-900 [overflow-wrap:anywhere]">Bhaktapur Hospital</h4>
                 <div class="flex items-center space-x-1.5 mt-1">
                   <svg class="w-3.5 h-3.5 text-blue-500 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                  <span class="text-xs font-semibold text-blue-700">Saino Pro</span>
+                  <span class="text-xs font-semibold text-blue-700">SAINO Verified (VIP)</span>
                 </div>
                 <div class="flex items-center space-x-2 mt-2 text-xs">
                   <span class="text-amber-500 font-bold">★ 4.5</span>
@@ -4133,17 +4134,17 @@ function renderListYourCareView() {
 
       </div>
 
-      <!-- 4-TIER SUBSCRIPTION PRICING PLANS (Page 3 - 7 Official Specification) -->
+      <!-- Provider subscription plans -->
       <div id="tierComparisonSection" class="mb-14">
         <div class="text-center mb-8">
           <span class="px-3 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-800 uppercase tracking-wider">
             SUBSCRIPTION TIERS & VERIFIED BADGES
           </span>
           <h2 class="text-xl md:text-3xl font-extrabold text-slate-900 mt-2 mb-2">Choose the Right Growth Plan for Your Facility</h2>
-          <p class="text-xs md:text-sm text-slate-500">From free directory listings to flagship enterprise growth packages</p>
+          <p class="text-xs md:text-sm text-slate-500">Choose Free Listing, SAINO Verified (VIP), or SAINO VVIP</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           ${window.SAINO_DATA.subscriptionTiers.map(plan => `
             <div class="rounded-3xl border ${plan.highlight ? 'border-2 border-rose-500 shadow-xl bg-rose-50/20 ring-4 ring-rose-500/10' : 'border-slate-200 bg-white shadow-sm'} p-5 sm:p-6 flex flex-col justify-between relative">
               ${plan.popularTag ? `
@@ -4303,10 +4304,9 @@ function renderListYourCareView() {
           <div>
             <label class="block font-bold text-slate-200 mb-1">Choose Verification Plan</label>
             <select id="regPlanSelect" class="w-full bg-slate-900 border border-white/20 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-rose-400">
-              <option value="listed">SAINO LISTED (Free Listing - NPR 0)</option>
-              <option value="pro" selected>SAINO PRO (✓ Pro Verified - NPR 3,600 / month)</option>
-              <option value="vip">SAINO VIP (👑 VIP Verified - NPR 5,900 / month)</option>
-              <option value="vvip">SAINO HEALTH VVIP (🏆 Flagship Growth - NPR 9,999 / month)</option>
+              <option value="saino_listed">Free Listing (NPR 0)</option>
+              <option value="saino_pro" selected>SAINO Verified (VIP)</option>
+              <option value="saino_prime">SAINO VVIP</option>
             </select>
           </div>
 
@@ -5185,8 +5185,8 @@ function openProviderModal(providerId) {
               <div>
                 <div class="flex items-center space-x-2 mb-1">
                   <h2 class="text-xl md:text-2xl font-bold">${p.name}</h2>
-                  ${p.verification === 'pro' ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-500 text-white">✓ SAINO Pro</span>` : ''}
-                  ${p.verification === 'prime' ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500 text-white">✓ SAINO Prime</span>` : ''}
+                  ${p.verification === 'pro' ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white">SAINO Verified (VIP)</span>` : ''}
+                  ${p.verification === 'prime' ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500 text-white">SAINO VVIP</span>` : ''}
                 </div>
                 <p class="text-xs text-sky-200 flex items-center">
                   <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i>
@@ -5520,7 +5520,7 @@ function openAdWhatsApp(adId) {
 }
 
 // Upgrade Badge Modal (Page 2 & 3: Upgrade your Badge takes to payment subscription)
-function openUpgradeBadgeModal(preselectedTier = 'prime') {
+function openUpgradeBadgeModal(preselectedTier = 'saino_prime') {
   const modalContainer = document.getElementById('modalContainer');
   if (!modalContainer) return;
 
@@ -5543,7 +5543,7 @@ function openUpgradeBadgeModal(preselectedTier = 'prime') {
         <form onsubmit="handleUpgradeSubmit(event)" class="p-6 space-y-4 text-xs">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Select Verification Tier</label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               ${window.SAINO_DATA.subscriptionTiers.map(t => `
                 <label class="p-3.5 rounded-2xl border ${t.id === preselectedTier ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-500/20' : 'border-slate-200 bg-slate-50'} flex flex-col justify-between cursor-pointer">
                   <div class="flex items-center justify-between mb-2">
@@ -5788,7 +5788,7 @@ function openProviderSignInModal(defaultTab = 'patient') {
             Sign In to Hospital Dashboard
           </button>
           <div class="text-center text-slate-500 text-[11px]">
-            New Healthcare Provider? <button type="button" onclick="openUpgradeBadgeModal('prime')" class="text-rose-600 font-bold hover:underline">Register Facility Here</button>
+            New Healthcare Provider? <button type="button" onclick="openUpgradeBadgeModal('saino_prime')" class="text-rose-600 font-bold hover:underline">Register Facility Here</button>
           </div>
         </div>
 
@@ -5839,7 +5839,7 @@ function handleProviderSignInSubmit(e) {
 }
 
 function openAdCampaignModal() {
-  openUpgradeBadgeModal('pro');
+  openUpgradeBadgeModal('saino_prime');
 }
 
 function closeModal() {

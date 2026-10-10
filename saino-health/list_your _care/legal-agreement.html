@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAINO HEALTH - Search, Discover, Review & Book Healthcare in Nepal</title>
+  <meta name="description" content="Nepal's premier connected healthcare marketplace. Search, discover, review and book doctor consultations, hospital OPD, diagnostic scans, homecare nurses and emergency blood bank across Kathmandu, Lalitpur, Pokhara and nationwide.">
+
+  <!-- Google Fonts (Plus Jakarta Sans & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link href="css/custom.css" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            saino: {
+              red: '#ad0b0e',
+              'red-dark': '#B3121A',
+              'red-light': '#FDE8E9',
+              navy: '#1A2B4C',
+              'navy-light': '#2A4070',
+              gray: {
+                50: '#F8F9FA',
+                100: '#F1F3F5',
+                200: '#E9ECEF',
+                300: '#DEE2E6',
+                400: '#CED4DA',
+                500: '#ADB5BD',
+                600: '#6C757D',
+                700: '#495057',
+                800: '#343A40',
+                900: '#212529',
+              }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+
+  
+
+
+
+   <!-- Top Header -->
+<header class="sticky top-0 z-40 bg-[#d6d6d6] backdrop-blur-md border-b border-saino-gray-200 shadow-sm">    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between min-h-[72px] py-2 gap-4">
+        
+        <!-- Brand Logo -->
+        <a href="#" data-nav="marketplace" class="flex items-center space-x-3 group py-1 flex-shrink-0 ml-0 md:-ml-8">
+  <img src="assets/logo.png" alt="SAINO HEALTH" class="h-12 sm:h-14 md:h-16 w-auto max-w-[200px] object-contain transition group-hover:scale-105 drop-shadow-xs">
+</a>
+
+            <!-- Header Search Bar - Desktop Only -->
+    <div class="hidden md:flex flex-1 max-w-xl items-center bg-saino-gray-50 rounded-lg border border-saino-gray-200 p-1 pl-4 shadow-sm focus-within:border-saino-red focus-within:ring-2 focus-within:ring-saino-red/20 transition">
+      <i data-lucide="search" class="w-4 h-4 text-saino-gray-400 mr-2 flex-shrink-0"></i>
+
+      <input 
+        type="text" 
+        id="headerSearchInput" 
+        placeholder="Search hospitals, clinics, services..." 
+        class="bg-transparent flex-1 text-xs text-saino-gray-800 font-medium focus:outline-none placeholder-saino-gray-400"
+      >
+
+      <div class="h-4 w-px bg-saino-gray-300 mx-2"></div>
+
+      <select 
+        id="headerLocationSelect" 
+        class="bg-transparent text-xs text-saino-gray-600 font-semibold focus:outline-none cursor-pointer pr-2"
+      >
+        <option value="all">All Locations</option>
+        <option value="Kathmandu">Kathmandu</option>
+        <option value="Lalitpur">Lalitpur</option>
+        <option value="Bhaktapur">Bhaktapur</option>
+        <option value="Pokhara">Pokhara</option>
+        <option value="Chitwan">Chitwan</option>
+      </select>
+
+      <button 
+        onclick="triggerHeaderSearch()" 
+        class="px-4 py-1.5 bg-[#ad0b0e] hover:bg-saino-red-dark text-white font-bold rounded-lg text-xs transition shadow-sm"
+      >
+        Search
+      </button>
+    </div>
+
+      
+<!-- Right Actions - Desktop -->
+<div class="hidden md:flex items-center gap-2 flex-shrink-0">
+
+  <button
+    onclick="openProviderSignInModal('patient')"
+    class="header-action-btn bg-saino-red hover:bg-saino-red-dark text-white"
+  >
+    Sign In
+  </button>
+
+  <a
+    href="#"
+    class="header-action-btn bg-saino-red hover:bg-saino-red-dark text-white"
+  >
+    <span>Get Started</span>
+  </a>
+
+</div>
+
+        <!-- Mobile + Tablet Actions (Sign In + Menu) - visible below 768px -->
+        <div class="md:hidden flex items-center space-x-2 ml-auto">
+            <button
+        onclick="openProviderSignInModal('patient')"
+        class="w-24 h-9 px-3 rounded-lg bg-saino-red hover:bg-saino-red-dark border border-saino-red text-white font-bold text-xs flex items-center justify-center transition shadow-xs"
+      >
+        Sign In
+      </button>
+          <button id="mobileMenuBtn" class="p-2 rounded-xl text-saino-gray-600 hover:bg-saino-gray-100 transition">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+  </div>
+
+    <!-- Sub-Navigation -->
+<div class="bg-[#d6d6d6] px-4 sm:px-6 lg:px-8 py-2">      
+  <div class="max-w-7xl mx-auto flex items-center justify-between text-xs font-bold text-saino-gray-600">
+        <nav class="flex items-center space-x-6">
+          <a href="#" data-nav="marketplace" class="text-saino-red font-black uppercase tracking-wider hover:text-saino-red-dark transition">HOME</a>
+          <a href="#" data-nav="about" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Discover</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Find Health care</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">My Appoinments</a>
+          <a href="#" data-nav="discovery" class="text-saino-gray-800 font-semibold uppercase tracking-wider hover:text-saino-red transition">Saved</a>
+
+        </nav>
+        <div class="hidden md:flex items-center space-x-5 text-saino-gray-700 font-semibold text-[11px]">
+    
+          <a href="list-your-care.html" class="text-saino-gray-700 hover:text-saino-red transition">List Your Care</a>
+          <a href="#" data-nav="contact" class="text-saino-gray-700 hover:text-saino-red transition">About Us</a>
+          <a href="#" data-nav="about" class="text-saino-gray-700 hover:text-saino-red transition">Contact Us</a>
+          <a href="#" data-nav="contact" class="text-saino-gray-700 hover:text-saino-red transition">FAQs</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-saino-gray-200 bg-white px-4 py-4 space-y-2 shadow-lg">
+      <a href="#" data-nav="marketplace" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Home</a>
+      <a href="#" data-nav="discovery" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition flex items-center justify-between">
+        <span>Discovery</span>
+        <span class="px-1.5 py-0.5 rounded text-[10px] bg-saino-red/10 text-saino-red font-bold">Explore</span>
+      </a>
+      <a href="#" data-nav="about" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">About us</a>
+      <a href="#" data-nav="contact" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-gray-900 hover:bg-saino-red/5 hover:text-saino-red transition">Contact us</a>
+      <a href="#" data-nav="list-your-care" class="block px-3 py-2 rounded-lg text-sm font-semibold text-saino-red hover:bg-saino-red/5 transition">List your care</a>
+      <div class="pt-3 border-t border-saino-gray-100 mb-2">
+        <button onclick="openProviderSignInModal('patient')" class="w-full py-2.5 text-xs font-bold text-saino-gray-800 border border-saino-gray-200 rounded-xl hover:border-saino-red hover:text-saino-red hover:bg-saino-red/5 transition flex items-center justify-center space-x-2">
+          <i data-lucide="user" class="w-4 h-4 text-saino-red"></i>
+          <span>Sign In / Register</span>
+        </button>
+      </div>
+      <a href="tel:+9779761427155" class="w-full py-2.5 text-xs font-bold bg-saino-red hover:bg-saino-red-dark text-white rounded-xl shadow flex items-center justify-center space-x-2 transition">
+        <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+        <span>Call Hotline: +977 9761427155</span>
+      </a>
+    </div>
+  </header>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7f9;
+    color: #222;
+    font-size: 14px;
+    line-height: 1.5;
+}
+@media (max-width: 600px) {
+ .card {
+                padding: 15px;
+            }
+
+            .document {
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .document-info {
+                align-items: flex-start;
+            }
+
+            .upload-btn {
+                padding: 7px 8px;
+            }}
+            .selected-provider-type {
+    background: #fde8e9;
+    border: 1px solid #f3c4c6;
+    border-radius: 5px;
+    padding: 9px 12px;
+    margin-bottom: 12px;
+    font-size: 10px;
+    color: #555;
+}
+
+.selected-provider-type span {
+    font-weight: 500;
+}
+
+.selected-provider-type strong {
+    color: #b3121a;
+    margin-left: 5px;
+}
+/* ================= TECHNICAL UPLOAD ================= */
+
+.technical-upload {
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: #f8f9fa;
+    border: 1px solid #e0e4e8;
+    border-radius: 5px;
+}
+
+.technical-upload h3 {
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.technical-upload ul {
+    padding-left: 17px;
+    margin: 0;
+}
+
+.technical-upload li {
+    font-size: 9px;
+    color: #555;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+        /* ================= DOCUMENTS ================= */
+
+        .documents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress {
+            font-size: 10px;
+            color: #777;
+            background: #f1f3f5;
+            padding: 5px 9px;
+            border-radius: 10px;
+        }
+
+        .document {
+            min-height: 57px;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 5px;
+        }
+
+        .document-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-number {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #f0f2f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .document-name {
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .document-type {
+            color: #888;
+            font-size: 9px;
+            margin-top: 3px;
+        }
+
+        .upload-btn {
+            border: 1px dashed #aeb6bd;
+            background: white;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            color: #555;
+        }
+
+        .upload-btn:hover {
+            border-color: #e3262e;
+            color: #e3262e;
+        }
+
+        .uploaded {
+            color: #188447;
+            font-size: 9px;
+        }
+
+        .warning {
+            color: #e3262e;
+            font-size: 9px;
+        }
+
+
+/* ================= MAIN ================= */
+
+.container {
+    width: 92%;
+    max-width: 1100px;
+
+    margin: 30px auto 50px;
+}
+
+/* Page title */
+
+.page-title h1 {
+    font-size: 26px;
+    margin-bottom: 3px;
+}
+
+.page-title h2 {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.page-title p {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 22px;
+}
+
+/* ================= STEPS ================= */
+
+  .steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #7b8490;
+    font-size: 10px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    padding: 7px 9px;
+    border-radius: 6px;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    white-space: nowrap;
+}
+
+.step:hover {
+    background: #fde8e9;
+    color: #b3121a;
+}
+
+.step:hover .circle {
+    background: #b3121a;
+    color: white;
+}
+
+.step.active {
+    background: #fde8e9;
+    color: #b3121a;
+    font-weight: 700;
+}
+
+.circle {
+    width: 19px;
+    height: 19px;
+
+    min-width: 19px;
+
+    border-radius: 50%;
+
+    background: #dce1e6;
+    color: #687382;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.step.active .circle {
+    background: #b3121a;
+    color: white;
+}
+
+/* ================= PLAN BOX ================= */
+
+.plan-box {
+    background: white;
+
+    border: 1px solid #ddd;
+    border-radius: 6px;
+
+    padding: 18px 20px;
+
+    margin-bottom: 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.plan-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.plan-description {
+    color: #777;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.change-plan {
+    background: white;
+
+    border: 1px solid #aaa;
+
+    padding: 8px 15px;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    font-size: 12px;
+}
+
+/* ================= AGREEMENT ================= */
+
+.agreement-card {
+    background: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 7px;
+
+    overflow: hidden;
+
+    margin-bottom: 20px;
+}
+
+.agreement-header {
+    padding: 18px 22px;
+
+    border-bottom: 1px solid #ddd;
+
+    background: #fafafa;
+}
+
+.agreement-header h3 {
+    font-size: 17px;
+    margin-bottom: 3px;
+}
+
+.agreement-header p {
+    font-size: 12px;
+    color: #777;
+}
+
+/* Agreement item */
+
+.agreement-item {
+    padding: 18px 22px;
+
+    border-bottom: 1px solid #e5e5e5;
+
+    display: flex;
+
+    gap: 15px;
+}
+
+.checkbox-area {
+    padding-top: 3px;
+}
+
+.checkbox-area input {
+    width: 17px;
+    height: 17px;
+
+    cursor: pointer;
+}
+
+.agreement-content {
+    flex: 1;
+}
+
+.agreement-title {
+    font-size: 15px;
+    font-weight: bold;
+
+    margin-bottom: 4px;
+}
+
+.agreement-description {
+    color: #666;
+
+    font-size: 12px;
+
+    margin-bottom: 10px;
+}
+
+.agreement-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-document {
+    color: #d71920;
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.view-document:hover {
+    text-decoration: underline;
+}
+
+.required-text {
+    color: #d71920;
+    font-size: 11px;
+}
+
+/* ================= BOTTOM BAR ================= */
+
+.bottom-bar {
+    background: white;
+
+    border: 1px solid #ddd;
+
+    padding: 18px 22px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    border-radius: 5px;
+}
+
+.accept-text {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+
+/* ================= BOTTOM ACTIONS ================= */
+
+.bottom-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* ================= BACK BUTTON ================= */
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 12px 18px;
+
+    background: white;
+    color: #596474;
+
+    border: 1px solid #d5dbe0;
+    border-radius: 5px;
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.back-btn i {
+    width: 15px;
+    height: 15px;
+    stroke-width: 2.5;
+}
+
+.back-btn:hover {
+    color: #b3121a;
+    border-color: #b3121a;
+    background: #fde8e9;
+    transform: translateX(-2px);
+}
+
+
+/* ================= CONTINUE BUTTON ================= */
+
+.proceed-btn {
+    background: #c81720;
+    color: white;
+
+    border: none;
+
+    padding: 12px 24px;
+
+    border-radius: 5px;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.proceed-btn:hover {
+    background: #a80f17;
+    transform: translateY(-1px);
+}
+
+/* ================= FOOTER ================= */
+
+footer {
+    background: #e7edf1;
+
+    border-top: 3px solid #168bd2;
+
+    padding: 40px 7% 20px;
+}
+
+.footer-container {
+    max-width: 1100px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 60px;
+}
+
+.footer-column h3 {
+    font-size: 14px;
+
+    margin-bottom: 13px;
+}
+
+.footer-column a {
+    display: block;
+
+    text-decoration: none;
+
+    color: #666;
+
+    font-size: 11px;
+
+    margin-bottom: 7px;
+}
+
+.footer-column a:hover {
+    color: #d71920;
+}
+
+/* Footer logo */
+
+.footer-bottom {
+    max-width: 1100px;
+
+    margin: 30px auto 0;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #bfc6ca;
+
+    text-align: center;
+}
+
+.footer-logo {
+    font-size: 25px;
+
+    font-weight: bold;
+}
+
+.footer-logo span {
+    color: #d71920;
+}
+
+.footer-bottom p {
+    color: #777;
+
+    font-size: 10px;
+
+    margin-top: 5px;
+}
+
+.social {
+    margin-top: 15px;
+}
+
+.social span {
+    display: inline-flex;
+
+    justify-content: center;
+    align-items: center;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: #d71920;
+
+    color: white;
+
+    margin: 3px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+.copyright {
+    margin-top: 15px;
+
+    font-size: 10px;
+
+    color: #888;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width: 900px) {
+
+    .top-header {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .search-area {
+        width: 100%;
+        order: 3;
+    }
+
+    .navbar {
+        overflow-x: auto;
+
+        justify-content: flex-start;
+
+        padding: 10px 20px;
+
+        gap: 25px;
+    }
+
+    .steps {
+        overflow-x: auto;
+        justify-content: flex-start;
+        gap: 20px;
+    }
+
+    .steps::before {
+        display: none;
+    }
+
+    .step {
+        white-space: nowrap;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media(max-width: 600px) {
+
+    body {
+        font-size: 13px;
+    }
+
+    .container {
+        width: 94%;
+    }
+
+    .page-title h1 {
+        font-size: 22px;
+    }
+
+    .page-title h2 {
+        font-size: 18px;
+    }
+
+    .plan-box {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .agreement-item {
+        padding: 15px;
+    }
+
+  .bottom-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+}
+
+.bottom-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+}
+
+.back-btn,
+.proceed-btn {
+    flex: 1;
+    justify-content: center;
+}
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .header-buttons {
+        width: 100%;
+    }
+}
+/*****Document Upload Section*****/
+/* ================= DOCUMENT UPLOAD ================= */
+
+  .card {
+            background: white;
+            border: 1px solid #e0e4e7;
+            border-radius: 7px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            color: #777;
+            font-size: 11px;
+            margin-bottom: 18px;
+        }
+
+</style>
+<link rel="stylesheet" href="onboarding/provider-onboarding.css">
+<script src="onboarding/provider-onboarding.js" defer></script>
+</head>
+
+
+<body>
+
+
+
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="container">
+
+
+    <div class="page-title">
+
+        <h1>Provider Registration</h1>
+
+        <h2>Legal Sign Agreement</h2>
+
+        <p>
+            Review and accept the registration agreement,
+            then you can set your annual plan payment.
+        </p>
+
+    </div>
+
+
+
+    <!-- STEPS -->
+
+           <div class="steps">
+
+    <a href="organization-details.html" class="step">
+        <span class="circle">1</span>
+        <span>Organization Details</span>
+    </a>
+
+    <a href="provider-details.html" class="step" >
+        <span class="circle">2</span>
+        <span>Choose Plan</span>
+    </a>
+       <a href="legal-agreement.html" class="step active">
+        <span class="circle">3</span>
+        <span>Legal Agreement  & Documents</span>
+    </a>
+
+    <a href="bank-details.html" class="step">
+        <span class="circle">4</span>
+        <span>Bank Details </span>
+    </a>
+
+ 
+
+    <a href="check-submit.html"  class="step ">
+        <span class="circle">5</span>
+        <span>Check & Submit</span>
+    </a>
+
+</div>
+
+
+
+    <!-- PLAN -->
+
+    <div class="plan-box">
+
+        <div>
+
+           <div class="plan-name" id="selectedPlanName">
+    Loading selected plan...
+</div>
+
+<div class="plan-description" id="selectedPlanPrice">
+    Loading price...
+</div>
+
+        </div>
+
+
+        <button
+            class="change-plan"
+            onclick="changePlan()"
+        >
+            Change plan
+        </button>
+
+    </div>
+        <!-- ================= DOCUMENTS ================= -->
+
+<section class="card">
+
+    <div class="documents-header">
+
+        <div>
+            <h2 class="card-title">
+                Upload Documents (Paid Users)
+            </h2>
+
+            <p class="card-subtitle">
+                Upload the required documents based on your healthcare provider type.
+            </p>
+        </div>
+
+        <span class="progress" id="documentProgress">
+            0 documents
+        </span>
+
+    </div>
+
+
+    <!-- SELECTED ORGANIZATION TYPE -->
+
+    <div class="selected-provider-type">
+        <span>Organization Type:</span>
+        <strong id="selectedOrganizationType">
+            Loading...
+        </strong>
+    </div>
+
+
+    <!-- DYNAMIC DOCUMENT LIST -->
+
+    <div id="documentsContainer"></div>
+
+
+    <!-- TECHNICAL IMAGE UPLOAD -->
+
+    <div class="technical-upload">
+
+        <h3>
+            Technical Image Upload
+        </h3>
+
+        <ul>
+            <li>200 DPI Scan or Crisp</li>
+            <li>All stamps, official seals, signatures and expiration dates must be perfectly readable.</li>
+            <li>Framing: Four Outer Corners document visibility</li>
+            <li>PDF, JPEG or PNG 5MB.</li>
+        </ul>
+
+    </div>
+
+
+
+    <!-- AGREEMENT -->
+
+    <section class="agreement-card">
+
+
+        <div class="agreement-header">
+
+            <h3>
+                7 Documents Agreement
+            </h3>
+
+            <p>
+                Please review each agreement carefully before accepting.
+            </p>
+
+        </div>
+
+
+
+        <!-- 1 -->
+
+        <div class="agreement-item">
+
+            <div class="checkbox-area">
+
+                <input
+                    type="checkbox"
+                    class="agreement-check"
+                >
+
+            </div>
+
+
+            <div class="agreement-content">
+
+                <div class="agreement-title">
+                    Healthcare Marketplace Terms & Conditions
+                </div>
+
+                <div class="agreement-description">
+
+                    Covers your rights, obligations,
+                    and responsibilities as a healthcare provider
+                    on SAINO Marketplace.
+
+                </div>
+
+
+                <div class="agreement-footer">
+
+                    <span class="required-text">
+                        Required
+                    </span>
+
+                    <a
+                        href="javascript:void(0);"
+                        class="view-document"
+                        onclick="viewDocument('Healthcare Marketplace Terms & Conditions')"
+                    >
+                        View full document
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 2 -->
+
+        <div class="agreement-item">
+
+            <div class="checkbox-area">
+
+                <input
+                    type="checkbox"
+                    class="agreement-check"
+                >
+
+            </div>
+
+
+            <div class="agreement-content">
+
+                <div class="agreement-title">
+                    Booking Terms & Conditions
+                </div>
+
+                <div class="agreement-description">
+
+                    Terms for accepting, managing,
+                    and cancelling appointments booked through SAINO.
+
+                </div>
+
+
+                <div class="agreement-footer">
+
+                    <span class="required-text">
+                        Required
+                    </span>
+
+                    <a
+                        href="#"
+                        class="view-document"
+                        onclick="viewDocument('Booking Terms & Conditions')"
+                    >
+                        View full document
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 3 -->
+
+        <div class="agreement-item">
+
+            <div class="checkbox-area">
+
+                <input
+                    type="checkbox"
+                    class="agreement-check"
+                >
+
+            </div>
+
+
+            <div class="agreement-content">
+
+                <div class="agreement-title">
+                    Marketplace Terms & Services
+                </div>
+
+                <div class="agreement-description">
+
+                    Terms for using SAINO Marketplace
+                    and provider services.
+
+                </div>
+
+
+                <div class="agreement-footer">
+
+                    <span class="required-text">
+                        Required
+                    </span>
+
+                    <a
+                        href="#"
+                        class="view-document"
+                        onclick="viewDocument('Marketplace Terms & Services')"
+                    >
+                        View full document
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 4 -->
+
+        <div class="agreement-item">
+
+            <div class="checkbox-area">
+
+                <input
+                    type="checkbox"
+                    class="agreement-check"
+                >
+
+            </div>
+
+
+            <div class="agreement-content">
+
+                <div class="agreement-title">
+                    Ads & Collaboration
+                </div>
+
+                <div class="agreement-description">
+
+                    Terms for approved advertisements
+                    and collaborations with SAINO.
+
+                </div>
+
+
+                <div class="agreement-footer">
+
+                    <span class="required-text">
+                        Required
+                    </span>
+
+                    <a
+                        href="#"
+                        class="view-document"
+                        onclick="viewDocument('Ads & Collaboration')"
+                    >
+                        View full document
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 5 -->
+
+        <div class="agreement-item">
+
+            <div class="checkbox-area">
+
+                <input
+                    type="checkbox"
+                    class="agreement-check"
+                >
+
+            </div>
+
+
+            <div class="agreement-content">
+
+                <div class="agreement-title">
+                    SAINO Boost Services
+                </div>
+
+                <div class="agreement-description">
+
+                    Terms for using SAINO Boost
+                    promotional services.
+
+                </div>
+
+
+                <div class="agreement-footer">
+
+                    <span class="required-text">
+                        Required
+                    </span>
+
+                    <a
+                        href="#"
+                        class="view-document"
+                        onclick="viewDocument('SAINO Boost Services')"
+                    >
+                        View full document
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 6 -->
+
+        <div class="agreement-item">
+
+            <div class="checkbox-area">
+
+                <input
+                    type="checkbox"
+                    class="agreement-check"
+                >
+
+            </div>
+
+
+            <div class="agreement-content">
+
+                <div class="agreement-title">
+                    Future Digital Marketing Services
+                </div>
+
+                <div class="agreement-description">
+
+                    Terms covering future digital
+                    marketing services offered by SAINO.
+
+                </div>
+
+
+                <div class="agreement-footer">
+
+                    <span class="required-text">
+                        Required
+                    </span>
+
+                    <a
+                        href="#"
+                        class="view-document"
+                        onclick="viewDocument('Future Digital Marketing Services')"
+                    >
+                        View full document
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 7 -->
+
+        <div class="agreement-item">
+
+            <div class="checkbox-area">
+
+                <input
+                    type="checkbox"
+                    class="agreement-check"
+                >
+
+            </div>
+
+
+            <div class="agreement-content">
+
+                <div class="agreement-title">
+                    Privacy Policy
+                </div>
+
+                <div class="agreement-description">
+
+                    How SAINO collects,
+                    uses, and protects your information.
+
+                </div>
+
+
+                <div class="agreement-footer">
+
+                    <span class="required-text">
+                        Required
+                    </span>
+
+                    <a
+                        href="#"
+                        class="view-document"
+                        onclick="viewDocument('Privacy Policy')"
+                    >
+                        View full document
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+
+
+    <!-- BOTTOM -->
+
+<div class="bottom-bar">
+
+    <div class="accept-text">
+        Accept all 7 documents to continue
+    </div>
+
+    <div class="bottom-actions">
+
+        <a href="provider-details.html" class="back-btn">
+            <i data-lucide="arrow-left"></i>
+            <span>Back</span>
+        </a>
+
+        <button
+            class="proceed-btn"
+            onclick="goToCheckSubmit()"
+        >
+            Continue to Bank Details→
+        </button>
+
+    </div>
+
+</div>
+
+
+</main>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-container">
+
+
+        <div class="footer-column">
+
+            <h3>Patients</h3>
+
+            <a href="#">Find Doctors</a>
+            <a href="#">Hospitals</a>
+            <a href="#">Clinics</a>
+            <a href="#">Diagnostics Centers</a>
+            <a href="#">Pharmacies</a>
+            <a href="#">Book Appointment</a>
+            <a href="#">Health Articles</a>
+            <a href="#">Emergency Services</a>
+
+        </div>
+
+
+
+        <div class="footer-column">
+
+            <h3>Healthcare Providers</h3>
+
+            <a href="#">Login</a>
+            <a href="#">Register</a>
+            <a href="#">SAINO Boost</a>
+            <a href="#">Manage Services</a>
+            <a href="#">Manage your Bookings</a>
+            <a href="#">Legal and Privacy Information</a>
+
+            <br>
+
+            <h3>Sales & Distribution</h3>
+
+            <a href="#">Contact Us</a>
+
+        </div>
+
+
+
+        <div class="footer-column">
+
+            <h3>For Advertisers</h3>
+
+            <a href="#">Healthcare Campaigns</a>
+            <a href="#">Boost Your Marketplace</a>
+            <a href="#">Terms & Conditions</a>
+
+            <br>
+
+            <h3>More</h3>
+
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms & Conditions</a>
+            <a href="#">Contact</a>
+            <a href="#">SAINO Blog</a>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="footer-bottom">
+
+        <div class="footer-logo">
+            S<span>AI</span>NO
+        </div>
+
+        <p>
+            Connecting patients with quality healthcare.
+        </p>
+
+
+        <div class="social">
+
+            <span>f</span>
+            <span>𝕏</span>
+            <span>in</span>
+
+        </div>
+
+
+        <div class="copyright">
+
+            © 2026 SAINO. All rights reserved.
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<script>
+/* =========================================================
+   DOCUMENT REQUIREMENTS
+========================================================= */
+
+const documentRequirements = {
+    "Hospital": [
+        "Facility Operating Licence",
+        "Clinical Establishment Act Registration",
+        "Biomedical Waste (BMW) Management",
+        "Fire Safety and NOC",
+        "Professional Indemnity Insurance",
+        "Tax and Incorporation Documents",
+        "PAN / EIN or Corporate Charter"
+    ],
+
+    "Clinic": [
+        "Facility Operating Licence",
+        "Clinical Establishment Act Registration",
+        "Biomedical Waste (BMW) Management",
+        "Fire Safety and NOC",
+        "Professional Indemnity Insurance",
+        "Tax and Incorporation Documents",
+        "PAN / EIN or Corporate Charter"
+    ],
+
+    "Diagnostic Centre / Lab": [
+        "Lab Accreditation Certificate",
+        "PNDT Act Registration",
+        "AERB / Radiation Safety Approval",
+        "Signatory Doctor Qualifications"
+    ],
+
+    "Blood Bank": [
+        "Drug and Component License",
+        "Medical Officer Credentials",
+        "Equipment Calibration Logs"
+    ],
+
+    "Home Care": [
+        "Nursing Agency / Trade License",
+        "Staff Background Clearances",
+        "Staff Medical Certifications"
+    ],
+
+    "Ambulance Provider": [],
+
+    "Wellness Centre": []
+};
+
+
+/* =========================================================
+   LOAD DOCUMENTS
+========================================================= */
+
+function loadDocuments() {
+
+    const organizationType =
+        localStorage.getItem("sainoOrganizationType");
+
+    const typeDisplay =
+        document.getElementById("selectedOrganizationType");
+
+    const container =
+        document.getElementById("documentsContainer");
+
+    const progress =
+        document.getElementById("documentProgress");
+
+
+    if (!typeDisplay || !container || !progress) {
+        return;
+    }
+
+
+    /* Organization type not selected */
+
+    if (!organizationType) {
+
+        typeDisplay.textContent = "Not selected";
+
+        container.innerHTML = `
+            <div class="warning">
+                Please go back to Organization Details and select
+                your organization type.
+            </div>
+        `;
+
+        progress.textContent = "0 documents";
+
+        return;
+    }
+
+
+    /* Display organization type */
+
+    typeDisplay.textContent = organizationType;
+
+
+    /* Get required documents */
+
+    const documents =
+        documentRequirements[organizationType] || [];
+
+
+    /* No specific documents */
+
+    if (documents.length === 0) {
+
+        container.innerHTML = `
+            <div class="info-message"
+                 style="padding:12px;background:#f8f9fa;border:1px solid #e0e4e8;border-radius:5px;color:#555;font-size:11px;">
+                No specific document list has been configured for
+                <strong>${organizationType}</strong>.
+                Please upload the applicable legal and registration
+                documents if required.
+            </div>
+        `;
+
+        progress.textContent = "0 documents";
+
+        return;
+    }
+
+
+    /* Clear existing documents */
+
+    container.innerHTML = "";
+
+
+    /* Create document rows */
+
+    documents.forEach((documentName, index) => {
+
+        const number = index + 1;
+
+        const documentHTML = `
+            <div class="document">
+
+                <div class="document-info">
+
+                    <div class="doc-number">
+                        ${number}
+                    </div>
+
+                    <div>
+
+                        <div class="document-name">
+                            ${documentName}
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="document-type">
+                            PDF, JPG, JPEG, PNG • Max 5MB
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <input
+                        type="file"
+                        id="file${number}"
+                        hidden
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onchange="uploadFile(${number})"
+                    >
+
+                    <button
+                        type="button"
+                        class="upload-btn"
+                        onclick="document.getElementById('file${number}').click()"
+                    >
+                        ↑ Upload Document
+                    </button>
+
+                    <div id="status${number}"></div>
+
+                </div>
+
+            </div>
+        `;
+
+        container.insertAdjacentHTML(
+            "beforeend",
+            documentHTML
+        );
+
+    });
+
+
+    progress.textContent =
+        `0 of ${documents.length} uploaded`;
+}
+
+
+/* =========================================================
+   FILE UPLOAD
+========================================================= */
+
+function uploadFile(number) {
+
+    const fileInput =
+        document.getElementById("file" + number);
+
+    const status =
+        document.getElementById("status" + number);
+
+
+    if (!fileInput || !status) {
+        return;
+    }
+
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        return;
+    }
+
+
+    const file =
+        fileInput.files[0];
+
+
+    const maxSize =
+        5 * 1024 * 1024;
+
+
+    /* File size validation */
+
+    if (file.size > maxSize) {
+
+        status.innerHTML = `
+            <div class="warning">
+                File must be less than 5MB.
+            </div>
+        `;
+
+        fileInput.value = "";
+
+        updateDocumentProgress();
+
+        return;
+    }
+
+
+    /* File type validation */
+
+    const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png"
+    ];
+
+
+    if (!allowedTypes.includes(file.type)) {
+
+        status.innerHTML = `
+            <div class="warning">
+                Only PDF, JPG, JPEG and PNG files are allowed.
+            </div>
+        `;
+
+        fileInput.value = "";
+
+        updateDocumentProgress();
+
+        return;
+    }
+
+
+    /* Upload successful */
+
+    status.innerHTML = `
+        <div class="uploaded">
+            ✓ ${file.name} uploaded
+        </div>
+    `;
+
+
+    updateDocumentProgress();
+}
+
+
+/* =========================================================
+   UPDATE DOCUMENT PROGRESS
+========================================================= */
+
+function updateDocumentProgress() {
+
+    const organizationType =
+        localStorage.getItem("sainoOrganizationType");
+
+    const documents =
+        documentRequirements[organizationType] || [];
+
+    let uploadedCount = 0;
+
+
+    documents.forEach((documentName, index) => {
+
+        const fileInput =
+            document.getElementById(
+                `file${index + 1}`
+            );
+
+
+        if (
+            fileInput &&
+            fileInput.files &&
+            fileInput.files.length > 0
+        ) {
+            uploadedCount++;
+        }
+
+    });
+
+
+    const progress =
+        document.getElementById("documentProgress");
+
+
+    if (progress) {
+
+        progress.textContent =
+            `${uploadedCount} of ${documents.length} uploaded`;
+
+    }
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function searchService() {
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+
+    if (!searchInput) {
+        return;
+    }
+
+
+    const value =
+        searchInput.value.trim();
+
+
+    if (value === "") {
+
+        alert("Please enter something to search.");
+
+    } else {
+
+        alert("Searching for: " + value);
+
+    }
+}
+
+
+/* =========================================================
+   SIGN IN
+========================================================= */
+
+function signIn() {
+
+    alert("Sign In page will open.");
+
+}
+
+
+/* =========================================================
+   GET STARTED
+========================================================= */
+
+function getStarted() {
+
+    alert("Welcome to SAINO!");
+
+}
+
+
+/* =========================================================
+   CHANGE PLAN
+========================================================= */
+
+function changePlan() {
+
+    window.location.href =
+        "provider-details.html";
+
+}
+
+
+/* =========================================================
+   VIEW DOCUMENT
+========================================================= */
+
+function viewDocument(documentName) {
+
+    alert(
+        "Opening document:\n\n" +
+        documentName
+    );
+
+}
+
+
+/* =========================================================
+   GO TO CHECK & SUBMIT
+========================================================= */
+
+function goToCheckSubmit() {
+
+    /* Get selected plan */
+
+    const selectedPlan =
+        localStorage.getItem("selectedPlanName");
+
+
+    /* =====================================================
+       CHECK PLAN
+    ===================================================== */
+
+    if (!selectedPlan) {
+
+        alert(
+            "No plan has been selected.\n\n" +
+            "Please go back and select a plan."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       FREE PLAN
+    ===================================================== */
+
+    if (
+        selectedPlan === "Saino Free" ||
+        selectedPlan === "Free"
+    ) {
+
+        localStorage.setItem(
+            "legalAgreementsAccepted",
+            "true"
+        );
+
+        localStorage.setItem(
+            "uploadedDocuments",
+            JSON.stringify([])
+        );
+
+        localStorage.setItem(
+            "agreementCount",
+            "7"
+        );
+
+
+        window.location.href =
+            "check-submit.html";
+
+        return;
+    }
+
+
+    /* =====================================================
+       PAID PLAN
+    ===================================================== */
+
+    const organizationType =
+        localStorage.getItem("sainoOrganizationType");
+
+
+    if (!organizationType) {
+
+        alert(
+            "Organization type is missing.\n\n" +
+            "Please go back to Organization Details."
+        );
+
+        return;
+    }
+
+
+    const documents =
+        documentRequirements[organizationType] || [];
+
+
+    /* =====================================================
+       CHECK REQUIRED DOCUMENTS
+    ===================================================== */
+
+    for (
+        let i = 0;
+        i < documents.length;
+        i++
+    ) {
+
+        const fileInput =
+            document.getElementById(
+                `file${i + 1}`
+            );
+
+
+        if (
+            !fileInput ||
+            !fileInput.files ||
+            fileInput.files.length === 0
+        ) {
+
+            alert(
+                "Please upload the required document:\n\n" +
+                documents[i]
+            );
+
+            return;
+        }
+
+    }
+
+
+    /* =====================================================
+       CHECK ALL 7 AGREEMENTS
+    ===================================================== */
+
+    const agreementCheckboxes =
+        document.querySelectorAll(
+            ".agreement-check"
+        );
+
+
+    if (agreementCheckboxes.length !== 7) {
+
+        alert(
+            "There should be 7 legal agreements on this page."
+        );
+
+        return;
+    }
+
+
+    for (
+        let i = 0;
+        i < agreementCheckboxes.length;
+        i++
+    ) {
+
+        if (!agreementCheckboxes[i].checked) {
+
+            alert(
+                "Please accept all 7 legal agreements before continuing."
+            );
+
+            return;
+        }
+
+    }
+
+
+    /* =====================================================
+       SAVE AGREEMENT STATUS
+    ===================================================== */
+
+    localStorage.setItem(
+        "legalAgreementsAccepted",
+        "true"
+    );
+
+
+    /* =====================================================
+       SAVE UPLOADED DOCUMENT NAMES
+    ===================================================== */
+
+    const uploadedDocuments = [];
+
+
+    for (
+        let i = 0;
+        i < documents.length;
+        i++
+    ) {
+
+        const fileInput =
+            document.getElementById(
+                `file${i + 1}`
+            );
+
+
+        if (
+            fileInput &&
+            fileInput.files &&
+            fileInput.files.length > 0
+        ) {
+
+            uploadedDocuments.push(
+                fileInput.files[0].name
+            );
+
+        }
+
+    }
+
+
+    localStorage.setItem(
+        "uploadedDocuments",
+        JSON.stringify(uploadedDocuments)
+    );
+
+
+    /* =====================================================
+       SAVE AGREEMENT COUNT
+    ===================================================== */
+
+    localStorage.setItem(
+        "agreementCount",
+        agreementCheckboxes.length.toString()
+    );
+
+
+    /* =====================================================
+       CONFIRM
+    ===================================================== */
+
+    const confirmed =
+        confirm(
+            "Documents uploaded successfully!\n\n" +
+            "All 7 legal agreements have been accepted successfully.\n\n" +
+            "Continue to bank details page?"
+        );
+
+
+    if (confirmed) {
+
+        window.location.href =
+            "bank-details.html";
+
+    }
+
+}
+
+
+/* =========================================================
+   PAGE LOAD
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* ================================================
+           LOAD SELECTED PLAN
+        ================================================ */
+
+        const planName =
+            localStorage.getItem("selectedPlanName");
+
+        const planPrice =
+            localStorage.getItem("selectedPlanPrice");
+
+
+        const planNameElement =
+            document.getElementById(
+                "selectedPlanName"
+            );
+
+        const planPriceElement =
+            document.getElementById(
+                "selectedPlanPrice"
+            );
+
+
+        if (planNameElement) {
+
+            planNameElement.textContent =
+                planName || "No plan selected";
+
+        }
+
+
+        if (planPriceElement) {
+
+            planPriceElement.textContent =
+                planPrice || "Please select a plan";
+
+        }
+
+
+        /* ================================================
+           LOAD DOCUMENTS
+        ================================================ */
+
+        loadDocuments();
+
+    }
+);
+</script>
+</body>
+</html>
