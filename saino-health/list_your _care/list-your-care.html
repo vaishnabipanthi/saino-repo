@@ -6,9 +6,12 @@
   <title>List Your Care | SAINO HEALTH</title>
   <meta name="description" content="List your healthcare business on SAINO HEALTH and connect with patients.">
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -38,7 +41,12 @@
     }
   </script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="icon" type="image/png" href="assets/logo.png">
+  
+  <!-- Favicon & CSS -->
+  <link rel="icon" type="image/png" href="../assets/logo.png">
+  <link rel="stylesheet" href="../css/custom.css">
+  <link rel="stylesheet" href="onboarding/provider-onboarding.css">
+  <script src="onboarding/provider-onboarding.js" defer></script>
 
   <style>
     body { font-family: "Plus Jakarta Sans", Inter, sans-serif; }
@@ -53,627 +61,474 @@
   </style>
 </head>
 
-<body class="bg-[#f8fafb] text-[#343a40] min-h-screen flex flex-col">
+<body class="bg-[#f8fafb] text-[#343a40] min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
 
-<header class="sticky top-0 z-40 bg-[#d6d6d6] border-b border-[#e9ecef] shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between min-h-[72px] py-2 gap-4">
-      <a href="index.html" class="flex items-center flex-shrink-0">
-        <img src="assets/logo.png" alt="SAINO HEALTH" class="h-12 sm:h-14 md:h-16 w-auto max-w-[200px] object-contain">
-      </a>
-
-      <div class="hidden md:flex flex-1 max-w-xl items-center bg-[#f8f9fa] rounded-lg border border-[#e9ecef] p-1 pl-4 shadow-sm">
-        <i data-lucide="search" class="w-4 h-4 text-[#adb5bd] mr-2"></i>
-        <input type="text" placeholder="Search hospitals, clinics, services..."
-          class="bg-transparent flex-1 text-xs text-[#343a40] font-medium focus:outline-none">
-        <div class="h-4 w-px bg-[#dee2e6] mx-2"></div>
-        <select class="bg-transparent text-xs text-[#6c757d] font-semibold focus:outline-none cursor-pointer pr-2">
-          <option>All Locations</option>
-          <option>Kathmandu</option>
-          <option>Lalitpur</option>
-          <option>Pokhara</option>
-        </select>
-        <button class="px-4 py-1.5 bg-[#ad0b0e] hover:bg-[#B3121A] text-white font-bold rounded-lg text-xs">Search</button>
-      </div>
-
-      <div class="hidden md:flex items-center gap-2 flex-shrink-0">
-        <button class="h-9 px-5 rounded-lg bg-[#ad0b0e] text-white font-bold text-xs">Sign In</button>
-        <a href="list-your-care-login.html" class="h-9 px-4 rounded-lg bg-[#ad0b0e] text-white font-bold text-xs flex items-center">Get Started</a>
-      </div>
-
-      <div class="md:hidden flex items-center gap-2">
-        <button class="h-9 px-4 rounded-lg bg-[#ad0b0e] text-white font-bold text-xs">Sign In</button>
-        <button id="mobileMenuBtn" class="p-2 rounded-xl text-[#495057]">
-          <i data-lucide="menu" class="w-6 h-6"></i>
+  <!-- ================= AAPKA ORIGINAL GLOBAL HEADER ================= -->
+  <header class="w-full flex justify-center shadow-sm" style="background: #E2E6EA;">
+    <div class="w-full max-w-full px-3 py-0 flex flex-col justify-center gap-0 overflow-visible">
+      <div class="flex items-center justify-between w-full gap-2 md:gap-3 lg:gap-4 px-2 sm:px-4 py-2 bg-[#E2E6EA] flex-nowrap">
+        <a href="../index.html#marketplace" class="flex items-center flex-shrink-0 lg:-my-3">
+          <img src="../assets/logo.png" alt="SAINO HEALTH" class="h-20 sm:h-20 md:h-20 lg:h-32 w-auto object-contain" style="mix-blend-mode: multiply;">
+        </a>
+        <button onclick="alert('No new notifications')" class="p-2 text-slate-600 hover:text-[#B91C1C] hover:bg-slate-100 rounded-full transition relative" aria-label="Notifications">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"></span>
         </button>
+
+        <!-- Global Search Bar -->
+        <div class="search-shell relative hidden md:flex flex-1 max-w-xs sm:max-w-md md:max-w-xl lg:max-w-6xl items-center border-2 border-slate-400 rounded-[10px] bg-[#E2E6EA] px-2 md:pl-3 md:pr-1 py-1 z-30">
+          <i data-lucide="search" class="w-3.5 h-3.5 md:w-6 md:h-6 text-slate-400 mr-1.5 shrink-0"></i>
+          <input type="text" id="globalSearchInput" placeholder="Search hospital, clinics, services..." class="w-full text-xs md:text-sm lg:text-base py-1 text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0">
+          <div class="hidden sm:flex items-center text-[11px] md:text-xs font-semibold text-slate-700 shrink-0 pr-1 md:pr-2 border-l border-slate-300 pl-2 ml-1">
+            <i data-lucide="map-pin" class="w-3 h-3 md:w-3.5 md:h-3.5 text-[#B91C1C] mr-1"></i>
+            <select id="globalLocationSelect" class="bg-transparent focus:outline-none cursor-pointer max-w-[70px] md:max-w-none truncate">
+              <option value="Kathmandu">Kathmandu</option>
+              <option value="Lalitpur">Lalitpur</option>
+              <option value="Bhaktapur">Bhaktapur</option>
+              <option value="Pokhara">Pokhara</option>
+            </select>
+          </div>
+          <button id="globalSearchBtn" class="bg-[#B91C1C] hover:bg-[#991B1B] text-white px-2.5 sm:px-4 md:px-5 py-1.5 rounded-[8px] text-[11px] md:text-xs font-bold transition shrink-0 ml-1">Search</button>
+        </div>
+
+        <div class="hidden md:flex items-center gap-2 flex-shrink-0">
+          <a href="../provider/index.html" class="px-3 py-1.5 text-xs font-bold text-slate-900 hover:text-black border-2 border-slate-700 rounded-[10px] bg-[#E2E6EA] hover:bg-slate-300 transition shadow-xs">Sign In</a>
+          <a href="list-your-care-login.html" class="px-3 py-2 text-xs font-semibold bg-[#B91C1C] hover:bg-[#991B1B] text-white rounded-[10px] transition shadow-xs">Get Started</a>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center justify-between w-full text-[12px] lg:text-[15px] font-semibold text-slate-700 pt-1 pb-2 relative z-20 mt-1">
+        <div class="flex items-center gap-4 lg:gap-6">
+          <a href="../index.html#marketplace" class="text-slate-700 hover:text-[#B91C1C] transition">Home</a>
+          <a href="../index.html#discovery" class="text-slate-700 hover:text-[#B91C1C] transition">Discover</a>
+          <a href="../index.html#find-healthcare" class="text-slate-700 hover:text-[#B91C1C] transition cursor-pointer">Find Healthcare</a>
+          <a href="../index.html#appointments" class="text-slate-700 hover:text-[#B91C1C] transition">My Appointments</a>
+          <a href="../index.html#saved" class="text-slate-700 hover:text-[#B91C1C] transition">Saved</a>
+        </div>
+        <div class="flex items-center gap-4 lg:gap-6">
+          <a href="list-your-care.html" class="text-[#B91C1C] font-bold transition">List Your Care</a>
+          <a href="../index.html#about" class="text-slate-700 hover:text-[#B91C1C] transition">About Us</a>
+          <a href="../index.html#contact" class="text-slate-700 hover:text-[#B91C1C] transition">Contact Us</a>
+          <a href="../index.html#faqs" class="text-slate-700 hover:text-[#B91C1C] transition">FAQs</a>
+        </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="bg-[#d6d6d6] px-4 sm:px-6 lg:px-8 py-2">
-    <div class="max-w-7xl mx-auto flex items-center justify-between text-xs font-bold text-[#6c757d]">
-      <nav class="flex items-center space-x-5 overflow-hidden whitespace-nowrap">
-        <a href="index.html" class="text-[#ad0b0e] font-black uppercase tracking-wider">HOME</a>
-        <a href="#" class="text-[#343a40] uppercase tracking-wider">Discover</a>
-        <a href="#" class="text-[#343a40] uppercase tracking-wider">Find Health Care</a>
-        <a href="#" class="text-[#343a40] uppercase tracking-wider">My Appointments</a>
-        <a href="#" class="text-[#343a40] uppercase tracking-wider">Saved</a>
-      </nav>
-      <div class="hidden lg:flex items-center space-x-5 text-[11px]">
-        <a href="list-your-care.html" class="text-[#ad0b0e] font-bold">List Your Care</a>
-        <a href="#">About Us</a>
-        <a href="#">Contact Us</a>
-        <a href="#">FAQs</a>
+  <main class="flex-1">
+
+    <!-- Healthcare Advertisement Slider -->
+    <section class="relative overflow-hidden bg-[#071126] text-white">
+      <div id="careAdSlider" class="relative h-[360px] sm:h-[400px] md:h-[460px] lg:h-[500px]">
+
+        <!-- AD 1 -->
+        <div class="care-ad-slide absolute inset-0 opacity-100 transition-opacity duration-700">
+          <img
+            src="../assets/ads/healthcare-ad-1.jpg"
+            alt="Healthcare services"
+            onerror="this.src='https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80'"
+            class="absolute inset-0 w-full h-full object-cover object-center"
+          >
+          <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/70 to-transparent"></div>
+
+          <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 py-10 h-full flex items-center">
+            <div class="max-w-xl">
+              <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
+                Saino Health
+              </span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
+                Your Health,
+                <span class="text-[#ffb3b5]">Our Priority</span>
+              </h2>
+              <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
+                Discover trusted healthcare providers, medical services and healthcare facilities with SAINO HEALTH.
+              </p>
+              <a href="../index.html#discovery" class="mt-5 inline-block bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
+                Explore Healthcare
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- AD 2 -->
+        <div class="care-ad-slide absolute inset-0 opacity-0 transition-opacity duration-700">
+          <img
+            src="../assets/ads/healthcare-ad-2.jpg"
+            alt="Healthcare professionals"
+            onerror="this.src='https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80'"
+            class="absolute inset-0 w-full h-full object-cover object-center"
+          >
+          <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/65 to-transparent"></div>
+
+          <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 py-10 h-full flex items-center">
+            <div class="max-w-xl">
+              <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
+                Healthcare Providers
+              </span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
+                Connect With
+                <span class="text-[#ffb3b5]">More Patients</span>
+              </h2>
+              <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
+                Showcase your healthcare services and make your facility easier for patients to discover.
+              </p>
+              <a href="list-your-care-login.html" class="mt-5 inline-flex items-center bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
+                List Your Care
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- AD 3 -->
+        <div class="care-ad-slide absolute inset-0 opacity-0 transition-opacity duration-700">
+          <img
+            src="../assets/ads/healthcare-ad-3.jpg"
+            alt="Doctor consultation"
+            onerror="this.src='https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80'"
+            class="absolute inset-0 w-full h-full object-cover object-center"
+          >
+          <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/65 to-transparent"></div>
+
+          <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 py-10 h-full flex items-center">
+            <div class="max-w-xl">
+              <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
+                Find Healthcare
+              </span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
+                Discover The Right
+                <span class="text-[#ffb3b5]">Healthcare</span>
+              </h2>
+              <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
+                Find hospitals, clinics, doctors, diagnostic centres and healthcare services in one place.
+              </p>
+              <a href="../index.html#discovery" class="mt-5 inline-block bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
+                Find Healthcare
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- AD 4 -->
+        <div class="care-ad-slide absolute inset-0 opacity-0 transition-opacity duration-700">
+          <img
+            src="../assets/ads/healthcare-ad-2.jpg"
+            alt="Healthcare facility"
+            onerror="this.src='https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80'"
+            class="absolute inset-0 w-full h-full object-cover object-center"
+          >
+          <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/65 to-transparent"></div>
+
+          <div class="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 py-12 h-full flex items-center">
+            <div class="max-w-xl">
+              <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
+                SAINO HEALTH
+              </span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
+                Grow Your
+                <span class="text-[#ffb3b5]">Healthcare Business</span>
+              </h2>
+              <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
+                Build your online presence and connect your healthcare business with the SAINO HEALTH community.
+              </p>
+              <a href="organization-details.html" class="mt-5 inline-block bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
+                Get Started
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <button id="careAdPrev" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </button>
+
+        <button id="careAdNext" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition">
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Dots -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          <button class="care-ad-dot w-5 h-1.5 rounded-full bg-white transition-all" data-slide="0"></button>
+          <button class="care-ad-dot w-1.5 h-1.5 rounded-full bg-white/40 transition-all" data-slide="1"></button>
+          <button class="care-ad-dot w-1.5 h-1.5 rounded-full bg-white/40 transition-all" data-slide="2"></button>
+          <button class="care-ad-dot w-1.5 h-1.5 rounded-full bg-white/40 transition-all" data-slide="3"></button>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div id="mobileMenu" class="hidden border-t border-[#e9ecef] bg-white px-4 py-4 space-y-2">
-    <a href="index.html" class="block px-3 py-2 rounded-lg text-sm font-semibold">Home</a>
-    <a href="list-your-care.html" class="block px-3 py-2 rounded-lg text-sm font-bold text-[#ad0b0e]">List Your Care</a>
-    <a href="#" class="block px-3 py-2 rounded-lg text-sm font-semibold">About Us</a>
-    <a href="#" class="block px-3 py-2 rounded-lg text-sm font-semibold">Contact Us</a>
-  </div>
-</header>
+    <!-- WHAT CAN YOU LIST -->
+    <section class="bg-white py-8 sm:py-10">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8">
+        <div class="text-center mb-6">
+          <p class="text-[11px] font-bold text-[#ad0b0e] uppercase tracking-[.2em]">List your care</p>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-[#212529] uppercase">WHAT CAN YOU LIST</h2>
+          <p class="text-[12px] sm:text-[13px] text-[#6c757d] mt-2">Built to Help Every Part of Your Healthcare Ecosystem</p>
+        </div>
 
-<main class="flex-1">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto">
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="building-2" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Healthcare Facilities</h3>
+          </div>
 
-  <!-- HERO -->
- <!-- Healthcare Advertisement Slider -->
-<section class="relative overflow-hidden bg-[#071126] text-white">
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="stethoscope" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Healthcare Professionals</h3>
+          </div>
 
- <div id="careAdSlider" class="relative h-[360px] sm:h-[400px] md:h-[460px] lg:h-[500px]">
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="microscope" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Diagnostic & Medical Services</h3>
+          </div>
 
-    <!-- AD 1 -->
-    <div class="care-ad-slide absolute inset-0 opacity-100 transition-opacity duration-700">
-      <img
-        src="assets/ads/healthcare-ad-1.jpg"
-        alt="Healthcare services"
-        class="absolute inset-0 w-full h-full object-cover object-center"
-      >
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="pill" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Online Medical Retail</h3>
+          </div>
 
-      <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/70 to-transparent"></div>
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="house-heart" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Healthcare at Home</h3>
+          </div>
 
-      <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 py-10 h-full flex items-center">
-        <div class="max-w-xl">
-          <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
-            Saino Health
-          </span>
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="megaphone" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Healthcare Organizations & Campaigns</h3>
+          </div>
 
-          <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
-            Your Health,
-            <span class="text-[#ffb3b5]">Our Priority</span>
-          </h2>
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="heart-pulse" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Healthcare Awareness</h3>
+          </div>
 
-          <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
-            Discover trusted healthcare providers, medical services and
-            healthcare facilities with SAINO HEALTH.
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="sparkles" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Wellness Facilities</h3>
+          </div>
+
+          <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
+            <i data-lucide="shield-check" class="w-6 h-6 mx-auto text-[#495057]"></i>
+            <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">Health Insurance</h3>
+          </div>
+        </div>
+
+        <div class="text-center mt-6">
+          <a href="organization-details.html" class="rounded-full bg-[#ad0b0e] text-white px-6 py-2.5 text-[12px] font-extrabold shadow-sm hover:bg-[#B3121A]">
+            List Your Care
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="bg-[#f8fafb] py-9 sm:py-11 border-y border-[#edf0f2]">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8">
+        <div class="text-center mb-6">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-[#212529]">What are the services we offer</h2>
+          <p class="text-[12px] sm:text-[13px] text-[#6c757d] mt-2 max-w-2xl mx-auto">
+            Our provider services help healthcare businesses become easier to discover, manage appointments, understand performance and connect with patients.
           </p>
+        </div>
 
-          <button class="mt-5 bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
-            Explore Healthcare
-          </button>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
+            <i data-lucide="badge-check" class="w-6 h-6 mx-auto text-[#596574]"></i>
+            <h3 class="mt-3 text-[12px] font-bold">Trusted Badges</h3>
+          </div>
+
+          <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
+            <i data-lucide="search-check" class="w-6 h-6 mx-auto text-[#596574]"></i>
+            <h3 class="mt-3 text-[12px] font-bold">Online Discovery & Organic Content</h3>
+          </div>
+
+          <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
+            <i data-lucide="calendar-check" class="w-6 h-6 mx-auto text-[#596574]"></i>
+            <h3 class="mt-3 text-[12px] font-bold">Appointment Management</h3>
+          </div>
+
+          <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
+            <i data-lucide="smartphone" class="w-6 h-6 mx-auto text-[#596574]"></i>
+            <h3 class="mt-3 text-[12px] font-bold">Digital Health & Telemedicine Tools</h3>
+          </div>
+
+          <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
+            <i data-lucide="bar-chart-3" class="w-6 h-6 mx-auto text-[#596574]"></i>
+            <h3 class="mt-3 text-[12px] font-bold">Reports & Business Insights</h3>
+          </div>
+
+          <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
+            <i data-lucide="layout-list" class="w-6 h-6 mx-auto text-[#596574]"></i>
+            <h3 class="mt-3 text-[12px] font-bold">Easy Booking Experience</h3>
+          </div>
+
+          <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
+            <i data-lucide="megaphone" class="w-6 h-6 mx-auto text-[#596574]"></i>
+            <h3 class="mt-3 text-[12px] font-bold">Healthcare Importance to Public</h3>
+          </div>
+        </div>
+
+        <div class="mt-7 bg-[#eef2f4] rounded-lg p-4 sm:p-5">
+          <div class="text-center mb-4">
+            <span class="text-[11px] font-extrabold text-[#495057] uppercase tracking-[.18em]">Coming Soon</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">Medical Test</div>
+            <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">Surgery Centre</div>
+            <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">Dentistry Services</div>
+            <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">Home Health Care</div>
+            <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">Caregiver Support</div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
+    <!-- SIMPLE CTA -->
+    <section class="bg-white py-5">
+      <div class="max-w-6xl mx-auto px-5 text-center">
+        <div class="h-px bg-[#edf0f2] mb-5"></div>
+        <p class="text-[11px] text-[#adb5bd]">Grow your healthcare presence with SAINO HEALTH</p>
+        <a href="organization-details.html" class="mt-2 inline-block rounded-full bg-[#ad0b0e] text-white px-6 py-2 text-[11px] font-extrabold">
+          List Your Care
+        </a>
+      </div>
+    </section>
 
-    <!-- AD 2 -->
-    <div class="care-ad-slide absolute inset-0 opacity-0 transition-opacity duration-700">
-      <img
-        src="assets/ads/healthcare-ad-2.jpg"
-        alt="Healthcare professionals"
-        class="absolute inset-0 w-full h-full object-cover object-center"
-      >
+  </main>
 
-      <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/65 to-transparent"></div>
-
-      <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 py-10 h-full flex items-center">
-        <div class="max-w-xl">
-          <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
-            Healthcare Providers
-          </span>
-
-          <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
-            Connect With
-            <span class="text-[#ffb3b5]">More Patients</span>
-          </h2>
-
-          <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
-            Showcase your healthcare services and make your facility easier
-            for patients to discover.
+  <!-- ================= AAPKA ORIGINAL GLOBAL FOOTER ================= -->
+  <footer class="w-full bg-[#E5E9EE] text-slate-700 pt-16 pb-10 border-t border-slate-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between items-start gap-8 md:gap-4 mb-12 text-xs w-full">
+        <div class="w-full md:flex-1 md:min-w-[220px] md:max-w-[240px] pl-0 md:pl-6 flex flex-col items-start md:items-center text-left md:text-center">
+          <a href="../index.html#marketplace" class="inline-block mb-1 -ml-3">
+            <img src="../assets/logo.png" alt="SAINO HEALTH" class="h-[130px] w-auto object-contain mix-blend-multiply contrast-125">
+          </a>
+          <p class="text-[9px] leading-snug text-slate-500 font-bold mb-4 text-left inline-block">
+            Saino Health is Nepal's trusted<br>healthcare discovery platform.
+            <span class="block mt-2">We help you find, compare and<br>book<br>healthcare you can trust.</span>
           </p>
+          <h5 class="text-sm font-bold text-black mb-1.5">Follow Us</h5>
+          <div class="flex items-center space-x-2.5">
+            <a href="#" class="w-7 h-7 rounded-full bg-[#c82026] text-white flex items-center justify-center hover:bg-red-600 transition shadow-sm" aria-label="Facebook">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <a href="#" class="w-7 h-7 rounded-full bg-[#c82026] text-white flex items-center justify-center hover:bg-red-600 transition shadow-sm" aria-label="Instagram">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <a href="#" class="w-7 h-7 rounded-full bg-[#c82026] text-white flex items-center justify-center hover:bg-red-600 transition shadow-sm" aria-label="LinkedIn">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+          </div>
+        </div>
 
-          <a href="list-your-care-login.html"
-           class="mt-5 inline-flex items-center bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
-           List Your Care
-     </a>
+        <div>
+          <h4 class="text-sm font-bold text-black mb-4">Patients</h4>
+          <ul class="space-y-2 font-bold text-slate-500">
+            <li><a href="../index.html#marketplace" class="hover:text-red-600 hover:underline">Write Reviews</a></li>
+            <li><a href="../index.html#marketplace" class="hover:text-red-600 hover:underline">Hospital</a></li>
+            <li><a href="../index.html#marketplace" class="hover:text-red-600 hover:underline">Clinic</a></li>
+            <li><a href="../index.html#marketplace" class="hover:text-red-600 hover:underline">Diagnostic Centre</a></li>
+            <li><a href="../index.html#marketplace" class="hover:text-red-600 hover:underline">Wellness Centre</a></li>
+            <li><a href="../index.html#marketplace" class="hover:text-red-600 hover:underline">Blood Bank</a></li>
+          </ul>
+        </div>
+
+        <div class="space-y-6">
+          <div>
+            <h4 class="text-sm font-bold text-black mb-4">Healthcare Providers</h4>
+            <ul class="space-y-2 font-bold text-slate-500">
+              <li><a href="../provider/index.html" class="hover:text-red-600 hover:underline">Login</a></li>
+              <li><a href="organization-details.html" class="hover:text-red-600 hover:underline">Register</a></li>
+              <li><a href="list-your-care.html" class="hover:text-red-600 hover:underline">List Your Care Facility</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div>
+            <h4 class="text-sm font-bold text-black mb-4">More</h4>
+            <ul class="space-y-2 font-bold text-slate-500">
+              <li><a href="../index.html#about" class="hover:text-red-600 hover:underline">About Us</a></li>
+              <li><a href="../index.html#contact" class="hover:text-red-600 hover:underline">Contact Us</a></li>
+              <li><a href="../index.html#faqs" class="hover:text-red-600 hover:underline">FAQs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full border-t-2 border-slate-500 mt-10 pt-6 mb-4">
+        <div class="flex items-center space-x-1.5 text-xs text-slate-700 font-medium">
+          <span class="text-sm font-bold leading-none">&copy;</span>
+          <span class="font-bold text-slate-900">Saino Health 2026</span>
+          <span>· Saino Tech Ventures</span>
         </div>
       </div>
     </div>
-
-
-    <!-- AD 3 -->
-    <div class="care-ad-slide absolute inset-0 opacity-0 transition-opacity duration-700">
-      <img
-        src="assets/ads/healthcare-ad-3.jpg"
-        alt="Doctor consultation"
-        class="absolute inset-0 w-full h-full object-cover object-center"
-      >
-
-      <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/65 to-transparent"></div>
-
-      <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 py-10 h-full flex items-center">
-        <div class="max-w-xl">
-          <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
-            Find Healthcare
-          </span>
-
-          <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
-            Discover The Right
-            <span class="text-[#ffb3b5]">Healthcare</span>
-          </h2>
-
-          <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
-            Find hospitals, clinics, doctors, diagnostic centres and
-            healthcare services in one place.
-          </p>
-
-          <button class="mt-5 bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
-            Find Healthcare
-          </button>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- AD 4 -->
-    <div class="care-ad-slide absolute inset-0 opacity-0 transition-opacity duration-700">
-      <img
-        src="assets/ads/healthcare-ad-2.jpg"
-        alt="Healthcare facility"
-        class="absolute inset-0 w-full h-full object-cover object-center"
-      >
-
-      <div class="absolute inset-0 bg-gradient-to-r from-[#071126]/95 via-[#071126]/65 to-transparent"></div>
-
-      <div class="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 py-12 h-full flex items-center">
-        <div class="max-w-xl">
-          <span class="inline-block bg-[#ad0b0e] text-white px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-3">
-            SAINO HEALTH
-          </span>
-
-          <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
-            Grow Your
-            <span class="text-[#ffb3b5]">Healthcare Business</span>
-          </h2>
-
-          <p class="mt-3 text-[10px] sm:text-xs text-white/75 max-w-md leading-relaxed">
-            Build your online presence and connect your healthcare business
-            with the SAINO HEALTH community.
-          </p>
-
-          <button class="mt-5 bg-white text-[#071126] px-5 py-2 rounded-lg text-[10px] font-extrabold hover:bg-gray-100 transition">
-            Get Started
-          </button>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- Previous Button -->
-    <button
-      id="careAdPrev"
-      class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition"
-    >
-      <i data-lucide="chevron-left" class="w-4 h-4"></i>
-    </button>
-
-    <!-- Next Button -->
-    <button
-      id="careAdNext"
-      class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition"
-    >
-      <i data-lucide="chevron-right" class="w-4 h-4"></i>
-    </button>
-
-
-    <!-- Dots -->
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-
-      <button
-        class="care-ad-dot w-5 h-1.5 rounded-full bg-white transition-all"
-        data-slide="0">
-      </button>
-
-      <button
-        class="care-ad-dot w-1.5 h-1.5 rounded-full bg-white/40 transition-all"
-        data-slide="1">
-      </button>
-
-      <button
-        class="care-ad-dot w-1.5 h-1.5 rounded-full bg-white/40 transition-all"
-        data-slide="2">
-      </button>
-
-      <button
-        class="care-ad-dot w-1.5 h-1.5 rounded-full bg-white/40 transition-all"
-        data-slide="3">
-      </button>
-
-    </div>
-
-  </div>
-
-</section>
-<!-- WHAT CAN YOU LIST -->
-<section class="bg-white py-8 sm:py-10">
-  <div class="max-w-6xl mx-auto px-5 sm:px-8">
-
-    <div class="text-center mb-6">
-      <p class="text-[11px] font-bold text-[#ad0b0e] uppercase tracking-[.2em]">
-        List your care
-      </p>
-
-      <h2 class="text-xl sm:text-2xl font-extrabold text-[#212529] uppercase">
-        WHAT CAN YOU LIST
-      </h2>
-
-      <p class="text-[12px] sm:text-[13px] text-[#6c757d] mt-2">
-        Built to Help Every Part of Your Healthcare Ecosystem
-      </p>
-    </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-5xl mx-auto">
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="building-2" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Healthcare Facilities
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="stethoscope" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Healthcare Professionals
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="microscope" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Diagnostic & Medical Services
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="pill" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Online Medical Retail
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="house-heart" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Healthcare at Home
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="megaphone" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Healthcare Organizations & Campaigns
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="heart-pulse" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Healthcare Awareness
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="sparkles" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Wellness Facilities
-        </h3>
-      </div>
-
-      <div class="care-card bg-[#f7fafc] border border-transparent rounded-lg p-5 text-center">
-        <i data-lucide="shield-check" class="w-6 h-6 mx-auto text-[#495057]"></i>
-        <h3 class="mt-3 text-[12px] sm:text-[13px] font-bold">
-          Health Insurance
-        </h3>
-      </div>
-
-    </div>
-
-    <div class="text-center mt-6">
-      <a href="list-your-care-login.html"
-         class="rounded-full bg-[#ad0b0e] text-white px-6 py-2.5 text-[12px] font-extrabold shadow-sm hover:bg-[#B3121A]">
-        List Your Care
-      </a>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- SERVICES -->
-<section class="bg-[#f8fafb] py-9 sm:py-11 border-y border-[#edf0f2]">
-  <div class="max-w-6xl mx-auto px-5 sm:px-8">
-
-    <div class="text-center mb-6">
-      <h2 class="text-xl sm:text-2xl font-extrabold text-[#212529]">
-        What are the services we offer
-      </h2>
-
-      <p class="text-[12px] sm:text-[13px] text-[#6c757d] mt-2 max-w-2xl mx-auto">
-        Our provider services help healthcare businesses become easier to discover,
-        manage appointments, understand performance and connect with patients.
-      </p>
-    </div>
-
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-
-      <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
-        <i data-lucide="badge-check" class="w-6 h-6 mx-auto text-[#596574]"></i>
-        <h3 class="mt-3 text-[12px] font-bold">
-          Trusted Badges
-        </h3>
-      </div>
-
-      <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
-        <i data-lucide="search-check" class="w-6 h-6 mx-auto text-[#596574]"></i>
-        <h3 class="mt-3 text-[12px] font-bold">
-          Online Discovery & Organic Content
-        </h3>
-      </div>
-
-      <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
-        <i data-lucide="calendar-check" class="w-6 h-6 mx-auto text-[#596574]"></i>
-        <h3 class="mt-3 text-[12px] font-bold">
-          Appointment Management
-        </h3>
-      </div>
-
-      <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
-        <i data-lucide="smartphone" class="w-6 h-6 mx-auto text-[#596574]"></i>
-        <h3 class="mt-3 text-[12px] font-bold">
-          Digital Health & Telemedicine Tools
-        </h3>
-      </div>
-
-      <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
-        <i data-lucide="bar-chart-3" class="w-6 h-6 mx-auto text-[#596574]"></i>
-        <h3 class="mt-3 text-[12px] font-bold">
-          Reports & Business Insights
-        </h3>
-      </div>
-
-      <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
-        <i data-lucide="layout-list" class="w-6 h-6 mx-auto text-[#596574]"></i>
-        <h3 class="mt-3 text-[12px] font-bold">
-          Easy Booking Experience
-        </h3>
-      </div>
-
-      <div class="service-card bg-white rounded-lg p-4 text-center border border-[#edf0f2]">
-        <i data-lucide="megaphone" class="w-6 h-6 mx-auto text-[#596574]"></i>
-        <h3 class="mt-3 text-[12px] font-bold">
-          Healthcare Importance to Public
-        </h3>
-      </div>
-
-    </div>
-
-
-    <!-- COMING SOON -->
-    <div class="mt-7 bg-[#eef2f4] rounded-lg p-4 sm:p-5">
-
-      <div class="text-center mb-4">
-        <span class="text-[11px] font-extrabold text-[#495057] uppercase tracking-[.18em]">
-          Coming Soon
-        </span>
-      </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-
-        <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">
-          Medical Test
-        </div>
-
-        <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">
-          Surgery Centre
-        </div>
-
-        <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">
-          Dentistry Services
-        </div>
-
-        <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">
-          Home Health Care
-        </div>
-
-        <div class="bg-white/80 rounded-md px-2 py-3 text-center text-[11px] font-semibold text-[#6c757d]">
-          Caregiver Support
-        </div>
-
-      </div>
-    </div>
-
-
-    <p class="text-center text-[11px] sm:text-[12px] text-[#6c757d] max-w-2xl mx-auto mt-5 leading-relaxed">
-      Expand your healthcare business, improve your online visibility and make it easier
-      for patients to discover, compare and connect with you.
-
-      <a href="#"
-         class="ml-1 text-[#ad0b0e] underline font-semibold hover:text-[#8f080b] transition">
-        Learn More
-      </a>
-    </p>
-
-  </div>
-</section>
-
-
-<!-- SIMPLE CTA -->
-<section class="bg-white py-5">
-  <div class="max-w-6xl mx-auto px-5 text-center">
-
-    <div class="h-px bg-[#edf0f2] mb-5"></div>
-
-    <p class="text-[11px] text-[#adb5bd]">
-      Grow your healthcare presence with SAINO HEALTH
-    </p>
-
-   <a href="list-your-care-login.html"
-   class="mt-2 inline-block rounded-full bg-[#ad0b0e] text-white px-6 py-2 text-[11px] font-extrabold">
-  List Your Care
-</a>
-
-  </div>
-</section>
-
-</main>
-
-<!-- FOOTER -->
-<footer class="bg-[#dfe4e8] text-[#495057] pt-9 pb-5 border-t border-[#cbd1d6]">
-  <div class="max-w-6xl mx-auto px-5 sm:px-8">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-7 pb-7 border-b border-[#c3c9ce]">
-      <div>
-        <h4 class="text-[9px] font-black text-[#212529] uppercase tracking-wider mb-3">Platform</h4>
-        <ul class="space-y-1.5 text-[8px]">
-          <li><a href="index.html" class="hover:text-[#ad0b0e]">Home Marketplace</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Find Healthcare</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Discovery</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Reviews</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Saved</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-[9px] font-black text-[#212529] uppercase tracking-wider mb-3">For Providers</h4>
-        <ul class="space-y-1.5 text-[8px]">
-          <li><a href="list-your-care.html" class="text-[#ad0b0e] font-bold">List Your Care</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Provider Login</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Badges</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Business Insights</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-[9px] font-black text-[#212529] uppercase tracking-wider mb-3">For Patients</h4>
-        <ul class="space-y-1.5 text-[8px]">
-          <li><a href="#" class="hover:text-[#ad0b0e]">Healthcare Categories</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Search & Compare</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Book Appointments</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Reviews</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-[9px] font-black text-[#212529] uppercase tracking-wider mb-3">More</h4>
-        <ul class="space-y-1.5 text-[8px]">
-          <li><a href="#" class="hover:text-[#ad0b0e]">About Us</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Contact Us</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">FAQs</a></li>
-          <li><a href="#" class="hover:text-[#ad0b0e]">Privacy Policy</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="text-center pt-6">
-      <img src="assets/logo.png" alt="SAINO HEALTH" class="h-9 w-auto mx-auto object-contain">
-      <p class="text-[8px] text-[#6c757d] mt-2 max-w-xs mx-auto">Connected. Simplified. Better Health.</p>
-      <p class="text-[8px] text-[#6c757d] mt-3">Follow Us</p>
-      <div class="flex justify-center gap-2 mt-2">
-        <a href="#" class="w-6 h-6 rounded-full bg-[#1877F2] text-white flex items-center justify-center text-[9px]">f</a>
-        <a href="#" class="w-6 h-6 rounded-full bg-[#d62976] text-white flex items-center justify-center text-[9px]">◎</a>
-        <a href="#" class="w-6 h-6 rounded-full bg-[#0A66C2] text-white flex items-center justify-center text-[8px]">in</a>
-        <a href="#" class="w-6 h-6 rounded-full bg-[#FF0000] text-white flex items-center justify-center text-[8px]">▶</a>
-      </div>
-      <p class="text-[7px] text-[#6c757d] mt-3">© 2026 Saino Health. All rights reserved.</p>
-    </div>
-  </div>
-</footer>
-
-<script>
-  lucide.createIcons();
-
-  const menuBtn = document.getElementById('mobileMenuBtn');
-  const mobileMenu = document.getElementById('mobileMenu');
-  if (menuBtn) {
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-  }
-
-  const careAdSlides = document.querySelectorAll('.care-ad-slide');
-  const careAdDots = document.querySelectorAll('.care-ad-dot');
-
-  let careAdCurrent = 0;
-  let careAdTimer;
-
-  function showCareAd(index) {
-
-    if (index >= careAdSlides.length) {
-      careAdCurrent = 0;
-    } else if (index < 0) {
-      careAdCurrent = careAdSlides.length - 1;
-    } else {
-      careAdCurrent = index;
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    const careAdSlides = document.querySelectorAll('.care-ad-slide');
+    const careAdDots = document.querySelectorAll('.care-ad-dot');
+
+    let careAdCurrent = 0;
+    let careAdTimer;
+
+    function showCareAd(index) {
+      if (index >= careAdSlides.length) {
+        careAdCurrent = 0;
+      } else if (index < 0) {
+        careAdCurrent = careAdSlides.length - 1;
+      } else {
+        careAdCurrent = index;
+      }
+
+      careAdSlides.forEach((slide, i) => {
+        slide.classList.toggle('opacity-100', i === careAdCurrent);
+        slide.classList.toggle('opacity-0', i !== careAdCurrent);
+      });
+
+      careAdDots.forEach((dot, i) => {
+        if (i === careAdCurrent) {
+          dot.classList.remove('w-1.5', 'bg-white/40');
+          dot.classList.add('w-5', 'bg-white');
+        } else {
+          dot.classList.remove('w-5', 'bg-white');
+          dot.classList.add('w-1.5', 'bg-white/40');
+        }
+      });
     }
 
-    careAdSlides.forEach((slide, i) => {
-      slide.classList.toggle('opacity-100', i === careAdCurrent);
-      slide.classList.toggle('opacity-0', i !== careAdCurrent);
-    });
-
-    careAdDots.forEach((dot, i) => {
-      if (i === careAdCurrent) {
-        dot.classList.remove('w-1.5', 'bg-white/40');
-        dot.classList.add('w-5', 'bg-white');
-      } else {
-        dot.classList.remove('w-5', 'bg-white');
-        dot.classList.add('w-1.5', 'bg-white/40');
-      }
-    });
-  }
-
-  function nextCareAd() {
-    showCareAd(careAdCurrent + 1);
-    restartCareAdTimer();
-  }
-
-  function previousCareAd() {
-    showCareAd(careAdCurrent - 1);
-    restartCareAdTimer();
-  }
-
-  function restartCareAdTimer() {
-    clearInterval(careAdTimer);
-
-    careAdTimer = setInterval(() => {
+    function nextCareAd() {
       showCareAd(careAdCurrent + 1);
-    }, 4000);
-  }
-
-  document.getElementById('careAdNext')
-    ?.addEventListener('click', nextCareAd);
-
-  document.getElementById('careAdPrev')
-    ?.addEventListener('click', previousCareAd);
-
-  careAdDots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      showCareAd(Number(dot.dataset.slide));
       restartCareAdTimer();
-    });
-  });
+    }
 
-  showCareAd(0);
-  restartCareAdTimer();
-</script>
+    function previousCareAd() {
+      showCareAd(careAdCurrent - 1);
+      restartCareAdTimer();
+    }
+
+    function restartCareAdTimer() {
+      clearInterval(careAdTimer);
+      careAdTimer = setInterval(() => {
+        showCareAd(careAdCurrent + 1);
+      }, 4000);
+    }
+
+    document.getElementById('careAdNext')?.addEventListener('click', nextCareAd);
+    document.getElementById('careAdPrev')?.addEventListener('click', previousCareAd);
+
+    careAdDots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        showCareAd(Number(dot.dataset.slide));
+        restartCareAdTimer();
+      });
+    });
+
+    showCareAd(0);
+    restartCareAdTimer();
+  </script>
 </body>
 </html>
-
