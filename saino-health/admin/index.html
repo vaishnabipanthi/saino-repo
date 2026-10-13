@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SAINO Admin</title>
+    <title>SAINO Super Admin</title>
 
     <link rel="stylesheet" href="css/admin.css">
 
@@ -31,181 +31,96 @@
 
         <div class="sidebar-scroll">
 
+            <!-- 1. SUPER ADMIN -->
             <div class="nav-section">
-                <p class="nav-title">OVERVIEW</p>
+                <p class="nav-title">SUPER ADMIN</p>
 
                 <a class="nav-item active" href="#" data-page="dashboard">
                     <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
+                    <span>Executive Dashboard</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="live-operations">
+                    <i data-lucide="activity"></i>
+                    <span>Live Operations</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="analytics">
+                    <i data-lucide="chart-no-axes-combined"></i>
+                    <span>Analytics & Reports</span>
                 </a>
             </div>
 
-
+            <!-- 2. PLATFORM MANAGEMENT -->
             <div class="nav-section">
-                <p class="nav-title">MARKETPLACE</p>
+                <p class="nav-title">PLATFORM MANAGEMENT</p>
 
                 <a class="nav-item" href="#" data-page="providers">
                     <i data-lucide="building-2"></i>
                     <span>Providers</span>
-                    <b class="nav-count">486</b>
+                    <b class="nav-count">Live</b>
                 </a>
-
-                <a class="nav-item" href="#" data-page="doctors">
-                    <i data-lucide="stethoscope"></i>
-                    <span>Doctors</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="categories">
-                    <i data-lucide="layers"></i>
-                    <span>Categories</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="services">
-                    <i data-lucide="list"></i>
-                    <span>Services</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="featured">
-                    <i data-lucide="star"></i>
-                    <span>Featured Listings</span>
-                </a>
-            </div>
-
-
-            <div class="nav-section">
-                <p class="nav-title">VERIFICATION</p>
 
                 <a class="nav-item" href="#" data-page="verification">
                     <i data-lucide="badge-check"></i>
-                    <span>Verification Queue</span>
-                    <b class="nav-count warning">24</b>
-                </a>
-
-                <a class="nav-item" href="#" data-page="verification-rules">
-                    <i data-lucide="shield-check"></i>
-                    <span>Verification Rules</span>
-                </a>
-            </div>
-
-
-            <div class="nav-section">
-
-                <p class="nav-title">OPERATIONS</p>
-
-                <a class="nav-item" href="#" data-page="appointments">
-                    <i data-lucide="calendar-days"></i>
-                    <span>Appointments</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="reviews">
-                    <i data-lucide="message-square"></i>
-                    <span>Reviews & Moderation</span>
-                    <b class="nav-count danger">18</b>
+                    <span>Verification & Setup</span>
+                    <b class="nav-count warning">Queue</b>
                 </a>
 
                 <a class="nav-item" href="#" data-page="users">
                     <i data-lucide="users"></i>
-                    <span>Users</span>
+                    <span>Patient & User</span>
                 </a>
 
-                <a class="nav-item" href="#" data-page="reports">
-                    <i data-lucide="flag"></i>
-                    <span>Reports & Complaints</span>
+                <a class="nav-item" href="#" data-page="appointments">
+                    <i data-lucide="calendar-days"></i>
+                    <span>Bookings & Appointments</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="live-queue">
+                    <i data-lucide="list-ordered"></i>
+                    <span>Live Queue & Tokens</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="telemedicine">
+                    <i data-lucide="video"></i>
+                    <span>Telemedicine</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="marketplace">
+                    <i data-lucide="store"></i>
+                    <span>Patient Discovery Marketplace</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="qr-management">
+                    <i data-lucide="qr-code"></i>
+                    <span>QR Management</span>
                 </a>
             </div>
 
-
+            <!-- 3. BUSINESS & FINANCE -->
             <div class="nav-section">
+                <p class="nav-title">BUSINESS & FINANCE</p>
 
-                <p class="nav-title">ADVERTISING</p>
-
-                <a class="nav-item" href="#" data-page="ads">
-                    <i data-lucide="megaphone"></i>
-                    <span>Advertisements</span>
+                <a class="nav-item" href="#" data-page="payments">
+                    <i data-lucide="credit-card"></i>
+                    <span>Payment & Settlements</span>
                 </a>
 
-                <a class="nav-item" href="#" data-page="campaigns">
+                <a class="nav-item" href="#" data-page="plans">
                     <i data-lucide="badge-percent"></i>
-                    <span>Campaigns</span>
+                    <span>Plans & Subscriptions</span>
                 </a>
 
-                <a class="nav-item" href="#" data-page="boosts">
-                    <i data-lucide="zap"></i>
-                    <span>Boosts</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="ad-inventory">
-                    <i data-lucide="layout-template"></i>
-                    <span>Ad Inventory</span>
+                <a class="nav-item" href="#" data-page="disputes">
+                    <i data-lucide="message-square-warning"></i>
+                    <span>Support & Disputes</span>
                 </a>
             </div>
 
-
+            <!-- 4. CONTROL & SECURITY -->
             <div class="nav-section">
-
-                <p class="nav-title">CONTENT</p>
-
-                <a class="nav-item" href="#" data-page="homepage">
-                    <i data-lucide="home"></i>
-                    <span>Homepage</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="banners">
-                    <i data-lucide="image"></i>
-                    <span>Banners</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="articles">
-                    <i data-lucide="newspaper"></i>
-                    <span>Articles & FAQs</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="pages">
-                    <i data-lucide="file-text"></i>
-                    <span>Static Pages</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="seo">
-                    <i data-lucide="search"></i>
-                    <span>SEO</span>
-                </a>
-            </div>
-
-
-            <div class="nav-section">
-
-                <p class="nav-title">INTELLIGENCE</p>
-
-                <a class="nav-item" href="#" data-page="analytics">
-                    <i data-lucide="chart-no-axes-combined"></i>
-                    <span>Analytics</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="search">
-                    <i data-lucide="search-check"></i>
-                    <span>Search & Discovery</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="recommendations">
-                    <i data-lucide="sparkles"></i>
-                    <span>Recommendations</span>
-                </a>
-            </div>
-
-
-            <div class="nav-section">
-
-                <p class="nav-title">SYSTEM</p>
-
-                <a class="nav-item" href="#" data-page="notifications">
-                    <i data-lucide="bell"></i>
-                    <span>Notifications</span>
-                </a>
-
-                <a class="nav-item" href="#" data-page="features">
-                    <i data-lucide="toggle-right"></i>
-                    <span>Feature Controls</span>
-                </a>
+                <p class="nav-title">CONTROL & SECURITY</p>
 
                 <a class="nav-item" href="#" data-page="roles">
                     <i data-lucide="user-cog"></i>
@@ -217,11 +132,20 @@
                     <span>Audit Logs</span>
                 </a>
 
-                <a class="nav-item" href="#" data-page="settings">
-                    <i data-lucide="settings"></i>
-                    <span>Settings</span>
+                <a class="nav-item" href="#" data-page="notifications">
+                    <i data-lucide="bell"></i>
+                    <span>Notifications</span>
                 </a>
 
+                <a class="nav-item" href="#" data-page="system-health">
+                    <i data-lucide="shield-check"></i>
+                    <span>System Health</span>
+                </a>
+
+                <a class="nav-item" href="#" data-page="settings">
+                    <i data-lucide="settings"></i>
+                    <span>Global Settings</span>
+                </a>
             </div>
 
         </div>
@@ -233,7 +157,7 @@
 
                 <div>
                     <strong>System Operational</strong>
-                    <small>All services running</small>
+                    <small>PostgreSQL Live</small>
                 </div>
             </div>
 
@@ -257,8 +181,8 @@
                 </button>
 
                 <div>
-                    <p class="breadcrumb">SAINO / <span id="breadcrumbPage">Dashboard</span></p>
-                    <h1 id="pageTitle">Dashboard</h1>
+                    <p class="breadcrumb">SAINO / <span id="breadcrumbPage">Executive Dashboard</span></p>
+                    <h1 id="pageTitle">Executive Dashboard</h1>
                 </div>
 
             </div>
@@ -281,7 +205,7 @@
 
                     <div class="admin-info">
                         <strong>Super Admin</strong>
-                        <span>Administrator</span>
+                        <span>Platform Administrator</span>
                     </div>
 
                     <i data-lucide="chevron-down"></i>
@@ -307,13 +231,13 @@
                         <p class="eyebrow">MARKETPLACE OVERVIEW</p>
                         <h2>Good evening, Admin.</h2>
                         <p class="muted">
-                            Here's what's happening across SAINO today.
+                            Real-time platform operations and live provider network status.
                         </p>
                     </div>
 
-                    <button class="primary-button">
+                    <button class="primary-button" onclick="changePage('providers')">
                         <i data-lucide="plus"></i>
-                        Quick Action
+                        Add Provider
                     </button>
 
                 </div>
@@ -330,8 +254,8 @@
 
                         <div class="stat-content">
                             <span>Total Users</span>
-                            <strong id="totalUsers">12,480</strong>
-                            <small class="positive">↑ 8.4% this month</small>
+                            <strong id="totalUsers">--</strong>
+                            <small class="positive">Active Patients</small>
                         </div>
                     </div>
 
@@ -343,8 +267,8 @@
 
                         <div class="stat-content">
                             <span>Total Providers</span>
-                            <strong id="totalProviders">486</strong>
-                            <small class="positive">↑ 12 new this week</small>
+                            <strong id="totalProviders">--</strong>
+                            <small class="positive">Network Facilities</small>
                         </div>
                     </div>
 
@@ -356,8 +280,8 @@
 
                         <div class="stat-content">
                             <span>Verified Providers</span>
-                            <strong id="verifiedProviders">352</strong>
-                            <small>72.4% of providers</small>
+                            <strong id="verifiedProviders">--</strong>
+                            <small>Live on Marketplace</small>
                         </div>
                     </div>
 
@@ -369,8 +293,8 @@
 
                         <div class="stat-content">
                             <span>Appointments</span>
-                            <strong id="totalAppointments">1,284</strong>
-                            <small class="positive">↑ 14.2% this month</small>
+                            <strong id="totalAppointments">--</strong>
+                            <small class="positive">Booked Today</small>
                         </div>
                     </div>
 
@@ -382,8 +306,8 @@
 
                         <div class="stat-content">
                             <span>Total Reviews</span>
-                            <strong id="totalReviews">3,921</strong>
-                            <small>18 awaiting moderation</small>
+                            <strong id="totalReviews">--</strong>
+                            <small>Patient Ratings</small>
                         </div>
                     </div>
 
@@ -395,8 +319,8 @@
 
                         <div class="stat-content">
                             <span>Active Campaigns</span>
-                            <strong id="activeCampaigns">26</strong>
-                            <small>8 pending approval</small>
+                            <strong id="activeCampaigns">--</strong>
+                            <small>Live Promotions</small>
                         </div>
                     </div>
 
@@ -421,8 +345,8 @@
                             <i data-lucide="building-2"></i>
                         </span>
                         <span>
-                            <strong>Add Provider</strong>
-                            <small>Create a marketplace listing</small>
+                            <strong>Providers Directory</strong>
+                            <small>Manage hospital listings</small>
                         </span>
                     </button>
 
@@ -432,30 +356,30 @@
                             <i data-lucide="shield-check"></i>
                         </span>
                         <span>
-                            <strong>Review Verification</strong>
-                            <small>24 providers waiting</small>
+                            <strong>Verification Queue</strong>
+                            <small>Pending setups & review</small>
                         </span>
                     </button>
 
 
-                    <button class="quick-action" data-page="reviews">
+                    <button class="quick-action" data-page="live-queue">
                         <span class="quick-icon purple">
-                            <i data-lucide="message-square-warning"></i>
+                            <i data-lucide="list-ordered"></i>
                         </span>
                         <span>
-                            <strong>Moderate Reviews</strong>
-                            <small>18 require attention</small>
+                            <strong>Live Queue & Tokens</strong>
+                            <small>Real-time OPD rush</small>
                         </span>
                     </button>
 
 
-                    <button class="quick-action" data-page="ads">
+                    <button class="quick-action" data-page="payments">
                         <span class="quick-icon blue">
-                            <i data-lucide="megaphone"></i>
+                            <i data-lucide="credit-card"></i>
                         </span>
                         <span>
-                            <strong>Create Advertisement</strong>
-                            <small>Manage marketplace ads</small>
+                            <strong>Payment & Settlements</strong>
+                            <small>Hospital subscriptions</small>
                         </span>
                     </button>
 
@@ -477,7 +401,7 @@
                                 <p>Latest actions across the marketplace.</p>
                             </div>
 
-                            <button class="text-button">View All</button>
+                            <button class="text-button" onclick="changePage('audit')">View All</button>
 
                         </div>
 
@@ -495,8 +419,8 @@
                         <div class="panel-header">
 
                             <div>
-                                <h3>Verification Queue</h3>
-                                <p>Providers awaiting review.</p>
+                                <h3>Verification & Setup Queue</h3>
+                                <p>Hospitals awaiting setup & approval.</p>
                             </div>
 
                             <button class="text-button" data-page="verification">
@@ -521,8 +445,8 @@
                     <div class="panel-header">
 
                         <div>
-                            <h3>Marketplace Health</h3>
-                            <p>Current platform performance.</p>
+                            <h3>Platform Health & Operations</h3>
+                            <p>Real-time system telemetry.</p>
                         </div>
 
                         <span class="live-badge">
@@ -552,17 +476,17 @@
 
                         <div class="health-item">
                             <span>Provider Verification</span>
-                            <strong>72.4%</strong>
+                            <strong>100%</strong>
                             <div class="progress">
-                                <i style="width:72.4%"></i>
+                                <i style="width:100%"></i>
                             </div>
                         </div>
 
                         <div class="health-item">
-                            <span>Profile Completion</span>
-                            <strong>81.2%</strong>
+                            <span>PostgreSQL Latency</span>
+                            <strong>&lt; 5ms</strong>
                             <div class="progress">
-                                <i style="width:81.2%"></i>
+                                <i style="width:95%"></i>
                             </div>
                         </div>
 
@@ -578,11 +502,8 @@
 
 </div>
 
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/supabase-config.js"></script>
+<!-- SCRIPTS: Cleaned, connected to Express + PostgreSQL -->
 <script src="js/providers.js"></script>
-<script src="js/mock-data.js"></script>
 <script src="js/admin.js"></script>
 
 </body>

@@ -1,7 +1,6 @@
 (() => {
   "use strict";
-
-  const API_BASE = "http://localhost:5000/api/provider";
+  const API_BASE = "http://localhost:4000/api/provider";
   const app = document.getElementById("app");
 
   const navItems = [
@@ -38,8 +37,26 @@
   };
 
   async function loadData() {
+    // Sync local marketplace bookings into provider dashboard
     try {
-      const currentEmail = localStorage.getItem("currentProviderEmail") || "";
+      const localAppts = JSON.parse(localStorage.getItem("SAINO_MY_APPOINTMENTS") || "[]");
+      if (localAppts.length) {
+        state.appointments = [...localAppts.map(b => ({
+          token: b.token,
+          booking_ref: b.bookingId,
+          patient_name: b.patient,
+          patient_phone: b.phone,
+          doctor: b.doctor,
+          room: "Room 301",
+          source: "marketplace",
+          slot_time: "10:30 AM",
+          fee: 500,
+          status: b.status || "Waiting"
+        })), ...state.appointments];
+      }
+    } catch (_) {}
+    try {
+      const currentEmail =localStorage.getItem("currentProviderEmail") || "";
       const headers = {
         "Content-Type": "application/json",
         "x-provider-email": currentEmail
@@ -74,17 +91,104 @@
     render();
   }
 
-  async function triggerQueueAction(action) {
+  function playAirportChime() {
     try {
-      const res = await fetch(API_BASE + "/queue/" + action, { method: "POST" });
-      const data = await res.json();
-      if (data && data.success) {
-        state.queue = data;
-        await loadData();
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 Note
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15); // A5 Note
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.6);
+    } catch (_) {}
+  }
+
+  async function triggerQueueAction(action) {
+    if (!state.queue) state.queue = { serving: null, waiting: [], stats: { waiting: 0, completed: 0, issued: 0 } };
+    if (!state.queue.waiting) state.queue.waiting = [];
+    if (!state.queue.stats) state.queue.stats = { waiting: 0, completed: 0, issued: 0 };
+
+    if (action === "call-next") {
+      playAirportChime(); // 🔔 Airport ding-dong sound alert
+
+      if (state.queue.waiting.length > 0) {
+        const nextPatient = state.queue.waiting.shift();
+        state.queue.serving = {
+          token: nextPatient.token,
+          patient_name: nextPatient.patient_name || nextPatient.patient,
+          doctor: nextPatient.doctor || state.user.name,
+          room: nextPatient.room || "Room 301"
+        };
+        state.queue.stats.waiting = Math.max(0, state.queue.waiting.length);
+      } else {
+        const currentNum = state.queue.serving ? parseInt(state.queue.serving.token.replace(/[^0-9]/g, ''), 10) || 20 : 20;
+        const nextToken = `A-${currentNum + 1}`;
+        state.queue.serving = {
+          token: nextToken,
+          patient_name: "Walk-in Patient",
+          doctor: state.user.name || "Dr. Rajesh Verma",
+          room: "Room 301"
+        };
       }
-    } catch (e) {
-      alert("Queue error: " + e.message);
+
+      localStorage.setItem("SAINO_NOW_SERVING", state.queue.serving.token);
+      render();
+    } 
+    else if (action === "done") {
+      // 1. Consultation Complete
+      const finishedPatient = state.queue.serving;
+      state.queue.stats.completed = (state.queue.stats.completed || 0) + 1;
+
+      // 2. Automated Post-Consultation Feedback Loop
+      if (finishedPatient) {
+        const patientName = finishedPatient.patient_name || "Verified Patient";
+        const newReview = {
+          id: "rev_" + Date.now(),
+          user: patientName,
+          rating: 5,
+          date: "Just now",
+          comment: `Consultation with ${finishedPatient.doctor || 'doctor'} completed smoothly. Excellent clinical care via SAINO queue.`
+        };
+
+        try {
+          const reviewsStore = JSON.parse(localStorage.getItem("SAINO_PROVIDER_REVIEWS") || "{}");
+          const pid = state.provider.id || "clinic";
+          if (!reviewsStore[pid]) reviewsStore[pid] = [];
+          reviewsStore[pid].unshift(newReview);
+          localStorage.setItem("SAINO_PROVIDER_REVIEWS", JSON.stringify(reviewsStore));
+        } catch (_) {}
+      }
+
+      // 3. Move to next patient automatically
+      triggerQueueAction("call-next");
+    } 
+    else if (action === "skip") {
+      if (state.queue.serving) {
+        state.queue.waiting.push({
+          token: state.queue.serving.token,
+          patient_name: state.queue.serving.patient_name,
+          doctor: state.queue.serving.doctor,
+          room: state.queue.serving.room,
+          status: "Waiting",
+          source: "Skipped"
+        });
+      }
+      triggerQueueAction("call-next");
     }
+
+    // Background sync to backend port 4000
+    try {
+      await fetch(API_BASE + "/queue/" + action, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(state.queue)
+      });
+    } catch (_) {}
   }
 
   function kpiCard(title, val, sub, colorClass, badge) {
@@ -104,43 +208,66 @@
     if (s === 'cancelled') return '<span class="bg-red-50 text-red-700 px-2 py-0.5 rounded font-bold text-[10px]">Cancelled</span>';
     return '<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold text-[10px]">' + status + '</span>';
   }
-
+/* ============================================================
+     RENDER MASTER CONTROLLER (SOLO DOCTOR VS HOSPITAL POCKET DESK)
+     ============================================================ */
   function render() {
     if (!app) return;
 
+    // 1. Detect: Single Doctor Clinic vs Large Hospital
+    const isSolo = (state.provider && state.provider.provider_type === 'solo_doctor') || 
+                   (state.provider && state.provider.plan === 'clinic') || 
+                   (state.doctors && state.doctors.length <= 1);
+
+    // Solo Doctor gets clean 5-tool Pocket Console; Hospitals get all tabs
+    const visibleNavItems = isSolo 
+      ? navItems.filter(item => ['dashboard', 'appointments', 'doctors', 'qr_marketplace', 'settings'].includes(item.id))
+      : navItems;
+
     let navHtml = '';
-    for (let i = 0; i < navItems.length; i++) {
-      const item = navItems[i];
+    for (let i = 0; i < visibleNavItems.length; i++) {
+      const item = visibleNavItems[i];
       const active = state.page === item.id ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200';
       navHtml += '<button class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ' + active + '" data-page="' + item.id + '">' +
-  '<span class="text-sm">' + item.icon + '</span><span>' + item.label + '</span>' +
-'</button>';
+        '<span class="text-sm">' + item.icon + '</span><span>' + item.label + '</span>' +
+      '</button>';
     }
+
+    // 2. Real Clinic Name & Location (Raipur, Chhattisgarh Context)
+    const clinicName = state.provider.name || "Saino Partner Clinic";
+    const clinicCity = state.provider.city ? (state.provider.city + ', Chhattisgarh') : "Raipur, Chhattisgarh";
+    const planBadge = isSolo ? 'Solo Doctor Plan' : (state.provider.plan_name || 'Hospital VIP Plan');
 
     app.innerHTML = '<div class="flex min-h-screen">' +
       '<aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 border-r border-slate-800">' +
         '<div class="p-5 border-b border-slate-800 flex items-center gap-3">' +
           '<div class="bg-red-500 text-white font-bold w-8 h-8 rounded-lg flex items-center justify-center text-lg">S</div>' +
-          '<div><div class="font-bold text-white text-sm tracking-wide">SAINO Health</div><div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">PROVIDER NETWORK</div></div>' +
+          '<div>' +
+            '<div class="font-bold text-white text-sm tracking-wide">SAINO Health</div>' +
+            '<div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">' + (isSolo ? 'DOCTOR POCKET DESK' : 'PROVIDER NETWORK') + '</div>' +
+          '</div>' +
         '</div>' +
         '<nav class="flex-1 p-3 space-y-1 overflow-y-auto">' + navHtml + '</nav>' +
         '<div class="p-4 m-3 bg-slate-950/60 border border-slate-800 rounded-xl">' +
-          '<div class="text-xs font-bold text-slate-200">Provider QR Desk</div>' +
-          '<div class="text-[11px] text-slate-400 mt-0.5">Norvic OPD Instant Registration</div>' +
-          '<button class="nav-item mt-3 w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold rounded-lg border border-slate-700 transition" data-page="qr_marketplace">⬇ View & Print QR</button>' +
+          '<div class="text-xs font-bold text-slate-200">Reception QR Standee</div>' +
+          '<div class="text-[11px] text-slate-400 mt-0.5">' + clinicName + ' Instant Token</div>' +
+          '<button class="nav-item mt-3 w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold rounded-lg border border-slate-700 transition" data-page="qr_marketplace">⬇ View &amp; Print Standee</button>' +
         '</div>' +
       '</aside>' +
       '<div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">' +
         '<header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-10">' +
-          '<div class="w-96"><input type="text" placeholder="Search patients, tokens, doctors..." class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-900"></div>' +
+          '<div class="w-96"><input type="text" placeholder="Search patients, tokens, appointments..." class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-900"></div>' +
           '<div class="flex items-center gap-6">' +
             '<div class="text-right">' +
-              '<div class="text-xs font-bold text-slate-900 flex items-center gap-1.5 justify-end">' + state.provider.name + '<span class="bg-blue-50 text-blue-700 text-[10px] px-1.5 py-0.5 rounded border border-blue-200 font-bold">' + (state.provider.plan_name || 'Hospital Plan') + '</span></div>' +
-              '<div class="text-[11px] text-slate-500">' + state.provider.city + '</div>' +
+              '<div class="text-xs font-bold text-slate-900 flex items-center gap-1.5 justify-end">' + 
+                clinicName + 
+                '<span class="bg-emerald-50 text-emerald-800 text-[10px] px-2 py-0.5 rounded border border-emerald-200 font-bold">' + planBadge + '</span>' +
+              '</div>' +
+              '<div class="text-[11px] text-slate-500">' + clinicCity + '</div>' +
             '</div>' +
             '<button class="modal-trigger flex items-center gap-3 pl-4 border-l border-slate-200 hover:opacity-80 transition cursor-pointer text-left" data-modal="settings">' +
               '<div class="text-right"><div class="text-xs font-bold text-slate-900">' + state.user.name + ' ⚙</div><div class="text-[10px] text-slate-500">' + state.user.role + '</div></div>' +
-              '<div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-sm">AS</div>' +
+              '<div class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-sm">DR</div>' +
             '</button>' +
           '</div>' +
         '</header>' +
@@ -171,75 +298,168 @@
     }
   }
 
+  // 1. DASHBOARD
   function renderDashboard() {
-    const s = state.queue.serving;
+    // A. Live Queue variables (servToken define ho gaya)
+    const s = (state.queue && state.queue.serving) || null;
     const servToken = s ? s.token : 'A-023';
-    const servName = s ? s.patient_name : 'Ram Thapa';
-    const servDoc = (s && s.doctor) ? ('• ' + s.doctor + ' (' + s.room + ')') : '• Dr. Rekha Shrestha (Room 102)';
-    const waitCount = state.queue.stats.waiting || 8;
+    const servName = s ? s.patient_name : 'Patient Name';
+    const servDoc = (s && s.doctor) ? ('• ' + s.doctor) : '• Assigned Doctor';
+    const waitCount = (state.queue && state.queue.stats && state.queue.stats.waiting) || 8;
 
+    // B. Profile Completeness variables
+    const p = state.provider || {};
+    const doctors = state.doctors || [];
+
+    const hasBasic = Boolean(p.name && p.name.length > 2 && p.phone && p.description);
+    const hasAddress = Boolean(p.address || p.address_line);
+    const hasMedia = Boolean(p.logo_url && p.cover_image_url);
+    const hasDoctor = Boolean(doctors.length > 0);
+    const hasPayment = Boolean(p.upi_id);
+
+    let score = 0;
+    if (hasBasic) score += 20;
+    if (hasAddress) score += 20;
+    if (hasMedia) score += 20;
+    if (hasDoctor) score += 20;
+    if (hasPayment) score += 20;
+
+    // C. 0% - 100% Naukri Style Completeness Card
+    const completenessCardHtml = '<div class="mb-6 p-5 rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-md">' +
+      '<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">' +
+        '<div>' +
+          '<div class="flex items-center gap-2">' +
+            '<span class="bg-red-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider">Required For Marketplace Listing</span>' +
+            '<span class="text-xs font-bold text-slate-300">Profile Completeness: <strong class="text-white text-sm">' + score + '%</strong></span>' +
+          '</div>' +
+          '<h3 class="text-sm font-extrabold text-white mt-1">Complete your facility profile to start accepting patient bookings</h3>' +
+          '<p class="text-xs text-slate-400 mt-0.5">Patients discover your clinic, view doctor details and book OPD tokens only after your profile reaches 100%.</p>' +
+        '</div>' +
+        '<button class="modal-trigger px-4 py-2.5 bg-[#ad0b0e] hover:bg-[#8f080b] text-white text-xs font-bold rounded-xl transition shadow-md shrink-0 flex items-center gap-2" data-modal="profile_editor">' +
+          '<span>Complete Profile</span> <span>➜</span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="w-full bg-slate-700/60 rounded-full h-2 mt-4 overflow-hidden">' +
+        '<div class="bg-gradient-to-r from-red-500 to-emerald-400 h-2 rounded-full transition-all duration-500" style="width: ' + score + '%;"></div>' +
+      '</div>' +
+      '<div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-4 pt-3 border-t border-slate-700/60 text-[11px]">' +
+        '<div class="flex items-center gap-1.5 ' + (hasBasic ? 'text-emerald-400 font-semibold' : 'text-slate-400') + '">' +
+          '<span>' + (hasBasic ? '✓' : '○') + '</span> Basic Bio (20%)' +
+        '</div>' +
+        '<div class="flex items-center gap-1.5 ' + (hasAddress ? 'text-emerald-400 font-semibold' : 'text-slate-400') + '">' +
+          '<span>' + (hasAddress ? '✓' : '○') + '</span> Address & Maps (20%)' +
+        '</div>' +
+        '<div class="flex items-center gap-1.5 ' + (hasMedia ? 'text-emerald-400 font-semibold' : 'text-slate-400') + '">' +
+          '<span>' + (hasMedia ? '✓' : '○') + '</span> Logo & Cover (20%)' +
+        '</div>' +
+        '<div class="flex items-center gap-1.5 ' + (hasDoctor ? 'text-emerald-400 font-semibold' : 'text-slate-400') + '">' +
+          '<span>' + (hasDoctor ? '✓' : '○') + '</span> Doctor & Fee (20%)' +
+        '</div>' +
+        '<div class="flex items-center gap-1.5 ' + (hasPayment ? 'text-emerald-400 font-semibold' : 'text-slate-400') + '">' +
+          '<span>' + (hasPayment ? '✓' : '○') + '</span> Payout UPI ID (20%)' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    // D. Upcoming Queue list
     let upHtml = '';
-    const waitingList = state.queue.waiting.length ? state.queue.waiting : [
-      { token: 'A-024', patient_name: 'Sita Rai', doctor: 'Dr. Rekha Shrestha', room: 'Room 102', source: 'Marketplace', status: 'Waiting', wait: '4m' },
-      { token: 'A-025', patient_name: 'Bishal Karki', doctor: 'Dr. Anup Karki', room: 'Room 105', source: 'QR Booking', status: 'Arrived', wait: '8m' },
-      { token: 'A-026', patient_name: 'Sunita Lama', doctor: 'Dr. Aayush Shrestha', room: 'Room 201', source: 'Walk-in', status: 'Waiting', wait: '14m' }
+    const waitingList = (state.queue && state.queue.waiting && state.queue.waiting.length) ? state.queue.waiting : [
+      { token: 'A-024', patient_name: 'Sita Verma', doctor: 'Dr. Rajesh Verma', room: 'Chamber 1', source: 'Marketplace', status: 'Waiting', wait: '4m' },
+      { token: 'A-025', patient_name: 'Bishal Sharma', doctor: 'Dr. Rajesh Verma', room: 'Chamber 1', source: 'QR Booking', status: 'Arrived', wait: '8m' }
     ];
 
     for (let i = 0; i < waitingList.length; i++) {
       const w = waitingList[i];
       upHtml += '<div class="px-4 py-3 flex items-center justify-between border-b border-slate-100">' +
-        '<div class="flex items-center gap-3"><span class="font-bold text-slate-900 text-xs w-12">' + w.token + '</span><div><div class="text-xs font-bold text-slate-800">' + w.patient_name + '</div><div class="text-[11px] text-slate-500">' + (w.doctor || 'Doctor Assigned') + ' • ' + (w.room || 'Room 101') + '</div></div></div>' +
-        '<div class="flex items-center gap-2"><span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">' + w.source + '</span><span class="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded font-bold">' + w.status + '</span><span class="text-xs text-slate-400 w-16 text-right">' + (w.wait || '8m') + '</span></div>' +
+        '<div class="flex items-center gap-3">' +
+          '<span class="font-bold text-slate-900 text-xs w-12">' + w.token + '</span>' +
+          '<div>' +
+            '<div class="text-xs font-bold text-slate-800">' + w.patient_name + '</div>' +
+            '<div class="text-[11px] text-slate-500">' + (w.doctor || 'Doctor Assigned') + ' • ' + (w.room || 'Chamber 1') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="flex items-center gap-2">' +
+          '<span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">' + w.source + '</span>' +
+          '<span class="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded font-bold">' + w.status + '</span>' +
+          '<span class="text-xs text-slate-400 w-16 text-right">' + (w.wait || '8m') + '</span>' +
+        '</div>' +
       '</div>';
     }
 
-    return '<div class="flex items-center justify-between mb-6">' +
-      '<div><h1 class="text-xl font-bold text-slate-900">Good morning, ' + state.user.name + '</h1><p class="text-xs text-slate-500 mt-0.5">Thursday, 8 Oct 2026 • ' + state.provider.name + ', ' + state.provider.city + '</p></div>' +
-      '<button class="modal-trigger px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition" data-modal="token">+ Issue Token</button>' +
-    '</div>' +
-    '<div class="grid grid-cols-6 gap-4 mb-6">' +
-      kpiCard("Appointments today", state.stats.total || 42, "+8 vs yesterday", "text-emerald-600") +
-      kpiCard("Marketplace bookings", state.stats.marketplace || 18, "+4 vs yesterday", "text-emerald-600") +
-      kpiCard("Walk-ins", state.stats.walkin || 12, "+1 vs yesterday", "text-emerald-600") +
-      kpiCard("QR bookings", state.stats.qr || 7, "+3 vs yesterday", "text-emerald-600") +
-      kpiCard("Telemedicine", state.stats.telemedicine || 5, "-1 vs yesterday", "text-slate-500") +
-      kpiCard("Waiting now", state.stats.waiting || 9, "In OPD holding", "text-red-500", "Avg 14m") +
-    '</div>' +
-    '<div class="grid grid-cols-3 gap-6">' +
-      '<div class="col-span-2 space-y-4">' +
-        '<div class="flex items-center justify-between"><div class="flex items-center gap-2"><h2 class="text-sm font-bold text-slate-900">Live Queue</h2><span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">● Live</span></div><div class="text-xs text-slate-500">Department: <span class="font-semibold text-slate-700">General OPD</span></div></div>' +
-        '<div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-5 flex items-center justify-between">' +
-          '<div><div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">NOW SERVING</div><div class="text-3xl font-extrabold text-slate-900 my-1">' + servToken + '</div><div class="text-sm font-bold text-slate-900">' + servName + ' <span class="font-normal text-slate-500">' + servDoc + '</span></div><div class="text-xs text-slate-500 mt-1">Waiting in hall: <strong class="text-slate-700">' + waitCount + ' patients</strong> • Est. current wait: <strong class="text-slate-700">12 mins</strong></div></div>' +
-          '<div class="flex gap-2">' +
-            '<button class="queue-btn px-3.5 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition" data-action="call-next">📢 Call next</button>' +
-            '<button class="queue-btn px-3 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 transition" data-action="skip">⏭ Skip</button>' +
-            '<button class="queue-btn px-3 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 transition" data-action="done">✓ Done</button>' +
-          '</div>' +
+    // E. Final Dashboard Return
+    return completenessCardHtml +
+      '<div class="flex items-center justify-between mb-6">' +
+        '<div>' +
+          '<h1 class="text-xl font-bold text-slate-900">Good morning, ' + state.user.name + '</h1>' +
+          '<p class="text-xs text-slate-500 mt-0.5">Thursday, 8 Oct 2026 • ' + state.provider.name + ', ' + state.provider.city + '</p>' +
         '</div>' +
-        '<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">' +
-          '<div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center text-[11px] font-bold text-slate-500 uppercase tracking-wider"><span>UPCOMING IN QUEUE</span><button class="modal-trigger text-xs font-bold text-slate-900 hover:underline" data-modal="token">+ Issue Token</button></div>' +
-          '<div class="divide-y divide-slate-100">' + upHtml + '</div>' +
-        '</div>' +
+        '<button class="modal-trigger px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition" data-modal="token">+ Issue Token</button>' +
       '</div>' +
-      '<div class="space-y-4">' +
-        '<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">' +
-          '<div class="flex justify-between items-start"><div><h3 class="text-sm font-bold text-slate-900">' + state.provider.name + '</h3><p class="text-xs text-slate-500">' + state.provider.city + '</p></div><span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded border border-slate-200">' + state.provider.tier + '</span></div>' +
-          '<div class="flex items-center gap-2 mt-3 text-xs"><span class="font-bold text-slate-900">' + state.provider.rating + ' ★</span><span class="text-slate-500">(' + state.provider.reviews_count + ' reviews)</span><span class="ml-auto text-emerald-600 font-semibold text-[11px]">● Active on Marketplace</span></div>' +
-          '<div class="grid grid-cols-2 gap-2 mt-4"><button class="nav-item py-1.5 px-3 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50" data-page="qr_marketplace">↗ QR & Portal</button><button class="modal-trigger py-1.5 px-3 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50" data-modal="settings">⚙ Edit Settings</button></div>' +
-        '</div>' +
-        '<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">' +
-          '<h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">Quick Actions</h3>' +
-          '<div class="grid grid-cols-2 gap-2">' +
-            '<button class="modal-trigger p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 text-left hover:bg-slate-100" data-modal="token">+ Issue Token</button>' +
-            '<button class="modal-trigger p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 text-left hover:bg-slate-100" data-modal="doctor">+ Add Doctor</button>' +
-            '<button class="modal-trigger p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 text-left hover:bg-slate-100" data-modal="service">+ Add Service</button>' +
-            '<button class="modal-trigger p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 text-left hover:bg-slate-100" data-modal="payment">+ Record Payment</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }
 
+      '<div class="grid grid-cols-6 gap-4 mb-6">' +
+        kpiCard("Appointments today", state.stats.total || 42, "+8 vs yesterday", "text-emerald-600") +
+        kpiCard("Marketplace bookings", state.stats.marketplace || 18, "+4 vs yesterday", "text-emerald-600") +
+        kpiCard("Walk-ins", state.stats.walkin || 12, "+1 vs yesterday", "text-emerald-600") +
+        kpiCard("QR bookings", state.stats.qr || 7, "+3 vs yesterday", "text-emerald-600") +
+        kpiCard("Telemedicine", state.stats.telemedicine || 5, "-1 vs yesterday", "text-slate-500") +
+        kpiCard("Waiting now", state.stats.waiting || 9, "In OPD holding", "text-red-500", "Avg 14m") +
+      '</div>' +
+
+      '<div class="grid grid-cols-3 gap-6">' +
+        '<div class="col-span-2 space-y-4">' +
+          '<div class="flex items-center justify-between">' +
+            '<div class="flex items-center gap-2">' +
+              '<h2 class="text-sm font-bold text-slate-900">Live Queue</h2>' +
+              '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">● Live</span>' +
+            '</div>' +
+            '<div class="text-xs text-slate-500">Department: <span class="font-semibold text-slate-700">General OPD</span></div>' +
+          '</div>' +
+
+          '<div class="bg-emerald-50/60 border border-emerald-200 rounded-xl p-5 flex items-center justify-between">' +
+            '<div>' +
+              '<div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">NOW SERVING</div>' +
+              '<div class="text-3xl font-extrabold text-slate-900 my-1">' + servToken + '</div>' +
+              '<div class="text-sm font-bold text-slate-900">' + servName + ' <span class="font-normal text-slate-500">' + servDoc + '</span></div>' +
+              '<div class="text-xs text-slate-500 mt-1">Waiting in hall: <strong class="text-slate-700">' + waitCount + ' patients</strong> • Est. current wait: <strong class="text-slate-700">12 mins</strong></div>' +
+            '</div>' +
+            '<div class="flex gap-2">' +
+              '<button class="queue-btn px-3.5 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition" data-action="call-next">📢 Call next</button>' +
+              '<button class="queue-btn px-3 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 transition" data-action="skip">⏭ Skip</button>' +
+              '<button class="queue-btn px-3 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 transition" data-action="done">✓ Done</button>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">' +
+            '<div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center text-[11px] font-bold text-slate-500 uppercase tracking-wider">' +
+              '<span>UPCOMING IN QUEUE</span>' +
+              '<button class="modal-trigger text-xs font-bold text-slate-900 hover:underline" data-modal="token">+ Issue Token</button>' +
+            '</div>' +
+            '<div class="divide-y divide-slate-100">' + upHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="space-y-4">' +
+          '<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">' +
+            '<div class="flex justify-between items-start">' +
+              '<div>' +
+                '<h3 class="text-sm font-bold text-slate-900">' + state.provider.name + '</h3>' +
+                '<p class="text-xs text-slate-500">' + state.provider.city + '</p>' +
+              '</div>' +
+              '<span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded border border-slate-200">' + (state.provider.tier || 'VIP') + '</span>' +
+            '</div>' +
+            '<div class="flex items-center gap-2 mt-3 text-xs">' +
+              '<span class="font-bold text-slate-900">' + state.provider.rating + ' ★</span>' +
+              '<span class="text-slate-500">(' + state.provider.reviews_count + ' reviews)</span>' +
+              '<span class="ml-auto text-emerald-600 font-semibold text-[11px]">● Active on Marketplace</span>' +
+            '</div>' +
+            '<div class="grid grid-cols-2 gap-2 mt-4">' +
+              '<button class="nav-item py-1.5 px-3 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50" data-page="qr_marketplace">↗ QR & Portal</button>' +
+              '<button class="modal-trigger py-1.5 px-3 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50" data-modal="settings">⚙ Edit Settings</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
   function renderAppointments() {
     const filter = state.appointmentFilter || 'all';
     const list = filter === 'all' ? state.appointments : state.appointments.filter(a => (a.source || '').toLowerCase() === filter.toLowerCase());
@@ -347,12 +567,20 @@
     } else {
       for (let i = 0; i < state.doctors.length; i++) {
         const d = state.doctors[i];
-        dRows += '<tr class="hover:bg-slate-50/60">' +
-          '<td class="p-3 font-bold text-slate-900">' + d.name + '<br><span class="text-[10px] text-slate-400 font-normal">' + (d.nmc_no || 'NMC-Reg') + '</span></td>' +
-          '<td class="p-3 text-slate-700">' + d.department + '<br><span class="text-[10px] text-slate-500 font-medium">' + d.room + '</span></td>' +
-          '<td class="p-3 font-semibold text-slate-900">Rs. ' + d.opd_fee + '</td>' +
-          '<td class="p-3 text-slate-600">' + (d.duty_days || 'Mon-Fri') + '</td>' +
-          '<td class="p-3 text-slate-600">' + d.shift_start + ' - ' + d.shift_end + '</td>' +
+        dRows += '<tr class="hover:bg-slate-50/60 cursor-pointer">' +
+          '<td class="p-3">' +
+            '<div class="flex items-center gap-3">' +
+              '<img src="' + (d.avatar_url || 'assets/default-doctor.png') + '" class="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0" onerror="this.src=\'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=150&q=80\'">' +
+              '<div>' +
+                '<strong class="text-slate-900">' + d.name + '</strong>' +
+                '<div class="text-[10px] text-slate-500 font-medium">' + (d.qualification || 'MBBS') + ' • ' + (d.experience_years || 5) + ' Yrs Exp</div>' +
+              '</div>' +
+            '</div>' +
+          '</td>' +
+          '<td class="p-3 text-slate-700">' + d.department + '<br><span class="text-[10px] text-slate-500 font-medium">' + (d.room || 'Chamber 1') + '</span></td>' +
+          '<td class="p-3 font-bold text-slate-900">₹' + (d.opd_fee || 500) + '</td>' +
+          '<td class="p-3 text-slate-600">' + (d.shift_timings || '10:00 AM - 01:00 PM') + '</td>' +
+          '<td class="p-3 text-slate-500">' + (d.nmc_no || 'CGMC-Reg') + '</td>' +
           '<td class="p-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Active</span></td>' +
         '</tr>';
       }
@@ -441,21 +669,95 @@
   }
 
   function renderQRMarketplace() {
-    return '<div class="flex items-center justify-between mb-5"><div><h1 class="text-xl font-bold text-slate-900">QR Management</h1><p class="text-xs text-slate-500 mt-0.5">Physical & digital touchpoint QR distribution • ' + state.provider.name + '</p></div><button class="modal-trigger px-3.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800" data-modal="qr_gen">+ Generate New QR</button></div>' +
-    '<div class="grid grid-cols-12 gap-6 mb-6">' +
-      '<div class="col-span-5 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm text-center">' +
-        '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">PRIMARY MASTER QR STANDEE</div>' +
-        '<div class="w-36 h-36 mx-auto my-3 bg-white p-2 border-2 border-slate-900 rounded-xl shadow-inner flex flex-col justify-between"><div class="flex justify-between"><div class="w-8 h-8 bg-slate-900 rounded-sm"></div><div class="w-8 h-8 bg-slate-900 rounded-sm"></div></div><div class="text-[9px] font-bold text-red-600">NORVIC QR</div><div class="flex justify-between"><div class="w-8 h-8 bg-slate-900 rounded-sm"></div><div class="w-8 h-8 bg-slate-900 rounded-sm"></div></div></div>' +
-        '<div class="text-xs font-bold text-slate-900">Norvic OPD Instant Registration Desk</div>' +
-        '<button class="mt-4 w-full py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800" onclick="window.print()">🖨 Print / Download PDF Poster</button>' +
-      '</div>' +
-      '<div class="col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">' +
-        '<h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">Active Hospital QR Touchpoints</h3>' +
-        '<div class="space-y-2 text-xs"><div class="p-2.5 bg-slate-50 border border-slate-100 rounded-lg flex justify-between items-center"><div><strong>Norvic OPD Central Desk A</strong><div class="text-[10px] text-slate-400">Ground Floor Reception</div></div><span class="font-bold text-emerald-600">6,420 Scans</span></div><div class="p-2.5 bg-slate-50 border border-slate-100 rounded-lg flex justify-between items-center"><div><strong>Dr. Aayush Shrestha Room 201</strong><div class="text-[10px] text-slate-400">Cardiology Suite</div></div><span class="font-bold text-emerald-600">2,890 Scans</span></div></div>' +
-      '</div>' +
-    '</div>';
-  }
+    const provName = state.provider.name || "Saino Partner Clinic";
+    const provCity = state.provider.city || "Raipur, Chhattisgarh";
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(window.location.origin + '/index.html#' + (state.provider.id || 'clinic'))}`;
 
+    return `
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h1 class="text-xl font-bold text-slate-900">Reception QR &amp; Touchpoint Desk</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Physical desk QR standee generator for instant patient OPD tokens • ${provName}</p>
+        </div>
+        <button onclick="window.print()" class="px-4 py-2 bg-[#ad0b0e] hover:bg-[#8f080b] text-white text-xs font-bold rounded-xl shadow-md transition">
+          🖨 Print Official A4 Standee
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+        
+        <!-- Left: Official Physical Standee Preview -->
+        <div class="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm text-center flex flex-col items-center justify-between">
+          <div class="w-full">
+            <span class="text-[10px] font-black uppercase tracking-widest text-[#ad0b0e] block">OFFICIAL RECEPTION STANDEE</span>
+            <h3 class="text-base font-extrabold text-slate-900 mt-1">${provName}</h3>
+            <p class="text-xs text-slate-500">${provCity}</p>
+          </div>
+
+          <!-- Standee QR Frame with Logo -->
+          <div class="my-5 p-4 rounded-2xl bg-white border-2 border-slate-900 shadow-xl flex flex-col items-center w-56">
+            <img src="${qrUrl}" alt="Reception QR" class="w-44 h-44 object-contain">
+            <div class="mt-2 text-[10px] font-black text-[#ad0b0e] uppercase tracking-wider">
+              SCAN FOR INSTANT OPD TOKEN
+            </div>
+          </div>
+
+          <div class="text-xs text-slate-600 space-y-1">
+            <p class="font-bold text-slate-900">Skip the reception queue!</p>
+            <p class="text-[11px] text-slate-500">Scan via camera or WhatsApp to get your live token and track your turn live on phone.</p>
+          </div>
+
+          <button onclick="window.print()" class="mt-5 w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-md">
+            🖨 Print Reception Desk Poster (A4)
+          </button>
+        </div>
+
+        <!-- Right: Touchpoint Analytics & QR Settings -->
+        <div class="lg:col-span-7 space-y-5 text-left">
+          
+          <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Active QR Touchpoints &amp; Scan Telemetry</h3>
+            
+            <div class="space-y-3 text-xs">
+              <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex justify-between items-center">
+                <div>
+                  <strong class="text-slate-900 block text-xs">Main Entrance &amp; Central Reception Standee</strong>
+                  <span class="text-[11px] text-slate-500">Ground floor lobby kiosk • Active</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-black text-emerald-700 text-sm block">1,840 Scans</span>
+                  <span class="text-[10px] text-slate-400">82% conversion</span>
+                </div>
+              </div>
+
+              <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex justify-between items-center">
+                <div>
+                  <strong class="text-slate-900 block text-xs">Doctor Chamber Room Waiting Desk</strong>
+                  <span class="text-[11px] text-slate-500">Chamber 1 entrance • Active</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-black text-emerald-700 text-sm block">640 Scans</span>
+                  <span class="text-[10px] text-slate-400">Direct consultations</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Benefits Card -->
+          <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-5 text-xs text-emerald-900 space-y-2">
+            <h4 class="font-bold flex items-center gap-1.5 text-emerald-950">
+              <span>✓</span> Zero Friction Patient Habit
+            </h4>
+            <p class="text-[11px] leading-relaxed text-emerald-800">
+              When patients scan your reception standee, they book directly with their unique SAINO ID. Your receptionist doesn't have to manually enter paper tokens, and patients can track their turn right from the waiting room.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+  }
   function renderReports() {
     return '<div class="flex items-center justify-between mb-5"><div><h1 class="text-xl font-bold text-slate-900">Reports & Analytics</h1><p class="text-xs text-slate-500 mt-0.5">Outpatient volume trends, revenue telemetry & patient retention</p></div><button id="exportCsvBtnReports" class="px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800">Export Complete Report (CSV)</button></div>' +
     '<div class="grid grid-cols-4 gap-4 mb-5">' +
@@ -546,17 +848,90 @@
     }
 
     if (state.activeModal === 'doctor') {
-      return '<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">' +
-        '<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">' +
-          '<div class="flex justify-between items-center pb-3 border-b border-slate-100 mb-4"><h3 class="font-bold text-sm text-slate-900">Add New Doctor</h3><button class="close-modal text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button></div>' +
-          '<form id="addDocForm" class="space-y-3 text-xs">' +
-            '<div><label class="font-semibold text-slate-700">Doctor Full Name *</label><input name="name" required placeholder="Dr. Rameshwor Sharma" class="w-full mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg"></div>' +
-            '<div class="grid grid-cols-2 gap-2"><div><label class="font-semibold text-slate-700">NMC Number</label><input name="nmc_no" placeholder="NMC-18942" class="w-full mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg"></div><div><label class="font-semibold text-slate-700">Department</label><input name="department" value="General OPD" class="w-full mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg"></div></div>' +
-            '<div class="grid grid-cols-2 gap-2"><div><label class="font-semibold text-slate-700">Room</label><input name="room" value="Room 101" class="w-full mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg"></div><div><label class="font-semibold text-slate-700">OPD Fee (Rs.)</label><input name="opd_fee" type="number" value="800" class="w-full mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg"></div></div>' +
-            '<div class="pt-4 flex gap-2"><button type="button" class="close-modal flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold">Cancel</button><button type="submit" class="flex-1 py-2 bg-slate-900 text-white rounded-lg font-bold">Save Doctor</button></div>' +
-          '</form>' +
-        '</div>' +
-      '</div>';
+      return `
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg my-8 overflow-hidden border border-slate-200">
+            
+            <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center">
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-red-400">DOCTOR CREDENTIALS</span>
+                <h3 class="font-extrabold text-sm text-white">Add Doctor &amp; OPD Consultation</h3>
+              </div>
+              <button type="button" class="close-modal text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <form id="addDocForm" class="p-6 space-y-3.5 text-xs max-h-[75vh] overflow-y-auto">
+              
+              <!-- Doctor Name & Photo -->
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Doctor Full Name *</label>
+                <input name="name" required placeholder="Dr. Rajesh Verma" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+              </div>
+
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Doctor Profile Photo URL *</label>
+                <input name="avatar_url" required placeholder="https://images.unsplash.com/... or uploaded photo link" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+              </div>
+
+              <!-- Qualification & Speciality -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="font-bold text-slate-700 block mb-1">Qualifications &amp; Degree *</label>
+                  <input name="qualification" required placeholder="MBBS, MD (Medicine)" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+                </div>
+                <div>
+                  <label class="font-bold text-slate-700 block mb-1">Medical Speciality *</label>
+                  <input name="department" required placeholder="Consultant Physician" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+                </div>
+              </div>
+
+              <!-- Experience & Registration -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="font-bold text-slate-700 block mb-1">Experience (Years) *</label>
+                  <input name="experience_years" type="number" required placeholder="12" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+                </div>
+                <div>
+                  <label class="font-bold text-slate-700 block mb-1">NMC / State Reg No. *</label>
+                  <input name="nmc_no" required placeholder="CGMC-18942 / NMC-XXXX" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+                </div>
+              </div>
+
+              <!-- Consultation Fees in INR ₹ -->
+              <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/70">
+                <div class="font-bold text-slate-900 mb-2">Consultation Pricing (INR ₹)</div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="font-bold text-slate-700 block mb-1">In-Person OPD Fee (₹) *</label>
+                    <input name="opd_fee" type="number" required value="500" class="w-full p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-red-600 font-bold">
+                  </div>
+                  <div>
+                    <label class="font-bold text-slate-700 block mb-1">Follow-up / Online Fee (₹)</label>
+                    <input name="followup_fee" type="number" value="300" class="w-full p-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Timings & Room -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="font-bold text-slate-700 block mb-1">OPD Shift Hours *</label>
+                  <input name="shift_timings" value="10:00 AM - 01:00 PM, 05:00 PM - 08:00 PM" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+                </div>
+                <div>
+                  <label class="font-bold text-slate-700 block mb-1">Chamber / Room</label>
+                  <input name="room" value="Chamber 1" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-red-600">
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-200 flex justify-end gap-2">
+                <button type="button" class="close-modal px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-[#ad0b0e] hover:bg-[#8f080b] text-white font-extrabold rounded-lg shadow-md transition">Save Doctor Profile</button>
+              </div>
+
+            </form>
+          </div>
+        </div>`;
     }
 
     if (state.activeModal === 'service') {
@@ -615,7 +990,7 @@
               '<option value="VIP Tier"' + (!state.provider.tier.includes('Clinic') && !state.provider.tier.includes('Big') ? ' selected' : '') + '>Hospital Plan (₹5,999/mo - 5 Doctors)</option>' +
               '<option value="Big Hospital Tier"' + (state.provider.tier.includes('Big') ? ' selected' : '') + '>Big Hospital Plan (₹9,999/mo - 15 Doctors)</option>' +
             '</select></div>' +
-            '<div class="pt-4 flex gap-2"><button type="button" class="close-modal flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold">Cancel</button><button type="submit" class="flex-1 py-2 bg-slate-900 text-white rounded-lg font-bold">Save Settings to DB</button></div>' +
+            '<div class="pt-4 flex gap-2"><button type="button" class="close-modal flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold">Cancel</button><button type="submit" class="flex-1 py-2 bg-slate-900 text-white rounded-lg font-bold">Save</button></div>' +
           '</form>' +
         '</div>' +
       '</div>';
@@ -701,29 +1076,47 @@
       }
     });
 
-    const docForm = document.getElementById("addDocForm");
-    if (docForm) docForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fd = new FormData(e.target);
-      const res = await fetch(API_BASE + "/doctors", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+   const docForm = document.getElementById("addDocForm");
+    if (docForm) {
+      docForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(docForm);
+
+        const payload = {
           name: fd.get("name"),
-          nmc_no: fd.get("nmc_no"),
+          avatar_url: fd.get("avatar_url"),
+          qualification: fd.get("qualification"),
           department: fd.get("department"),
+          experience_years: parseInt(fd.get("experience_years"), 10) || 1,
+          nmc_no: fd.get("nmc_no"),
           room: fd.get("room"),
-          opd_fee: parseInt(fd.get("opd_fee"), 10) || 800
-        })
+          opd_fee: parseInt(fd.get("opd_fee"), 10) || 500,
+          followup_fee: parseInt(fd.get("followup_fee"), 10) || 300,
+          shift_timings: fd.get("shift_timings")
+        };
+
+        try {
+          const res = await fetch(API_BASE + "/doctors", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (data.success) {
+            state.activeModal = null;
+            await loadData(); // Reloads real doctors from PostgreSQL
+            render();
+          } else {
+            alert(data.message || "Failed to save doctor");
+          }
+        } catch (err) {
+          console.error("API error:", err);
+          state.doctors.push({ ...payload, id: Date.now() });
+          state.activeModal = null;
+          render();
+        }
       });
-      const data = await res.json();
-      if (data.success) {
-        state.activeModal = null;
-        await loadData();
-      } else {
-        alert(data.message);
-      }
-    });
+    }
 
     const srvForm = document.getElementById("addSrvForm");
     if (srvForm) srvForm.addEventListener("submit", async (e) => {

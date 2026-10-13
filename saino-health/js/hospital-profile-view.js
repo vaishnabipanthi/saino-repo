@@ -408,397 +408,226 @@ function renderHospitalDirectoryView(categoryType = "hospital") {
   `;
 }
 
-/* 2. Hospital Profile View (Single Profile Page) */
+/* ============================================================
+   PRACTO-STYLE DETAILED CLINIC & DOCTOR PROFILE ENGINE
+   (Matches Uploaded Docx & Practo Screenshots 2, 4, 7, 8)
+   ============================================================ */
 function renderHospitalProfileView(providerId) {
   const allProviders = (window.AppState && window.AppState.providers) || (window.SAINO_DATA && window.SAINO_DATA.providers) || [];
+  
+  // Find real provider from database or fallback to CityCare
+  const p = (typeof directoryFindProvider === "function" ? directoryFindProvider(providerId) : null) ||
+    allProviders.find(x => x && (String(x.id).toLowerCase() === String(providerId).toLowerCase() || String(x.name).toLowerCase() === String(providerId).toLowerCase())) ||
+    {
+      id: providerId,
+      name: "CityCare Multispeciality Hospital",
+      provider_type: "hospital",
+      rating: "4.8",
+      reviewsCount: 842,
+      location: "Civil Lines, Raipur, Chhattisgarh",
+      phone: "+91 98765 43210",
+      cover_image_url: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80",
+      logo_url: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=200&q=80",
+      description: "Premier multi-speciality healthcare facility in Chhattisgarh equipped with 24/7 emergency, digital OPD tokens, advanced diagnostics, and specialist care.",
+      doctors: [
+        {
+          id: "doc-1",
+          name: "Dr. Aayush Sharma",
+          qualification: "MBBS, MD, DM (Cardiology)",
+          department: "Senior Consultant Interventional Cardiologist",
+          experience_years: 15,
+          avatar_url: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80",
+          opd_fee: 650,
+          shift_timings: "10:00 AM - 01:00 PM, 05:00 PM - 08:00 PM",
+          stories_pct: 97,
+          stories_count: 512
+        },
+        {
+          id: "doc-2",
+          name: "Dr. Sunita Verma",
+          qualification: "MBBS, MS (Orthopedics)",
+          department: "Consultant Joint Replacement Surgeon",
+          experience_years: 12,
+          avatar_url: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=400&q=80",
+          opd_fee: 500,
+          shift_timings: "11:00 AM - 02:00 PM",
+          stories_pct: 95,
+          stories_count: 328
+        }
+      ]
+    };
 
-  // Data se exact provider dhoondega (Hospital, Clinic, Diagnostic, Wellness etc.)
-  const provider = allProviders.find(p => 
-    p && (
-      (p.id && String(p.id).toLowerCase() === String(providerId).toLowerCase()) ||
-      (p.name && p.name.toLowerCase() === String(providerId).toLowerCase()) ||
-      (p.name && p.name.toLowerCase().includes(String(providerId).toLowerCase()))
-    )
-  ) || {
-    name: providerId || "Healthcare Provider",
-    category: (window.AppState && window.AppState.activeView) || "clinic",
-    rating: "4.8",
-    reviewsCount: "210",
-    location: "Kathmandu",
-    distance: "2.5km",
-    opd: "Mon–Sat, 8:00 AM – 7:00 PM",
-    phone: "+977 1-4200000",
-    about: "Verified partner healthcare facility offering quality healthcare services."
-  };
+  const name = p.name || "Healthcare Facility";
+  const coverImg = p.cover_image_url || p.image || "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80";
+  const logoImg = p.logo_url || p.logo || "assets/logo.png";
+  const locationText = p.address || p.location || "Civil Lines, Raipur, Chhattisgarh";
+  const ratingText = p.rating || "4.8";
+  const reviewsCount = p.reviewsCount || p.reviews || 842;
+  const isSolo = p.provider_type === "solo_doctor" || (p.doctors && p.doctors.length === 1);
 
-  const name = provider.name || "Provider";
-  const category = (provider.category || "healthcare").toLowerCase();
-
-const initials = name
-  .split(" ")
-  .filter(Boolean)
-  .map(w => w[0])
-  .join("")
-  .slice(0, 2)
-  .toUpperCase() || "HC";
-  const providerImage =
-  provider.image ||
-  provider.logo ||
-  provider.imageUrl ||
-  provider.photo ||
-  provider.profileImage ||
-  '';
-    const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1) + "s";
-  const location = provider.location || provider.address || "Kathmandu";
-  const rating = provider.rating || "4.8";
-  const reviews = provider.reviewsCount || "240";
-  const opd = provider.opd || "Mon–Sat, 8:00 AM – 7:00 PM";
-  const phone = provider.phone || "+977 1-4400000";
-  const distance = provider.distance || "2.5km";
-  const about = provider.about || `${name} provides specialized medical services, diagnostics, and care in ${location}.`;
-
-  // Doctors / Services / Tests
-  const docs = (Array.isArray(provider.doctors) && provider.doctors.length > 0) ? provider.doctors : [
-    { name: "Dr. Anup Karki", role: "Consultant Specialist", initials: "AK" },
-    { name: "Dr. Sabina Shrestha", role: "General Care", initials: "SS" },
-    { name: "Dr. Ashina Pradhan", role: "Specialist", initials: "AP" }
+  // Doctors list (Photo, Degrees, 15 yrs exp, ₹ Fees)
+  const docs = (Array.isArray(p.doctors) && p.doctors.length) ? p.doctors : [
+    {
+      id: "doc-def",
+      name: p.leadDoctor || "Dr. Rajesh Verma",
+      qualification: "MBBS, MD",
+      department: p.leadDoctorRole || "Senior Consultant Physician",
+      experience_years: 14,
+      avatar_url: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80",
+      opd_fee: 500,
+      shift_timings: "10:00 AM - 01:00 PM, 05:00 PM - 08:00 PM",
+      stories_pct: 96,
+      stories_count: 410
+    }
   ];
-  return `
-    <div id="hospital-profile-container" class="bg-slate-50 min-h-screen pb-16">
-      
-      <!-- Breadcrumb -->
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
-        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <button type="button" onclick="returnToProviderSource()" class="font-semibold text-red-700 hover:underline">← Back to previous page</button>
-          <span>·</span>
-          <button type="button" onclick="navigateTo('marketplace')" class="hover:underline">Home</button>
-          <span>›</span>
-          <button type="button" onclick="backToHospitalList()" class="hover:underline">${categoryTitle}</button>
-          <span>›</span>
-          <<span class="text-slate-800 font-semibold">${name}</span>>
+
+  // Render Doctor Cards (Matches Practo Screenshot 7 & 8)
+  const doctorsHtml = docs.map(d => `
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:shadow-md transition flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mb-4">
+      <div class="flex items-start gap-4 text-left">
+        <div class="w-20 h-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+          <img src="${d.avatar_url || 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80'}" alt="${d.name}" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-extrabold text-base text-slate-900">${d.name}</h3>
+            <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">✓ Medical Reg. Verified</span>
+          </div>
+          <p class="text-xs text-slate-600 font-medium mt-0.5">${d.qualification || 'MBBS, MD'} • <span class="text-slate-900 font-bold">${d.department || 'General Medicine'}</span></p>
+          <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 mt-1.5">
+            <span class="font-bold text-slate-700">${d.experience_years || 10} Years Experience</span>
+            <span>•</span>
+            <span class="text-emerald-700 font-bold">👍 ${d.stories_pct || 96}% (${d.stories_count || 120} Patient Stories)</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-1">
+            <span>🕒 Timings: <strong>${d.shift_timings || '10:00 AM - 01:00 PM'}</strong></span>
+          </div>
         </div>
       </div>
 
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 space-y-6">
-
-        <!-- Banner -->
-        <div class="relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-900 text-white p-6 sm:p-8 flex flex-col justify-between shadow-sm" style="min-height: 190px;">
-          <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-             <div class="w-20 h-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-                ${
-                  providerImage
-                    ? `<img src="${providerImage}" alt="${name}"
-                        class="w-full h-full object-cover">`
-                    : `<div class="w-full h-full flex items-center justify-center
-                        bg-slate-100 text-slate-500 font-bold text-xl">
-                        ${initials}
-                      </div>`
-                }
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h1 class="text-2xl font-bold">${name}</h1>
-                  ${typeof window.renderSainoTierBadge === "function"
-                    ? window.renderSainoTierBadge(provider, true)
-                    : `<span class="text-[11px] font-semibold bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 px-2 py-0.5 rounded-full">Saino Verified</span>`}
-                </div>
-                <div class="flex items-center gap-3 text-xs text-emerald-100/80 mt-1">
-                  <span>Multispecialty Hospital</span>
-                  <span>•</span>
-                  <span>24/7 Emergency</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-xs text-amber-300 mt-2">
-                  <span>★</span>
-                  <span class="font-bold text-white">${rating}</span>
-                  <span class="text-emerald-100/70">(${reviews} reviews)</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-3">
-              <span class="bg-white rounded-full p-2 inline-flex shadow-sm">${typeof savedHeartButton === "function" ? savedHeartButton(provider.id || name) : ""}</span>
-              <button type="button"
-                onclick="openAppointmentBooking('${provider.id || name}')"
-                class="bg-red-700 hover:bg-red-800 text-white text-xs font-bold px-6 py-3 rounded-xl transition shadow-sm">
-                Book appointment
-              </button>
-            </div>
-          </div>
+      <div class="flex md:flex-col items-center md:items-end justify-between w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 gap-3 shrink-0">
+        <div class="text-left md:text-right">
+          <div class="text-xl font-black text-slate-900">₹${d.opd_fee || 500}</div>
+          <div class="text-[10px] text-slate-400 font-semibold">Consultation Fee</div>
         </div>
-
-        <!-- About & Meta -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6">
-            <h2 class="text-base font-bold text-slate-900 mb-2">About</h2>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              ${about}
-            </p>
-          </div>
-          
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 text-xs space-y-3">
-            <div class="flex justify-between border-b border-slate-100 pb-2">
-              <span class="text-slate-400">Address</span>
-              <span class="font-semibold text-slate-800 text-right">Thapathali, Kathmandu</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-100 pb-2">
-              <span class="text-slate-400">Hours</span>
-              <span class="font-semibold text-slate-800">Open 24 hours</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-100 pb-2">
-              <span class="text-slate-400">Phone</span>
-              <span class="font-semibold text-slate-800">+977 1-4258554</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-400">Distance</span>
-              <span class="font-semibold text-slate-800">3km</span>
-            </div>
-          </div>
+        <div class="flex gap-2 w-full md:w-auto">
+          <button onclick="if(typeof openBookingWhatsApp==='function'){openBookingWhatsApp('${p.id}');}else{alert('Connecting video consult...');}" class="px-3.5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs transition">
+            📹 Video Consult
+          </button>
+          <button onclick="if(typeof openAppointmentBooking==='function'){openAppointmentBooking('${p.id}', '${d.name}', '${d.department}');}else{alert('Opening OPD booking...');}" class="px-5 py-2.5 bg-[#ad0b0e] hover:bg-[#8f080b] text-white font-extrabold rounded-xl text-xs shadow-md transition">
+            ⚡ Book Clinic Visit
+          </button>
         </div>
-
-        <!-- Available Doctors -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-bold text-slate-900">Available doctors</h2>
-            <span class="text-xs text-slate-400 font-medium">3 Doctors Active</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-            <div class="border border-slate-200 rounded-xl p-4 text-center">
-              <img src="assets/doctor3.jpg" class="w-14 h-14 mx-auto rounded-full object-cover mb-2" alt="Dr. Anup Karki">
-              <h3 class="text-xs font-bold text-slate-900">Dr. Anup Karki</h3>
-              <p class="text-[11px] text-slate-500 mb-3">General physician</p>
-              <button type="button" onclick="openAppointmentBooking('${provider.id || name}', 'Dr. Anup Karki', 'General physician')" class="w-full bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold py-2 rounded-lg transition">
-                Book Appointment
-              </button>
-            </div>
-
-            <div class="border border-slate-200 rounded-xl p-4 text-center">
-              <img src="assets/doctor2.jpg" class="w-14 h-14 mx-auto rounded-full object-cover mb-2" alt="Dr. Sabina Shrestha">
-              <h3 class="text-xs font-bold text-slate-900">Dr. Sabina Shrestha</h3>
-              <p class="text-[11px] text-slate-500 mb-3">General physician</p>
-              <button type="button" onclick="openAppointmentBooking('${provider.id || name}', 'Dr. Sabina Shrestha', 'General physician')" class="w-full bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold py-2 rounded-lg transition">
-                Book Appointment
-              </button>
-            </div>
-
-            <div class="border border-slate-200 rounded-xl p-4 text-center">
-              <img src="assets/doctor1.jpg" class="w-14 h-14 mx-auto rounded-full object-cover mb-2" alt="Dr. Ashina Pradhan">
-              <h3 class="text-xs font-bold text-slate-900">Dr. Ashina Pradhan</h3>
-              <p class="text-[11px] text-slate-500 mb-3">Gynaecologist</p>
-              <button type="button" onclick="openAppointmentBooking('${provider.id || name}', 'Dr. Ashina Pradhan', 'Gynaecologist')" class="w-full bg-red-700 hover:bg-red-800 text-white text-[11px] font-bold py-2 rounded-lg transition">
-                Book Appointment
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Available Slots -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
-          <div class="flex items-center justify-between">
-            <h2 class="text-base font-bold text-slate-900">Doctor's available slots</h2>
-            <span class="text-xs text-slate-400">Today, 24 Oct</span>
-          </div>
-
-          <div>
-            <div class="text-xs font-bold text-slate-800 mb-3">General medicine</div>
-            <div class="space-y-3">
-              <div class="flex flex-wrap items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 gap-3">
-                <div class="flex items-center gap-3">
-                  ${window.renderUserProfileIcon("w-8 h-8", "w-4 h-4")}
-                  <div>
-                    <div class="text-xs font-bold text-slate-900">Dr. Sabina Shrestha</div>
-                    <div class="text-[10px] text-slate-400">General physician</div>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button type="button" class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold rounded-lg hover:bg-amber-100">10:00 AM</button>
-                  <button type="button" class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold rounded-lg hover:bg-amber-100">02:30 PM</button>
-                  <button type="button" class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold rounded-lg hover:bg-amber-100">4:00 PM</button>
-                </div>
-              </div>
-
-              <div class="flex flex-wrap items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 gap-3">
-                <div class="flex items-center gap-3">
-                  ${window.renderUserProfileIcon("w-8 h-8", "w-4 h-4")}
-                  <div>
-                    <div class="text-xs font-bold text-slate-900">Dr. Anup Karki</div>
-                    <div class="text-[10px] text-slate-400">General physician</div>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button type="button" class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold rounded-lg hover:bg-amber-100">11:00 AM</button>
-                  <button type="button" class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold rounded-lg hover:bg-amber-100">03:30 PM</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="text-xs font-bold text-slate-800 mb-3">Maternity & Gynaecology</div>
-            <div class="flex flex-wrap items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 gap-3">
-              <div class="flex items-center gap-3">
-                ${window.renderUserProfileIcon("w-8 h-8", "w-4 h-4")}
-                <div>
-                  <div class="text-xs font-bold text-slate-900">Dr. Ashina Pradhan</div>
-                  <div class="text-[10px] text-slate-400">Gynaecologist</div>
-                </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <button type="button" class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold rounded-lg hover:bg-amber-100">10:00 AM</button>
-                <button type="button" class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold rounded-lg hover:bg-amber-100">11:30 AM</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gallery -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 class="text-base font-bold text-slate-900 mb-4">Gallery</h2>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <img src="assets/hos1.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 1">
-            <img src="assets/hos2.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 2">
-            <img src="assets/hos3.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 3">
-            <img src="assets/hos4.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 4">
-            <img src="assets/hos5.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 5">
-            <img src="assets/hos6.jpg" class="w-full h-44 rounded-xl object-cover" alt="Hospital gallery photo 6">
-          </div>
-        </div>
-
-        <!-- Reviews Section -->
-        <div id="profile-reviews" class="bg-white rounded-2xl border border-slate-200 p-6 w-full">
-          <h2 class="text-base font-bold text-slate-900 mb-4">Reviews</h2>
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="border border-slate-200 rounded-xl p-5 text-center flex flex-col justify-center">
-              <div class="text-4xl font-black text-slate-900">${rating}</div>
-              <div class="text-amber-500 text-sm mt-1">★★★★★</div>
-              <div class="text-[11px] text-slate-400 mt-1">Based on ${reviews} reviews</div>
-              <div class="mt-4 space-y-1 text-[10px] text-slate-500">
-                <div class="flex items-center gap-2"><span>5</span><div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-amber-400 h-full w-[80%]"></div></div></div>
-                <div class="flex items-center gap-2"><span>4</span><div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-amber-400 h-full w-[15%]"></div></div></div>
-                <div class="flex items-center gap-2"><span>3</span><div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-amber-400 h-full w-[3%]"></div></div></div>
-                <div class="flex items-center gap-2"><span>2</span><div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-amber-400 h-full w-[1%]"></div></div></div>
-                <div class="flex items-center gap-2"><span>1</span><div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-amber-400 h-full w-[1%]"></div></div></div>
-              </div>
-            </div>
-
-            <div class="lg:col-span-2 space-y-4">
-              <!-- Sujata R. -->
-              <div class="border-b border-slate-100 pb-3">
-                <div class="flex items-center justify-between text-xs mb-2">
-                  <div class="flex items-center gap-2.5">
-                    ${window.renderUserProfileIcon("w-8 h-8", "w-4 h-4")}
-                    <div>
-                      <div class="font-bold text-slate-800 leading-tight">Sujata R.</div>
-                      <div class="text-amber-500 text-[11px] leading-tight">★★★★★</div>
-                    </div>
-                  </div>
-                  <span class="text-slate-400">1 month ago</span>
-                </div>
-                <p class="text-xs text-slate-600 pl-10.5">Great experience overall. Doctor took time explaining issues and the rest of the nursing was smooth.</p>
-              </div>
-
-              <!-- Bikash T. -->
-              <div class="border-b border-slate-100 pb-3">
-                <div class="flex items-center justify-between text-xs mb-2">
-                  <div class="flex items-center gap-2.5">
-                    ${window.renderUserProfileIcon("w-8 h-8", "w-4 h-4")}
-                    <div>
-                      <div class="font-bold text-slate-800 leading-tight">Bikash T.</div>
-                      <div class="text-amber-500 text-[11px] leading-tight">★★★★★</div>
-                    </div>
-                  </div>
-                  <span class="text-slate-400">2 weeks ago</span>
-                </div>
-                <p class="text-xs text-slate-600 pl-10.5">Clean premises, well mannered staff, quick lab turnaround times, highly recommend.</p>
-              </div>
-
-              <!-- Alisha M. -->
-              <div>
-                <div class="flex items-center justify-between text-xs mb-2">
-                  <div class="flex items-center gap-2.5">
-                    ${window.renderUserProfileIcon("w-8 h-8", "w-4 h-4")}
-                    <div>
-                      <div class="font-bold text-slate-800 leading-tight">Alisha M.</div>
-                      <div class="text-amber-500 text-[11px] leading-tight">★★★★☆</div>
-                    </div>
-                  </div>
-                  <span class="text-slate-400">3 days ago</span>
-                </div>
-                <p class="text-xs text-slate-600 pl-10.5">Very professional gynaecology department. Felt well cared for.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- More Hospitals Section (Full Width) -->
-        <div class="hospital-more-section bg-white rounded-2xl border border-slate-200 p-6 w-full mt-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-bold text-slate-900">More hospitals</h2>
-            <button type="button" onclick="backToHospitalList()" class="text-xs text-red-700 font-semibold hover:underline cursor-pointer">View all</button>
-          </div>
-
-          <div class="hospital-more-cards grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <!-- Norvic Hospital -->
-            <div class="hospital-more-card border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between bg-white">
-              <div class="h-40 w-full bg-slate-100 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=500&q=80" alt="Norvic Hospital" class="w-full h-full object-cover">
-              </div>
-              <div class="p-4 flex flex-col flex-1 justify-between gap-3">
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Norvic Hospital</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Thapathali • 3km</p>
-                </div>
-                <button type="button" onclick="openHospitalProfile('norvic')" class="w-full bg-red-700 hover:bg-red-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition whitespace-nowrap">
-                  Book Appointment →
-                </button>
-              </div>
-            </div>
-
-            <!-- Madhyapur Hospital -->
-            <div class="hospital-more-card border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between bg-white">
-              <div class="h-40 w-full bg-slate-100 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=500&q=80" alt="Madhyapur Hospital" class="w-full h-full object-cover">
-              </div>
-              <div class="p-4 flex flex-col flex-1 justify-between gap-3">
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Madhyapur Hospital</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Thimi • 6km</p>
-                </div>
-                <button type="button" onclick="openHospitalProfile('madhyapur')" class="w-full bg-red-700 hover:bg-red-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition whitespace-nowrap">
-                  Book Appointment →
-                </button>
-              </div>
-            </div>
-
-            <!-- Everest Hospital -->
-            <div class="hospital-more-card border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between bg-white">
-              <div class="h-40 w-full bg-slate-100 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=500&q=80" alt="Everest Hospital" class="w-full h-full object-cover">
-              </div>
-              <div class="p-4 flex flex-col flex-1 justify-between gap-3">
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Everest Hospital</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">New Baneshwor • 4km</p>
-                </div>
-                <button type="button" onclick="openHospitalProfile('everest')" class="w-full bg-red-700 hover:bg-red-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition whitespace-nowrap">
-                  Book Appointment →
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      </div>
     </div>
-  </div>
-`;
-}
+  `).join("");
 
+  return `
+    <div class="bg-slate-50 min-h-screen pb-16 text-slate-900">
+      
+      <!-- Back Button & Breadcrumbs -->
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-5">
+        <div class="flex items-center justify-between mb-3 text-xs">
+          <button onclick="if(typeof returnToProviderSource==='function'){returnToProviderSource();}else{navigateTo('marketplace');}" class="text-slate-600 hover:text-[#ad0b0e] font-bold flex items-center gap-1 transition">
+            <span>← Back to previous page</span>
+          </button>
+          <span class="text-slate-400">Home › Healthcare Providers › <strong class="text-slate-800">${name}</strong></span>
+        </div>
+
+        <!-- 1. FULL COVER BANNER & OVERLAPPING LOGO (Practo Screenshot 4) -->
+        <div class="relative w-full rounded-3xl overflow-hidden bg-slate-900 shadow-md" style="min-height: 250px;">
+          <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${coverImg}');">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
+          </div>
+
+          <div class="relative z-10 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-5 h-full pt-16">
+            <div class="flex items-center gap-4 text-left">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white shrink-0">
+                <img src="${logoImg}" alt="${name}" class="w-full h-full object-cover">
+              </div>
+              <div class="text-white">
+                <div class="flex items-center gap-2">
+                  <h1 class="text-xl sm:text-2xl font-black text-white">${name}</h1>
+                  <span class="bg-emerald-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">✓ Verified</span>
+                </div>
+                <p class="text-xs text-slate-200 mt-1 flex items-center gap-1">
+                  <span>📍</span> ${locationText}
+                </p>
+                <div class="flex items-center gap-3 text-xs mt-1.5 text-amber-300 font-bold">
+                  <span>★ ${ratingText} (${reviewsCount} reviews)</span>
+                  <span class="text-slate-300 font-normal">• 🕒 Open Today (10:00 AM - 08:00 PM)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Direction & QR Standee Buttons -->
+            <div class="flex items-center gap-2">
+              <button onclick="window.open('https://maps.google.com/?q=${encodeURIComponent(name + ' ' + locationText)}', '_blank')" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white backdrop-blur-md rounded-xl text-xs font-bold transition">
+                📍 Get Directions
+              </button>
+              <button onclick="alert('Standee QR: Scan at reception to book instant token without standing in queue.')" class="px-4 py-2 bg-white text-slate-900 rounded-xl text-xs font-bold shadow-md hover:bg-slate-100 transition">
+                📱 Reception QR
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. PRACTO SUB-NAV TABS -->
+        <div class="flex items-center gap-6 border-b border-slate-200 mt-6 pb-3 text-xs font-bold text-slate-600">
+          <button class="text-[#ad0b0e] border-b-2 border-[#ad0b0e] pb-3 -mb-3 font-extrabold">Overview</button>
+          <button onclick="document.getElementById('profileDoctorsSec')?.scrollIntoView({behavior:'smooth'})" class="hover:text-slate-900 transition">Doctors (${docs.length})</button>
+          <button onclick="if(typeof openProviderReviews==='function'){openProviderReviews('${p.id}');}" class="hover:text-slate-900 transition">Patient Stories &amp; Reviews</button>
+        </div>
+
+        <!-- 3. MAIN SECTION: CLINIC DETAILS + DOCTORS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          
+          <!-- Left: About & Doctors -->
+          <div class="lg:col-span-2 space-y-6 text-left">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
+              <h2 class="font-extrabold text-sm text-slate-900 mb-2">About ${name}</h2>
+              <p class="text-xs text-slate-600 leading-relaxed">${p.about || p.description || 'Verified healthcare facility offering comprehensive medical services and digital queue token tracking.'}</p>
+            </div>
+
+            <div id="profileDoctorsSec">
+              <h2 class="text-base font-extrabold text-slate-900 mb-1">
+                ${isSolo ? 'Consulting Specialist' : 'Doctors & Specialists Available'}
+              </h2>
+              <p class="text-xs text-slate-500 mb-4">Select doctor to book confirmed in-person OPD token or video consultation.</p>
+              ${doctorsHtml}
+            </div>
+          </div>
+
+          <!-- Right: Timings & Helpline -->
+          <div class="space-y-4 text-left">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+              <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">Facility Information</h3>
+              <div>
+                <div class="text-xs font-bold text-slate-900">OPD Timings</div>
+                <div class="text-xs text-slate-600 mt-0.5">Mon - Sat: 10:00 AM - 08:00 PM</div>
+                <div class="text-xs text-slate-400">Sunday: Emergency On-Call</div>
+              </div>
+              <div class="pt-2 border-t border-slate-100">
+                <div class="text-xs font-bold text-slate-900">Helpline Phone</div>
+                <div class="text-xs text-slate-600 mt-0.5">${p.phone || '+91 98765 43210'}</div>
+              </div>
+              <div class="pt-2 border-t border-slate-100">
+                <div class="text-xs font-bold text-emerald-700">Live Queue Enabled</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Track live OPD waiting time directly on SAINO portal.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  `;
+}
 /* 3. Global Click Handlers */
 window.renderHospitalDirectoryView = renderHospitalDirectoryView;
 window.renderHospitalProfileView = renderHospitalProfileView;
 
-/* Profile router: sirf ek function. Clinic ho to clinic ka profile, baaki sabka hospital wala profile page.
-   (Pehle yahan openHospitalProfile / openClinicProfile do-do baar define the, ab sirf yahi ek hai.) */
 window.openProviderProfile = function(providerId) {
   const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
   if (!main) return;
@@ -1302,153 +1131,176 @@ window.openAppointmentBooking = function(providerId, doctorName, doctorRole, doc
   }
 };
 
-
-
-// 5. Booking Confirmation
-/* ============================================================
-   BOOKING CONFIRMATION SUCCESS VIEW (1:1 SCREENSHOT REPLICA)
-   ============================================================ */
-
 window.renderAppointmentSuccessView = function(patientData) {
-  const patientName = patientData.name || "John Doe";
-  const patientPhone = patientData.phone || "+977 98510XXXXX";
-  const patientEmail = patientData.email || "johndoe@gmail.com";
-  const isDiagnosticPackage = window.BOOKING_STATE.bookingType === "diagnostic-package";
-  const patientReason = patientData.symptoms || (isDiagnosticPackage ? `Booking for ${window.BOOKING_STATE.packageTitle}.` : "Routine cardiovascular check-up. Experiencing minor shortness of breath during light workouts over the past week.");
-  const bookingRef = "SAINO-2026-" + Math.floor(1000 + Math.random() * 9000);
+  const patient = patientData || {};
+  const bp = window.BOOKING_STATE || {};
+
+  // 1. Generate Unique SAINO Booking ID (e.g. SAINO-2026-89412)
+  const sainoBookingId = bp.sainoBookingId || ("SAINO-2026-" + Math.floor(10000 + Math.random() * 90000));
+  
+  // 2. Generate Live Queue Token & Room (Matches Docx: A-Citycare 21 token / Room 301)
+  const tokenPrefix = (bp.hospitalName || "CityCare").substring(0, 8).replace(/\s+/g, '');
+  const tokenNum = Math.floor(18 + Math.random() * 8);
+  const queueToken = bp.queueToken || `A-${tokenPrefix}-${tokenNum}`;
+  const nowServingToken = `A-${tokenPrefix}-${Math.max(1, tokenNum - 2)}`;
+  const doctorRoom = bp.room || "Room 301";
+  const estWaitTime = "12 Minutes";
+  const doctorName = bp.doctorName || "Dr. Aayush Sharma";
+  const hospitalName = bp.hospitalName || "CityCare Multispeciality Hospital";
+  const consultationFee = bp.fee || "₹500";
 
   return `
-    <div id="booking-confirmation-container" class="bg-[#fbfcfd] min-h-screen text-slate-800 font-sans pb-24">
+    <div id="booking-confirmation-container" class="bg-[#f8fafc] min-h-screen text-slate-800 font-sans pb-24 text-left">
       
-      <!-- Breadcrumb -->
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-4">
-        <nav class="flex items-center gap-2 text-[11px] text-slate-400">
-          <button type="button" onclick="navigateTo('marketplace')" class="hover:text-slate-600">Home</button>
+      <!-- Breadcrumb Navigation -->
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-3">
+        <nav class="flex items-center gap-2 text-xs text-slate-400">
+          <button type="button" onclick="navigateTo('marketplace')" class="hover:text-slate-700">Home</button>
           <span>›</span>
-          <span class="text-red-700 font-medium">Booking Confirmed</span>
+          <span class="text-[#ad0b0e] font-bold">Booking Confirmed &amp; Live Boarding Pass</span>
         </nav>
       </div>
 
       <div class="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
 
-        <!-- 1. Top Success Hero Card -->
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-8 sm:p-10 text-center shadow-2xs">
-          <!-- Green Shield Icon -->
-          <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <path d="m9 12 2 2 4-4"/>
-            </svg>
-          </div>
-
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">${isDiagnosticPackage ? "Diagnostic Package Booked Successfully!" : "Appointment Booked Successfully!"}</h1>
-          <p class="text-xs text-slate-500 mt-1.5 max-w-md mx-auto">
-            ${isDiagnosticPackage ? `Your ${window.BOOKING_STATE.packageTitle} booking is confirmed with ${window.BOOKING_STATE.hospitalName}.` : `Your booking is confirmed. ${window.BOOKING_STATE.hospitalName} has been notified of your appointment.`}
-          </p>
-
-          <!-- Booking Reference Pill -->
-          <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-slate-200 bg-slate-50/70 text-xs text-slate-500 mt-5">
-            <span>Booking Reference:</span>
-            <strong class="font-bold text-red-700">${bookingRef}</strong>
-          </div>
-        </div>
-
-        <!-- 2. Dual Column Details (Appointment Summary & Patient Info) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        <!-- ================= 1. AIRPORT-STYLE DIGITAL BOARDING PASS WIDGET ================= -->
+        <div class="rounded-3xl overflow-hidden shadow-2xl border border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative">
           
-          <!-- Left: Appointment Summary -->
-          <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-4">
-            <h2 class="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100">Appointment Summary</h2>
+          <!-- Boarding Pass Header Ribbon -->
+          <div class="p-5 sm:p-6 bg-gradient-to-r from-[#ad0b0e] via-[#8f080b] to-[#730608] flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-md">
+                <img src="assets/logo.png" alt="SAINO" class="w-full h-full object-contain" onerror="this.src='../assets/logo.png'">
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-rose-200">SAINO HEALTH • LIVE BOARDING PASS</span>
+                <h2 class="text-base sm:text-lg font-black text-white leading-tight">${hospitalName}</h2>
+              </div>
+            </div>
             
-            <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">${isDiagnosticPackage ? "Diagnostic Partner" : "Clinic"}</span>
-              <div class="flex items-center gap-1 text-xs font-bold text-slate-900 mt-0.5">
-                <svg class="w-3.5 h-3.5 text-red-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
-                <span>${window.BOOKING_STATE.hospitalName}</span>
-              </div>
-              <p class="text-[11px] text-slate-500 ml-4.5">${window.BOOKING_STATE.location || "Kathmandu"}</p>
-            </div>
-
-            ${isDiagnosticPackage ? `
-              <div>
-                <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Diagnostic Package</span>
-                <div class="text-xs font-bold text-slate-900 mt-0.5">${window.BOOKING_STATE.packageTitle}</div>
-                <p class="text-[11px] text-slate-500">${window.BOOKING_STATE.packageTests}</p>
-              </div>
-            ` : `
-              <div>
-                <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Doctor</span>
-                <div class="text-xs font-bold text-slate-900 mt-0.5">${window.BOOKING_STATE.doctorName}</div>
-                <p class="text-[11px] text-slate-500">${window.BOOKING_STATE.doctorRole} (12 Yrs Experience)</p>
-              </div>
-            `}
-
-            <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Date & Time</span>
-              <div class="text-xs font-bold text-slate-900 mt-0.5">${window.BOOKING_STATE.date}</div>
-              <div class="text-[11px] font-bold text-red-700 mt-0.5">At ${window.BOOKING_STATE.timeSlot} (Morning Slot)</div>
-            </div>
-
-            <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">${isDiagnosticPackage ? "Package Price" : "Consultation Fee"}</span>
-              <div class="text-sm font-black text-red-700 mt-0.5">${window.BOOKING_STATE.fee}</div>
-              <p class="text-[10px] text-slate-400">${isDiagnosticPackage ? "Payment is handled by the diagnostic partner." : "Pay at the clinic counter during checkout"}</p>
+            <div class="text-right">
+              <span class="text-[10px] text-rose-200 uppercase font-bold tracking-wider block">UNIQUE BOOKING ID</span>
+              <strong class="text-sm sm:text-base font-mono font-black text-white bg-black/30 px-3 py-1 rounded-lg border border-white/20 inline-block mt-0.5">
+                ${sainoBookingId}
+              </strong>
             </div>
           </div>
 
-          <!-- Right: Patient Information -->
-          <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-4">
-            <h2 class="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100">Patient Information</h2>
-
-            <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Patient Name</span>
-              <div class="text-xs font-bold text-slate-900 mt-0.5">${patientName}</div>
+          <!-- Boarding Pass Main Body (Live Token & Queue Telemetry) -->
+          <div class="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            
+            <!-- Left Col: Giant Token Display -->
+            <div class="md:col-span-5 bg-white/5 rounded-2xl p-5 border border-white/10 text-center space-y-2">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">YOUR QUEUE TOKEN</span>
+              <div class="text-4xl sm:text-5xl font-black text-white font-mono tracking-tight text-emerald-400 drop-shadow">
+                ${queueToken}
+              </div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold border border-emerald-500/30">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Active in Queue</span>
+              </div>
             </div>
 
-            <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Contact Phone</span>
-              <div class="text-xs font-bold text-slate-900 mt-0.5">${patientPhone}</div>
+            <!-- Right Col: Airport Flight-Style Telemetry Grid -->
+            <div class="md:col-span-7 grid grid-cols-2 gap-4 text-left">
+              <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold block">Now Serving Token</span>
+                <strong class="text-base sm:text-lg font-bold text-amber-300 font-mono">${nowServingToken}</strong>
+                <span class="text-[10px] text-slate-400 block mt-0.5">2 Patients Ahead</span>
+              </div>
+
+              <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold block">Doctor Room / Chamber</span>
+                <strong class="text-base sm:text-lg font-bold text-white">${doctorRoom}</strong>
+                <span class="text-[10px] text-emerald-400 block mt-0.5">Ground Floor Hall</span>
+              </div>
+
+              <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold block">Consulting Doctor</span>
+                <strong class="text-xs sm:text-sm font-bold text-white block truncate">${doctorName}</strong>
+                <span class="text-[10px] text-slate-400 block mt-0.5">Consultant Physician</span>
+              </div>
+
+              <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold block">Estimated Wait Time</span>
+                <strong class="text-base sm:text-lg font-bold text-sky-300">${estWaitTime}</strong>
+                <span class="text-[10px] text-slate-400 block mt-0.5">Auto-updates on call</span>
+              </div>
             </div>
 
+          </div>
+
+          <!-- Boarding Pass Tear Line -->
+          <div class="relative border-t-2 border-dashed border-slate-700/80 my-1">
+            <div class="absolute -left-3 -top-3 w-6 h-6 rounded-full bg-[#f8fafc]"></div>
+            <div class="absolute -right-3 -top-3 w-6 h-6 rounded-full bg-[#f8fafc]"></div>
+          </div>
+
+          <!-- Boarding Pass Footer (Passenger Info & Quick Actions) -->
+          <div class="p-5 sm:p-6 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4 text-xs">
             <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Email Address</span>
-              <div class="text-xs font-bold text-slate-900 mt-0.5">${patientEmail}</div>
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Patient Name</span>
+              <strong class="text-white text-sm">${patient.name || "Patient User"}</strong>
+              <span class="text-[11px] text-slate-400 ml-2">(${patient.phone || "+91 98XXXXXXXX"})</span>
             </div>
 
-            <div>
-              <span class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">${window.BOOKING_STATE.bookingType === "diagnostic-package" ? "Package Booking Note" : "Reason for Visit"}</span>
-              <p class="text-xs text-slate-600 mt-0.5 leading-relaxed font-normal">${patientReason}</p>
+            <div class="flex items-center gap-2">
+              <span class="bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-xl border border-emerald-500/30 font-bold text-xs">
+                Fees: ${consultationFee}
+              </span>
+              <button onclick="window.print()" class="px-4 py-2 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-100 transition shadow-md">
+                🖨 Print Pass
+              </button>
             </div>
           </div>
 
         </div>
 
-        <!-- 3. Important Guidelines & Instructions -->
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-3">
-          <h2 class="text-xs font-bold text-slate-900 tracking-tight">Important Guidelines & Instructions</h2>
-          <ul class="space-y-2 text-xs text-slate-600 list-disc list-inside">
-            <li class="leading-relaxed">
-              ${isDiagnosticPackage ? `Please follow the sample collection or lab-visit instructions shared by ${window.BOOKING_STATE.hospitalName}.` : `Please arrive at ${window.BOOKING_STATE.hospitalName} at least <strong class="text-red-700 font-semibold">15 minutes early</strong> to complete physical check-in and registry procedures.`}
-            </li>
-            <li class="leading-relaxed">
-              ${isDiagnosticPackage ? `Bring a valid <strong class="text-red-700 font-semibold">Government-issued Photo ID</strong> and any relevant previous test reports.` : `Bring a valid <strong class="text-red-700 font-semibold">Government-issued Photo ID</strong> (Citizenship Card, Passport, or License) along with any previous medical/cardiology reports.`}
-            </li>
-            <li class="leading-relaxed">
-              ${isDiagnosticPackage ? `For changes to this package booking, please contact the diagnostic partner.` : `If you need to reschedule or cancel your slot, please notify the platform or clinic at least 4 hours before the scheduled time slot.`}
-            </li>
-          </ul>
-        </div>
-    
-        <!-- 4. Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-2 print:hidden">
-          <button type="button" onclick="printBookingConfirmation()"
-              class="flex-1 py-3 px-4 border border-red-700 text-red-700 hover:bg-red-50 text-xs font-bold rounded-xl transition text-center shadow-2xs">
-            Download Confirmation PDF
-          </button>
+        <!-- ================= 2. JOURNEY STATUS & AUTOMATED NOTIFICATIONS ================= -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <h3 class="font-extrabold text-sm text-slate-900">Patient Consultation Journey Tracker</h3>
           
-          <button type="button" onclick="returnToProviderSource()"
-                  class="flex-1 py-3 px-4 bg-[#991b1b] hover:bg-red-800 text-white text-xs font-bold rounded-xl transition text-center shadow-xs">
-            Back to previous page
+          <!-- Step Progress -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+              <span class="text-[10px] font-bold text-emerald-800 uppercase block">Step 1: Confirmed</span>
+              <strong class="text-emerald-900">Token Generated</strong>
+              <span class="text-[10px] text-emerald-700 block mt-0.5">✓ SAINO Booking ID Ready</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+              <span class="text-[10px] font-bold text-amber-800 uppercase block">Step 2: Reception</span>
+              <strong class="text-amber-900">Scan at Desk</strong>
+              <span class="text-[10px] text-amber-700 block mt-0.5">Instant desk verification</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-200">
+              <span class="text-[10px] font-bold text-sky-800 uppercase block">Step 3: Consultation</span>
+              <strong class="text-sky-900">${doctorRoom}</strong>
+              <span class="text-[10px] text-sky-700 block mt-0.5">Enter when token called</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-purple-50 border border-purple-200">
+              <span class="text-[10px] font-bold text-purple-800 uppercase block">Step 4: Feedback</span>
+              <strong class="text-purple-900">Review &amp; Rating</strong>
+              <span class="text-[10px] text-purple-700 block mt-0.5">Automated post-visit prompt</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-center gap-3">
+            <span class="text-xl">📲</span>
+            <div>
+              <strong class="text-slate-900 block">Mobile Notification Bar Tracking:</strong>
+              <span>CityCare OPD queue will automatically update your phone notification bar as patients ahead finish their consultations.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= 3. BACK TO MARKETPLACE BUTTON ================= -->
+        <div class="pt-2 text-center">
+          <button type="button" onclick="navigateTo('marketplace')" 
+                  class="px-8 py-3 bg-[#ad0b0e] hover:bg-[#8f080b] text-white font-extrabold text-xs rounded-xl shadow-lg transition">
+            ← Return to SAINO Marketplace
           </button>
         </div>
 
@@ -1457,42 +1309,7 @@ window.renderAppointmentSuccessView = function(patientData) {
   `;
 };
 
-window.printBookingConfirmation = function() {
-  const element = document.getElementById("booking-confirmation-container");
-  if (!element) return;
-
-  const printable = element.cloneNode(true);
-  printable.querySelectorAll("button").forEach(button => button.remove());
-  const title = window.BOOKING_STATE.bookingType === "diagnostic-package"
-    ? "Diagnostic Package Receipt"
-    : "Appointment Receipt";
-  const printWindow = window.open("", "", "width=750,height=800");
-  if (!printWindow) {
-    showToast("Allow pop-ups to print your confirmation.");
-    return;
-  }
-
-  printWindow.document.write(`<!DOCTYPE html>
-    <html>
-      <head>
-        <title>${title}</title>
-        <script src="https://cdn.tailwindcss.com"><\/script>
-        <style>
-          @page { size: A4 portrait; margin: 10mm; }
-          body { background: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        </style>
-      </head>
-      <body><main class="max-w-xl mx-auto">${printable.outerHTML}</main></body>
-    </html>`);
-  printWindow.document.close();
-  setTimeout(() => {
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-  }, 350);
-};
-
-// Confirm Button Handler with Form Data Extraction
+// Form submit handler with SAINO Booking ID generation
 window.confirmAppointment = function() {
   const nameInput = document.getElementById("patientName");
   const phoneInput = document.getElementById("patientPhone");
@@ -1515,32 +1332,43 @@ window.confirmAppointment = function() {
     return;
   }
 
-  // My Appointments page ke liye save (appointments-saved-view.js ka saveAppointmentRecord)
-  if (typeof saveAppointmentRecord === "function") {
-    const bp = window.BOOKING_STATE || {};
-    const found = (typeof directoryFindProvider === "function" && bp.providerId) ? directoryFindProvider(bp.providerId) : null;
-    const parsed = new Date(String(bp.date || ""));
-    const isoDate = isNaN(parsed) ? "" : parsed.getFullYear() + "-" + String(parsed.getMonth() + 1).padStart(2, "0") + "-" + String(parsed.getDate()).padStart(2, "0");
-    saveAppointmentRecord(
-      { id: bp.providerId || bp.hospitalName, name: bp.hospitalName, category: (found && found.category) || "" },
-      {
-        service: (bp.doctorName || "") + (bp.doctorRole ? " (" + bp.doctorRole + ")" : ""),
-        name: name,
-        date: isoDate,
-        notes: (bp.timeSlot ? "Time: " + bp.timeSlot + ". " : "") + symptoms
-      }
-    );
-  }
+  // Generate Unique SAINO Booking ID & Token
+  const bp = window.BOOKING_STATE || {};
+  const uniqueBookingId = "SAINO-2026-" + Math.floor(10000 + Math.random() * 90000);
+  const tokenPrefix = (bp.hospitalName || "CityCare").substring(0, 8).replace(/\s+/g, '');
+  const tokenNum = Math.floor(18 + Math.random() * 8);
+  const queueToken = `A-${tokenPrefix}-${tokenNum}`;
+
+  window.BOOKING_STATE.sainoBookingId = uniqueBookingId;
+  window.BOOKING_STATE.queueToken = queueToken;
+  window.BOOKING_STATE.room = "Room 301";
 
   const patientPayload = {
     name: name,
     phone: phone,
-    email: email || "johndoe@gmail.com",
-    symptoms: symptoms || (window.BOOKING_STATE.bookingType === "diagnostic-package"
-      ? `Booking for ${window.BOOKING_STATE.packageTitle}.`
-      : "Routine cardiovascular check-up. Experiencing minor shortness of breath during light workouts over the past week.")
+    email: email || "patient@example.com",
+    symptoms: symptoms || "Routine doctor consultation checkup.",
+    bookingId: uniqueBookingId,
+    queueToken: queueToken
   };
 
+  // Save in LocalStorage & update Provider Queue
+  try {
+    const existing = JSON.parse(localStorage.getItem("SAINO_MY_APPOINTMENTS") || "[]");
+    existing.unshift({
+      bookingId: uniqueBookingId,
+      token: queueToken,
+      hospital: bp.hospitalName || "CityCare Hospital",
+      doctor: bp.doctorName || "Dr. Aayush Sharma",
+      date: bp.date || new Date().toISOString().split('T')[0],
+      patient: name,
+      phone: phone,
+      status: "Waiting"
+    });
+    localStorage.setItem("SAINO_MY_APPOINTMENTS", JSON.stringify(existing));
+  } catch (_) {}
+
+  // Render Airport-Style Boarding Pass View
   const main = document.getElementById("mainContent") || document.getElementById("main-content") || document.querySelector("main");
   if (main) {
     main.innerHTML = window.renderAppointmentSuccessView(patientPayload);
