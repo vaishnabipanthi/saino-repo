@@ -1,13 +1,9 @@
-/* ============================================================
-   SAINO HEALTH - PROVIDER BACKEND ROUTES (PORT 4000)
-   File: backend/src/routes/provider.js
-   ============================================================ */
+
 
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
-// 1. Auto Schema Migration for Real Chhattisgarh Data
 let dbReady = false;
 async function initTables() {
   if (dbReady) return;
@@ -39,21 +35,37 @@ async function initTables() {
   }
 }
 
-// 2. GET Dashboard Stats
 router.get('/dashboard', async (req, res) => {
   await initTables();
-  res.json({
-    success: true,
-    stats: { total: 42, marketplace: 18, walkin: 12, qr: 7, telemedicine: 5, waiting: 9 },
-    queue: {
-      serving: { token: 'A-023', patient_name: 'Ram Verma', doctor: 'Dr. Rajesh Verma', room: 'Chamber 1' },
-      waiting: [
-        { token: 'A-024', patient_name: 'Sita Verma', doctor: 'Dr. Rajesh Verma', room: 'Chamber 1', source: 'Marketplace', status: 'Waiting' },
-        { token: 'A-025', patient_name: 'Bishal Sharma', doctor: 'Dr. Rajesh Verma', room: 'Chamber 1', source: 'QR Booking', status: 'Arrived' }
-      ],
-      stats: { waiting: 8, completed: 25, issued: 34 }
+  try {
+    const email = req.headers['x-provider-email'] || req.query.email;
+    let provider = null;
+
+    if (email) {
+      // 1. Agar email hai to user ka hospital dhoondo
+      const r = await pool.query("SELECT * FROM providers WHERE email = $1 OR phone = $1 ORDER BY created_at DESC LIMIT 1", [email]);
+      if (r.rows.length) provider = r.rows[0];
     }
-  });
+
+    // 2. Fallback: Latest registered provider uthao
+    if (!provider) {
+      const r = await pool.query("SELECT * FROM providers ORDER BY created_at DESC LIMIT 1");
+      if (r.rows.length) provider = r.rows[0];
+    }
+
+    res.json({
+      success: true,
+      provider: provider || { name: "My Clinic / Hospital", city: "Kathmandu" },
+      stats: { total: 42, marketplace: 18, walkin: 12, qr: 7, telemedicine: 5, waiting: 9 },
+      queue: {
+        serving: { token: 'A-023', patient_name: 'Ram Verma', doctor: 'Dr. Rajesh Verma', room: 'Chamber 1' },
+        waiting: [],
+        stats: { waiting: 8, completed: 25, issued: 34 }
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // 3. GET Doctors
@@ -150,5 +162,64 @@ router.get('/services', (req, res) => res.json({ success: true, rows: [] }));
 router.get('/staff', (req, res) => res.json({ success: true, rows: [] }));
 router.get('/payments', (req, res) => res.json({ success: true, rows: [] }));
 router.get('/appointments', (req, res) => res.json({ success: true, rows: [] }));
+// POST /api/provider/register -> New Hospital/Clinic Registration
+router.post('/register', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const b = req.body || {};
+    const id = 'prov_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+
+    await client.query('BEGIN');
+
+    // 1. Providers table me pending hospital insert
+    const insertProviderQuery = `
+      INSERT INTO providers (
+        id, name, provider_type, plan, city, address, phone,
+        status, verification_status, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', 'pending_verification', NOW())
+      RETURNING *
+    `;
+
+    const provResult = await client.query(insertProviderQuery, [
+      id,
+      b.name || 'New Facility',
+      b.type || 'hospital',
+      b.plan || 'clinic',
+      b.city || 'Kathmandu',
+      b.address || '',
+      b.phone || ''
+    ]);
+
+    const newProvider = provResult.rows[0];
+
+    // 2. Admin ke liye notification insert
+    try {
+      await client.query(`
+        INSERT INTO admin_notifications (title, message, provider_id, created_at)
+        VALUES ($1, $2, $3, NOW())
+      `, [
+        'New Provider Listed',
+        `Verification request received from ${newProvider.name} (${newProvider.provider_type})`,
+        newProvider.id
+      ]);
+    } catch (notifErr) {
+      console.warn("Notification insert notice:", notifErr.message);
+    }
+
+    await client.query('COMMIT');
+
+    res.status(201).json({ 
+      success: true, 
+      provider: newProvider,
+      message: 'Registration submitted for verification' 
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error("Provider register error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  } finally {
+    client.release();
+  }
+});
 
 module.exports = router;

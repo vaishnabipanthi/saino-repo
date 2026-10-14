@@ -2,18 +2,19 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express(); 
-app.use(cors());       
-app.use(express.json());
 const PORT = process.env.PORT || 4000;
 
 // Middlewares
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
-app.use('/api/admin', require('./routes/admin'));
 
 // Routes Mount
+app.use('/api/admin', require('./routes/admin'));
+
 const providerRoutes = require('./routes/provider');
 app.use('/api/provider', providerRoutes);
+
+// Home Root
 app.get('/', (req, res) => {
   res.send(`
     <div style="font-family: sans-serif; text-align: center; padding: 50px;">

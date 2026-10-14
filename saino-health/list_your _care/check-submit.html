@@ -887,10 +887,9 @@
         if (checkSubmitNumber) checkSubmitNumber.textContent = "3";
       }
     };
-
-    function submitRegistration() {
+    async function submitRegistration() {
       const confirmation = document.getElementById("finalConfirm");
-      if (!confirmation.checked) {
+      if (!confirmation || !confirmation.checked) {
         alert("Please confirm that all the information is correct.");
         return;
       }
@@ -901,35 +900,67 @@
         return;
       }
 
-      if (selectedPlan === "Saino Free") {
-        alert("Free registration submitted successfully!");
-        localStorage.clear();
-        window.location.href = "thank-you.html";
-        return;
+      const submitBtn = document.querySelector(".submit-btn");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
       }
 
-      if (selectedPlan === "Saino Pro") {
-        alert("Saino Pro registration submitted successfully!\n\nYour application has been sent for verification.");
-        localStorage.clear();
-        window.location.href = "thank-you-pro.html";
-        return;
-      }
+      // 1. Data pack karein
+      const payload = {
+        name: localStorage.getItem("providerName") || "Unnamed Facility",
+        type: localStorage.getItem("providerType") || localStorage.getItem("sainoOrganizationType") || "Hospital",
+        email: localStorage.getItem("email") || "",
+        phone: localStorage.getItem("phone") || "",
+        registration_no: localStorage.getItem("registrationNo") || "",
+        vatpan: localStorage.getItem("vatpan") || "",
+        address: localStorage.getItem("address") || "",
+        city: "Kathmandu",
+        contact_person: localStorage.getItem("contactFullName") || "",
+        plan: selectedPlan
+      };
 
-      if (selectedPlan === "Saino VIP") {
-        alert("Saino VIP registration submitted successfully!\n\nYour application has been sent for verification.");
-        localStorage.clear();
-        window.location.href = "thank-you-vip.html";
-        return;
-      }
+      // 2. Real Backend Endpoint call
+      try {
+        const response = await fetch("http://localhost:4000/api/provider/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-      if (selectedPlan === "Saino VVIP") {
-        alert("Saino VVIP registration submitted successfully!\n\nYour application has been sent for verification.");
-        localStorage.clear();
-        window.location.href = "thank-you-vvip.html";
-        return;
-      }
+        const data = await response.json();
 
-      alert("Selected plan could not be identified.");
+        if (data.success) {
+          localStorage.setItem("currentProviderId", data.provider.id);
+          if (payload.email) {
+            localStorage.setItem("savedProviderEmail", payload.email.toLowerCase());
+          }
+
+          // Plan ke hisaab se redirect
+          if (selectedPlan === "Saino Free") {
+            window.location.href = "thank-you.html";
+          } else if (selectedPlan === "Saino VIP") {
+            window.location.href = "thank-you-vip.html";
+          } else if (selectedPlan === "Saino VVIP") {
+            window.location.href = "thank-you-vvip.html";
+          } else {
+            window.location.href = "thank-you-pro.html";
+          }
+        } else {
+          alert("Submission error: " + (data.error || "Server issue"));
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Registration";
+          }
+        }
+      } catch (error) {
+        console.error("API Error:", error);
+        alert("Backend (http://localhost:4000) is not accessible. Please ensure the backend server is running.");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Submit Registration";
+        }
+      }
     }
 
     function goBack() {

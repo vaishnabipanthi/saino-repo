@@ -1,11 +1,17 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
+const NEON_DB_URL = 'postgresql://neondb_owner:npg_TW0PpCe9KLjz@ep-super-bar-b4hhuowo-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require';
+
+const connectionString = process.env.DATABASE_URL || NEON_DB_URL;
+const isLocal = connectionString.includes('localhost');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://postgres:admin123@localhost:5432/saino',
-  max: 20, // Rush ke waqt 20 simultaneous connections handle karega
+  connectionString: connectionString,
+  ssl: isLocal ? false : { rejectUnauthorized: false },
+  max: 20, // High traffic / rush ke liye 20 simultaneous connections
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 3000,
+  connectionTimeoutMillis: 5000,
 });
 
 pool.on('error', (err) => {

@@ -33,6 +33,14 @@ try {
   }
 })();
 
+/* 0. GET /api/admin (Root Admin Endpoint) */
+router.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'SAINO Admin API is running successfully!'
+  });
+});
+
 /* 1. GET /api/admin/stats */
 router.get('/stats', async (req, res) => {
   try {
@@ -191,6 +199,30 @@ router.post('/providers', async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+/* 6. GET /api/admin/notifications -> Live notifications list */
+router.get('/notifications', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM admin_notifications 
+      ORDER BY created_at DESC 
+      LIMIT 30
+    `);
+    const unreadCount = result.rows.filter(n => !n.is_read).length;
+    res.json({ success: true, notifications: result.rows, unreadCount });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/* 7. POST /api/admin/notifications/:id/read -> Mark as read */
+router.post('/notifications/:id/read', async (req, res) => {
+  try {
+    await pool.query(`UPDATE admin_notifications SET is_read = true WHERE id = $1`, [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

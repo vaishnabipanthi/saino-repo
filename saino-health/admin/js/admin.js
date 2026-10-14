@@ -1,8 +1,3 @@
-/* ============================================================
-   SAINO SUPER ADMIN - CORE ROUTING & DASHBOARD
-   File: saino-health/admin/js/admin.js
-   Connected directly to Express + PostgreSQL (Port 4000)
-   ============================================================ */
 
 var API_BASE = "http://localhost:4000/api/admin";
 
