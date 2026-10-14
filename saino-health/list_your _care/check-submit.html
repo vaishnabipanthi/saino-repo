@@ -922,7 +922,7 @@
 
       // 2. Real Backend Endpoint call
       try {
-        const response = await fetch("http://localhost:4000/api/provider/register", {
+        const response = await fetch("https://saino-backend-td51.onrender.com/api/provider/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)

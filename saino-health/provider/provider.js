@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const API_BASE = "http://localhost:4000/api/provider";
+  const API_BASE = "https://saino-backend-td51.onrender.com/api/provider";
   const app = document.getElementById("app");
 
   const navItems = [
